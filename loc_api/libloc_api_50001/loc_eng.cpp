@@ -312,7 +312,7 @@ static int loc_eng_init(GpsCallbacks* callbacks)
           property_get("ro.baseband", baseband, "msm");
           if ((strcmp(baseband,"svlte2a") == 0))
           {
-              loc_eng_dmn_conn_loc_api_server_launch(NULL, NULL);
+              loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb, NULL, NULL);
           }
       }
 #endif /* FEATURE_GNSS_BIT_API */
@@ -610,6 +610,11 @@ static int  loc_eng_set_position_mode(GpsPositionMode mode, GpsPositionRecurrenc
    if (min_interval > 0) {
         fix_criteria_ptr->min_interval = min_interval;
         fix_criteria_ptr->valid_mask |= RPC_LOC_FIX_CRIT_VALID_MIN_INTERVAL;
+    }else if(min_interval == 0)
+    {
+        /*If the framework passes in 0 transalate it into the maximum frequency we can report positions
+          which is 1 Hz or once very second */
+        fix_criteria_ptr->min_interval = MIN_POSSIBLE_FIX_INTERVAL;
     }
     if (preferred_accuracy > 0) {
         fix_criteria_ptr->preferred_accuracy = preferred_accuracy;
@@ -1281,31 +1286,39 @@ SIDE EFFECTS
 ===========================================================================*/
 static void loc_eng_report_status (const rpc_loc_status_event_s_type *status_report_ptr)
 {
-   GpsStatusValue status,status_internal;
+   GpsStatusValue status;
 
-   // LOC_LOGD("loc_eng_report_status: event = %d\n", status_report_ptr->event);
+   LOC_LOGD("loc_eng_report_status: event = %d engine_state = %d\n",
+            status_report_ptr->event, status_report_ptr->payload.rpc_loc_status_event_payload_u_type_u.engine_state);
+
    status = GPS_STATUS_NONE;
 
+   if (status_report_ptr->event == RPC_LOC_STATUS_EVENT_ENGINE_STATE)
+   {
+      if (status_report_ptr->payload.rpc_loc_status_event_payload_u_type_u.engine_state == RPC_LOC_ENGINE_STATE_ON)
+      {
+         status = GPS_STATUS_ENGINE_ON;
+      }
+      else if (status_report_ptr->payload.rpc_loc_status_event_payload_u_type_u.engine_state == RPC_LOC_ENGINE_STATE_OFF)
+      {
+         status = GPS_STATUS_ENGINE_OFF;
+      }
+   }
 
-  if (status_report_ptr->event == RPC_LOC_STATUS_EVENT_ENGINE_STATE)
-    {
-        if (status_report_ptr->payload.rpc_loc_status_event_payload_u_type_u.engine_state == RPC_LOC_ENGINE_STATE_ON)
-        {
-            // GPS_STATUS_SESSION_BEGIN implies GPS_STATUS_ENGINE_ON
-            status = GPS_STATUS_SESSION_BEGIN;
-            status_internal = GPS_STATUS_ENGINE_ON;
-            loc_inform_gps_status(status);
-        }
-        else if (status_report_ptr->payload.rpc_loc_status_event_payload_u_type_u.engine_state == RPC_LOC_ENGINE_STATE_OFF)
-        {
-            // GPS_STATUS_SESSION_END implies GPS_STATUS_ENGINE_OFF
-            status = GPS_STATUS_ENGINE_OFF;
-            status_internal = GPS_STATUS_ENGINE_OFF;
-            loc_inform_gps_status(status);
-        }
-    }
+   if (status_report_ptr->event == RPC_LOC_STATUS_EVENT_FIX_SESSION_STATE)
+   {
+      if (status_report_ptr->payload.rpc_loc_status_event_payload_u_type_u.fix_session_state == RPC_LOC_FIX_SESSION_STATE_BEGIN)
+      {
+         status = GPS_STATUS_SESSION_BEGIN;
 
-#if 0
+      }
+      else if (status_report_ptr->payload.rpc_loc_status_event_payload_u_type_u.fix_session_state == RPC_LOC_FIX_SESSION_STATE_END)
+      {
+         status = GPS_STATUS_SESSION_END;
+
+      }
+   }
+
    pthread_mutex_lock(&loc_eng_data.mute_session_lock);
 
    // Switch from WAIT to MUTE, for "engine on" or "session begin" event
@@ -1342,17 +1355,17 @@ static void loc_eng_report_status (const rpc_loc_status_event_s_type *status_rep
    }
 
    pthread_mutex_unlock(&loc_eng_data.mute_session_lock);
-#endif
+
    // Only keeps ENGINE ON/OFF in engine_status
-   if (status_internal == GPS_STATUS_ENGINE_ON || status_internal == GPS_STATUS_ENGINE_OFF)
+   if (status == GPS_STATUS_ENGINE_ON || status == GPS_STATUS_ENGINE_OFF)
    {
-      loc_eng_data.engine_status = status_internal;
+      loc_eng_data.engine_status = status;
    }
 
    // Only keeps SESSION BEGIN/END in fix_session_status
-   if (status_internal == GPS_STATUS_SESSION_BEGIN || status_internal == GPS_STATUS_SESSION_END)
+   if (status == GPS_STATUS_SESSION_BEGIN || status == GPS_STATUS_SESSION_END)
    {
-      loc_eng_data.fix_session_status = status_internal;
+      loc_eng_data.fix_session_status = status;
    }
 
    pthread_mutex_lock (&loc_eng_data.deferred_action_mutex);
@@ -2132,7 +2145,10 @@ SIDE EFFECTS
    N/A
 
 ===========================================================================*/
-static void loc_eng_report_agps_status(AGpsType type, AGpsStatusValue status, int ipaddr)
+static void loc_eng_report_agps_status(AGpsType type,
+                                       AGpsStatusValue status,
+                                       unsigned long ipv4_addr,
+                                       unsigned char ipv6_addr[16])
 {
    if (loc_eng_data.agps_status_cb == NULL)
    {
@@ -2140,10 +2156,10 @@ static void loc_eng_report_agps_status(AGpsType type, AGpsStatusValue status, in
       return;
    }
 
-   LOC_LOGD("loc_eng_report_agps_status, type = %d, status = %d, ipaddr = %d\n",
-         (int) type, (int) status,  ipaddr);
+   LOC_LOGD("loc_eng_report_agps_status, type = %d, status = %d, ipv4_addr = %d\n",
+         (int) type, (int) status,  (int) ipv4_addr);
 
-   AGpsStatus agpsStatus = {sizeof(agpsStatus),type, status, ipaddr};
+   AGpsStatus agpsStatus = {sizeof(agpsStatus),type, status, ipv4_addr, {ipv6_addr[16]}};
    switch (status)
    {
       case GPS_REQUEST_AGPS_DATA_CONN:
@@ -2186,7 +2202,7 @@ static void loc_eng_process_atl_action(AGpsStatusValue status)
          status,loc_eng_data.data_connection_is_on, loc_eng_data.apn_name);
 
    // Pass a dont care as the AGPS type as it is in any case discarded by GpsLocationProvider
-   agps_type = DONT_CARE;
+   agps_type = AGPS_TYPE_ANY;
 
    if (status == GPS_RELEASE_AGPS_DATA_CONN)
    {
@@ -2194,7 +2210,8 @@ static void loc_eng_process_atl_action(AGpsStatusValue status)
       loc_eng_report_agps_status(
             agps_type,
             GPS_RELEASE_AGPS_DATA_CONN,
-            INADDR_NONE
+            INADDR_NONE,
+            NULL
       );
    }
    else if (status == GPS_REQUEST_AGPS_DATA_CONN)
@@ -2203,7 +2220,8 @@ static void loc_eng_process_atl_action(AGpsStatusValue status)
       loc_eng_report_agps_status(
             agps_type,
             GPS_REQUEST_AGPS_DATA_CONN,
-            INADDR_NONE
+            INADDR_NONE,
+            NULL
       );
    }
 }
@@ -2419,6 +2437,12 @@ static void loc_eng_deferred_action_thread(void* arg)
 		 loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_ON);
 	  } 
 
+	  if (flags & DEFERRED_ACTION_MODEM_DOWN_DETECTED) {
+		 loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_OFF);
+	  } else if (flags & DEFERRED_ACTION_MODEM_UP_DETECTED) {
+		 loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_ON);
+	  } 
+
       // ATL open/close actions
       if (status != 0 )
       {
@@ -2449,11 +2473,11 @@ SIDE EFFECTS
    N/A
 
 ===========================================================================*/
-void loc_eng_if_wakeup(int if_req, int ipaddr)
+void loc_eng_if_wakeup(int if_req, unsigned is_supl, unsigned long ipv4_addr, unsigned char ipv6_addr[16])
 {
    AGpsType                            agps_type;
 
-   agps_type = 1? AGPS_TYPE_SUPL : AGPS_TYPE_C2K;  // XXX consider C2k
+   agps_type = is_supl? AGPS_TYPE_SUPL : AGPS_TYPE_ANY;  // No C2k?
 
    if (if_req)
    {
@@ -2461,7 +2485,8 @@ void loc_eng_if_wakeup(int if_req, int ipaddr)
       loc_eng_report_agps_status(
             agps_type,
             GPS_RELEASE_AGPS_DATA_CONN,
-            ipaddr
+            ipv4_addr,
+            ipv6_addr
       );
    }
    else
@@ -2470,7 +2495,8 @@ void loc_eng_if_wakeup(int if_req, int ipaddr)
       loc_eng_report_agps_status(
             agps_type,
             GPS_REQUEST_AGPS_DATA_CONN,
-            ipaddr
+            ipv4_addr,
+            ipv6_addr
       );
    }
 }
