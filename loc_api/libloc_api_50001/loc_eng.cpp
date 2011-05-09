@@ -2431,17 +2431,11 @@ static void loc_eng_deferred_action_thread(void* arg)
            pthread_mutex_unlock(&(loc_eng_data.deferred_stop_mutex));
        }
 
-	  if (flags & DEFERRED_ACTION_MODEM_DOWN_DETECTED) {
-		 loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_OFF);
-	  } else if (flags & DEFERRED_ACTION_MODEM_UP_DETECTED) {
-		 loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_ON);
-	  } 
-
-	  if (flags & DEFERRED_ACTION_MODEM_DOWN_DETECTED) {
-		 loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_OFF);
-	  } else if (flags & DEFERRED_ACTION_MODEM_UP_DETECTED) {
-		 loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_ON);
-	  } 
+       if (flags & DEFERRED_ACTION_MODEM_DOWN_DETECTED) {
+           loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_OFF);
+       } else if (flags & DEFERRED_ACTION_MODEM_UP_DETECTED) {
+           loc_eng_report_modem_state(RPC_LOC_ENGINE_STATE_ON);
+       }
 
       // ATL open/close actions
       if (status != 0 )
