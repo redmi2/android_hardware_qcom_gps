@@ -1283,7 +1283,7 @@ static void loc_eng_report_sv (const rpc_loc_gnss_info_s_type *gnss_report_ptr)
    }
 
    // LOC_LOGD ("num_svs = %d, eph mask = %d, alm mask = %d\n", SvStatus.num_svs, SvStatus.ephemeris_mask, SvStatus.almanac_mask );
-   if ((SvStatus.num_svs != 0) && (loc_eng_data.sv_status_cb != NULL))
+   if ((SvStatus.num_svs >= 0) && (loc_eng_data.sv_status_cb != NULL))
    {
       loc_eng_data.sv_status_cb(&SvStatus);
    }
