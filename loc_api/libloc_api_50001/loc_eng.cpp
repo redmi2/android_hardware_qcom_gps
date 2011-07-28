@@ -2175,7 +2175,7 @@ static void loc_eng_deferred_action_thread(void* arg)
          loc_eng_ioctl_data_close_status(SUCCESS);
       }else if(flags & DEFERRED_ACTION_AGPS_DATA_FAILED)
       {
-         if(loc_eng_data.data_connection_is_on == TRUE)
+         if(loc_eng_data.data_connection_is_on != TRUE)
          {
             loc_eng_ioctl_data_open_status(FAILURE);
          }else
