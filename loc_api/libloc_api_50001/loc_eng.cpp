@@ -1821,6 +1821,9 @@ static int loc_eng_data_conn_open(const char* apn, AGpsBearerType bearerType)
    INIT_CHECK("loc_eng_data_conn_open");
 
    LOC_LOGD("loc_eng_data_conn_open APN name = [%s]", apn);
+#ifdef FEATURE_GNSS_BIT_API
+   loc_eng_dmn_conn_loc_api_server_data_conn(1);
+#endif
    pthread_mutex_lock(&(loc_eng_data.deferred_action_mutex));
    loc_eng_data.data_connection_bearer = bearerType;
    loc_eng_set_apn(apn);
@@ -1854,6 +1857,9 @@ static int loc_eng_data_conn_closed()
    INIT_CHECK("loc_eng_data_conn_closed");
 
    LOC_LOGD("loc_eng_data_conn_closed");
+#ifdef FEATURE_GNSS_BIT_API
+   loc_eng_dmn_conn_loc_api_server_data_conn(0);
+#endif
    pthread_mutex_lock(&(loc_eng_data.deferred_action_mutex));
    /* hold a wake lock while events are pending for deferred_action_thread */
    loc_eng_data.acquire_wakelock_cb();
@@ -1885,6 +1891,9 @@ int loc_eng_data_conn_failed()
    INIT_CHECK("loc_eng_data_conn_failed");
    LOC_LOGD("loc_eng_data_conn_failed");
 
+#ifdef FEATURE_GNSS_BIT_API
+   loc_eng_dmn_conn_loc_api_server_data_conn(-1);
+#endif
    pthread_mutex_lock(&(loc_eng_data.deferred_action_mutex));
    /* hold a wake lock while events are pending for deferred_action_thread */
    loc_eng_data.acquire_wakelock_cb();
@@ -2249,7 +2258,7 @@ SIDE EFFECTS
    N/A
 
 ===========================================================================*/
-static void loc_eng_report_agps_status(AGpsType type,
+static int loc_eng_report_agps_status(AGpsType type,
                                        AGpsStatusValue status,
                                        unsigned long ipv4_addr,
                                        unsigned char * ipv6_addr)
@@ -2258,7 +2267,7 @@ static void loc_eng_report_agps_status(AGpsType type,
    if (loc_eng_data.agps_status_cb == NULL)
    {
       LOC_LOGE("loc_eng_report_agps_status, callback not initialized.\n");
-      return;
+      return 0;
    }
 
    LOC_LOGD("loc_eng_report_agps_status, type = %d, status = %d, ipv4_addr = %d\n",
@@ -2284,6 +2293,7 @@ static void loc_eng_report_agps_status(AGpsType type,
          break;
    }
 
+   return 1;
 }
 
 
@@ -2670,29 +2680,23 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_eng_if_wakeup(int if_req, unsigned is_supl, unsigned long ipv4_addr, unsigned char * ipv6_addr)
 {
-   AGpsType                            agps_type;
+   AGpsType agps_type = is_supl? AGPS_TYPE_SUPL : AGPS_TYPE_ANY;  // No C2k?
+   AGpsStatusValue status = if_req ? GPS_REQUEST_AGPS_DATA_CONN : GPS_RELEASE_AGPS_DATA_CONN;
+   int tries = 3;
 
-   agps_type = is_supl? AGPS_TYPE_SUPL : AGPS_TYPE_ANY;  // No C2k?
-
-   if (if_req == 0)
-   {
-      // Inform GpsLocationProvider (subject to cancellation if data call should not be bring down)
-      loc_eng_report_agps_status(
-            agps_type,
-            GPS_RELEASE_AGPS_DATA_CONN,
-            ipv4_addr,
-            ipv6_addr
-      );
+   while (tries > 0 && (0 == loc_eng_report_agps_status(agps_type,
+                                                        status,
+                                                        ipv4_addr,
+                                                        ipv6_addr))) {
+       tries--;
+       LOC_LOGD("loc_eng_if_wakeup loc_eng not initialized, sleep for 1 second, %d more tries", tries);
+       sleep(1);
    }
-   else
-   {
-      // Use GpsLocationProvider to bring up the data call if not yet open
-      loc_eng_report_agps_status(
-            agps_type,
-            GPS_REQUEST_AGPS_DATA_CONN,
-            ipv4_addr,
-            ipv6_addr
-      );
+
+   if (0 == tries) {
+#ifdef FEATURE_GNSS_BIT_API
+       loc_eng_dmn_conn_loc_api_server_data_conn(-1);
+#endif
    }
 }
 
