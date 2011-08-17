@@ -54,6 +54,7 @@
 
 #include <loc_eng.h>
 #include <loc_eng_dmn_conn.h>
+#include <loc_eng_dmn_conn_handler.h>
 
 #define LOG_TAG "libloc"
 #include <utils/Log.h>
@@ -1822,7 +1823,7 @@ static int loc_eng_data_conn_open(const char* apn, AGpsBearerType bearerType)
 
    LOC_LOGD("loc_eng_data_conn_open APN name = [%s]", apn);
 #ifdef FEATURE_GNSS_BIT_API
-   loc_eng_dmn_conn_loc_api_server_data_conn(1);
+   loc_eng_dmn_conn_loc_api_server_data_conn(GPSONE_LOC_API_IF_REQUEST_SUCCESS);
 #endif
    pthread_mutex_lock(&(loc_eng_data.deferred_action_mutex));
    loc_eng_data.data_connection_bearer = bearerType;
@@ -1858,7 +1859,7 @@ static int loc_eng_data_conn_closed()
 
    LOC_LOGD("loc_eng_data_conn_closed");
 #ifdef FEATURE_GNSS_BIT_API
-   loc_eng_dmn_conn_loc_api_server_data_conn(0);
+   loc_eng_dmn_conn_loc_api_server_data_conn(GPSONE_LOC_API_IF_RELEASE_SUCCESS);
 #endif
    pthread_mutex_lock(&(loc_eng_data.deferred_action_mutex));
    /* hold a wake lock while events are pending for deferred_action_thread */
@@ -1892,7 +1893,7 @@ int loc_eng_data_conn_failed()
    LOC_LOGD("loc_eng_data_conn_failed");
 
 #ifdef FEATURE_GNSS_BIT_API
-   loc_eng_dmn_conn_loc_api_server_data_conn(-1);
+   loc_eng_dmn_conn_loc_api_server_data_conn(GPSONE_LOC_API_IF_FAILURE);
 #endif
    pthread_mutex_lock(&(loc_eng_data.deferred_action_mutex));
    /* hold a wake lock while events are pending for deferred_action_thread */
@@ -2695,7 +2696,7 @@ void loc_eng_if_wakeup(int if_req, unsigned is_supl, unsigned long ipv4_addr, un
 
    if (0 == tries) {
 #ifdef FEATURE_GNSS_BIT_API
-       loc_eng_dmn_conn_loc_api_server_data_conn(-1);
+       loc_eng_dmn_conn_loc_api_server_data_conn(GPSONE_LOC_API_IF_FAILURE);
 #endif
    }
 }
