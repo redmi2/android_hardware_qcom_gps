@@ -64,7 +64,7 @@ const GpsXtraInterface sLocEngXTRAInterface =
 {
     sizeof(GpsXtraInterface),
     qct_loc_eng_xtra_init,
-    qct_loc_eng_inject_xtra_data_proxy
+    qct_loc_eng_inject_xtra_data
 };
 
 /*===========================================================================
