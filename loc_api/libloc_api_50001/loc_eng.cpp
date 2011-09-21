@@ -63,6 +63,7 @@
 #define LOG_TAG "libloc"
 #include "loc_dbg.h"
 #include "loc_log.h"
+#include "utils/Log.h"
 
 #define DEBUG_NI_REQUEST_EMU 0
 
@@ -413,7 +414,7 @@ static int loc_eng_deinit()
 
       void* ignoredValue;
       pthread_join(loc_eng_data.deferred_action_thread, &ignoredValue);
-      loc_eng_msgremove( loc_eng_data.deferred_q);
+      loc_eng_msgremove( &loc_eng_data.deferred_q);
       loc_eng_data.deferred_action_thread = NULL;
    }
 
@@ -676,7 +677,7 @@ static int  loc_eng_set_position_mode(GpsPositionMode mode, GpsPositionRecurrenc
    rpc_loc_operation_mode_e_type op_mode;
    int                          ret_val;
 
-   LOGD ("loc_eng_set_position mode, client = %d, interval = %d, mode = %d\n",
+   LOC_LOGD ("loc_eng_set_position mode, client = %d, interval = %d, mode = %d\n",
             (int32) loc_eng_data.client_handle, min_interval, mode);
 
    switch (mode)
@@ -2739,9 +2740,9 @@ static void loc_eng_deferred_action_thread(void* arg)
        LOC_LOGD("%s:%d] %d listening ...\n", __func__, __LINE__, cnt++);
 
        loc_eng_data.release_wakelock_cb();
-       int length = loc_eng_msgrcv(loc_eng_data.deferred_q, (void *) &msg, sizeof(msg));
+       int result = loc_eng_msgrcv(loc_eng_data.deferred_q, (void *) &msg, sizeof(msg));
        loc_eng_data.acquire_wakelock_cb();
-       if (length <= 0) {
+       if (result < 0) {
            LOC_LOGE("%s:%d] fail receiving msg\n", __func__, __LINE__);
            return;
        }
@@ -3185,7 +3186,7 @@ static int loc_eng_ulp_init()
     handle = dlopen ("libulp.so", RTLD_NOW);
     if (!handle)
     {
-        LOGE ("%s, dlopen for libulp.so failed\n", __func__);
+        LOC_LOGE ("%s, dlopen for libulp.so failed\n", __func__);
         ret_val = -1;
         goto exit;
     }
@@ -3193,7 +3194,7 @@ static int loc_eng_ulp_init()
 
     get_ulp_inf = (get_ulp_interface*) dlsym(handle, "ulp_get_interface");
     if ((error = dlerror()) != NULL)  {
-        LOGE ("%s, dlsym for ulpInterface failed, error = %s\n", __func__, error);
+        LOC_LOGE ("%s, dlsym for ulpInterface failed, error = %s\n", __func__, error);
         ret_val = -1;
         goto exit;
     }

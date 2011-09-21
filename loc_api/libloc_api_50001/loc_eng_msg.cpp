@@ -26,9 +26,11 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#include <stdlib.h>
 #include <fcntl.h>
 #include "loc_eng_msg.h"
 #include "loc_eng_dmn_conn_glue_msg.h"
+#include <msg_q.h>
 
 #ifdef _ANDROID_
 
@@ -39,83 +41,54 @@
 #define LOC_ENG_MSG_REQ_Q_PATH "/tmp/loc_eng_msg_req_q"
 
 #endif
-
-int loc_eng_msgget(int * p_req_msgq)
+static void free_msg(void* msg)
 {
-    * p_req_msgq = loc_eng_dmn_conn_glue_msgget(LOC_ENG_MSG_REQ_Q_PATH, O_RDWR);
-    return 0;
+    free(msg);
 }
 
-int loc_eng_msgremove(int req_msgq)
+int loc_eng_msgget(void ** p_req_msgq)
 {
-    loc_eng_dmn_conn_glue_piperemove(LOC_ENG_MSG_REQ_Q_PATH, req_msgq);
-    return 0;
+    return (eMSG_Q_SUCCESS == msg_q_init(p_req_msgq) ? 0 : -1);
 }
 
-int loc_eng_msgsnd(int msgqid, void * msgp, unsigned int msgsz)
+int loc_eng_msgremove(void** p_req_msgq)
 {
-    int result;
+    return (eMSG_Q_SUCCESS == msg_q_destroy(p_req_msgq) ? 0 : -1);
+}
 
-    struct msgbuf * pmsg = (struct msgbuf *) msgp;
-
-    if (msgsz < sizeof(struct msgbuf)) {
-        LOC_LOGE("%s:%d] msgbuf is too small %d\n", __func__, __LINE__, msgsz);
-        return -1;
+int loc_eng_msgsnd(void* msgqid, void * msgp, unsigned int size)
+{
+    int result = 0;
+    void* msg = malloc(size);
+    memcpy(msg, msgp, size);
+    if (eMSG_Q_SUCCESS != msg_q_snd(msgqid, msg, free)) {
+        free(msg);
+        result = -1;
     }
 
-    pmsg->msgsz = msgsz;
-
-    result = loc_eng_dmn_conn_glue_pipewrite(msgqid, msgp, msgsz);
-    if (result != (int) msgsz) {
-        LOC_LOGE("%s:%d] pipe broken %d, msgsz = %d\n", __func__, __LINE__, result, (int) msgsz);
-        return -1;
-    }
     return result;
 }
 
-int loc_eng_msgrcv(int msgqid, void *msgp, unsigned int msgsz)
+int loc_eng_msgrcv(void* msgqid, void *msgp, unsigned int size)
 {
-    int result;
-    struct msgbuf * pmsg = (struct msgbuf *) msgp;
+    int result = -1;
+    void* msg;
 
-    if (msgsz < sizeof(struct msgbuf)) {
-        LOC_LOGE("%s:%d] msgbuf is too small %d\n", __func__, __LINE__, msgsz);
-        return -1;
+    if (eMSG_Q_SUCCESS == msg_q_rcv(msgqid, &msg)) {
+        memcpy(msgp, msg, size);
+        free(msg);
+        result = 0;
     }
 
-    result = loc_eng_dmn_conn_glue_piperead(msgqid, msgp, sizeof(struct msgbuf));
-    if (result != sizeof(struct msgbuf)) {
-        LOC_LOGE("%s:%d] pipe broken %d\n", __func__, __LINE__, result);
-        return -1;
-    }
-
-    if (msgsz < pmsg->msgsz) {
-        LOC_LOGE("%s:%d] msgbuf is too small %d < %d\n", __func__, __LINE__, (int) msgsz, (int) pmsg->msgsz);
-        return -1;
-    }
-
-    if (pmsg->msgsz > sizeof(struct msgbuf)) {
-        /* there is msg body */
-        msgp += sizeof(struct msgbuf);
-
-        result = loc_eng_dmn_conn_glue_piperead(msgqid, msgp, pmsg->msgsz - sizeof(struct msgbuf));
-
-        if (result != (int) (pmsg->msgsz - sizeof(struct msgbuf))) {
-            LOC_LOGE("%s:%d] pipe broken %d, msgid = %d, msgsz = %d\n", __func__, __LINE__, result,
-                     (int) pmsg->msgid, (int) pmsg->msgsz);
-            return -1;
-        }
-    }
-
-    return pmsg->msgsz;
+    return result;
 }
 
-int loc_eng_msgflush(int msgqid)
+int loc_eng_msgflush(void* msgqid)
 {
-    return loc_eng_dmn_conn_glue_msgflush(msgqid);
+    return (eMSG_Q_SUCCESS == msg_q_flush(msgqid) ? 0 : -1);
 }
 
-int loc_eng_msgunblock(int msgqid)
+int loc_eng_msgunblock(void* msgqid)
 {
-    return loc_eng_dmn_conn_glue_pipeunblock(msgqid);
+    return (eMSG_Q_SUCCESS == msg_q_unblock(msgqid) ? 0 : -1);
 }

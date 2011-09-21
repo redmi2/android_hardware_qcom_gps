@@ -143,10 +143,10 @@ union loc_eng_msg {
     struct loc_eng_msg_agps_failed agps_failed;
 };
 
-int loc_eng_msgget(int * p_req_msgq);
-int loc_eng_msgremove(int req_msgq);
-int loc_eng_msgsnd(int msgqid, void * msgp, unsigned int msgsz);
-int loc_eng_msgrcv(int msgqid, void * msgp, unsigned int msgsz);
+int loc_eng_msgget(void ** p_req_msgq);
+int loc_eng_msgremove(void** req_msgq);
+int loc_eng_msgsnd(void* msgqid, void * msgp, unsigned int msgsz);
+int loc_eng_msgrcv(void* msgqid, void * msgp, unsigned int msgsz);
 int loc_eng_msgflush(int msgqid);
 int loc_eng_msgunblock(int msgqid);
 

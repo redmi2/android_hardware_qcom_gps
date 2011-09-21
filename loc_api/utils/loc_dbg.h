@@ -30,6 +30,10 @@
 #ifndef LOC_DBG_H
 #define LOC_DBG_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+
 /*=============================================================================
  *
  *                         LOC LOGGER TYPE DECLARATION
@@ -171,5 +175,9 @@ do { if (loc_logger.TIMESTAMP) {                                                
           }                                                                                                            \
     } while (0)
 
+
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
 #endif // LOC_DBG_H

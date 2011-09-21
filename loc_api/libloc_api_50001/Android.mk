@@ -31,7 +31,9 @@ LOCAL_SRC_FILES += \
     loc_eng_ni.cpp \
     loc_eng_cfg.cpp \
     loc_eng_msg.cpp \
-    gps.c
+    gps.c \
+    ../../utils/linked_list.c \
+    ../../utils/msg_q.c
 
 ifeq ($(FEATURE_GNSS_BIT_API), true)
 LOCAL_CFLAGS += -DFEATURE_GNSS_BIT_API
@@ -61,7 +63,8 @@ LOCAL_CFLAGS += \
 LOCAL_C_INCLUDES:= \
   $(TARGET_OUT_HEADERS)/libcommondefs-rpc/inc \
   $(TARGET_OUT_HEADERS)/librpc \
-  $(TARGET_OUT_HEADERS)/gps.utils
+  $(TARGET_OUT_HEADERS)/gps.utils \
+  hardware/qcom/gps/utils
 
 ifeq ($(BOARD_VENDOR_QCOM_GPS_LOC_API_AMSS_VERSION),50001)
 LOCAL_C_INCLUDES += \
