@@ -349,7 +349,14 @@ static int loc_eng_reinit()
                                    RPC_LOC_EVENT_STATUS_REPORT |
                                    RPC_LOC_EVENT_NMEA_1HZ_REPORT |
                                    RPC_LOC_EVENT_NI_NOTIFY_VERIFY_REQUEST;
-   loc_eng_data.client_handle = loc_open(event, loc_event_cb, loc_eng_rpc_global_cb);
+
+   int tries = 30;
+   while (tries > 0 &&
+          -1 == (loc_eng_data.client_handle = loc_open(event, loc_event_cb, loc_eng_rpc_global_cb))) {
+       tries--;
+       LOC_LOGD("loc_eng_init client open failed, %d more tries", tries);
+       sleep(1);
+   }
 
    loc_eng_data.client_opened = (loc_eng_data.client_handle >= 0);
    LOC_LOGD("loc_eng_init created client, id = %d\n", (int32) loc_eng_data.client_handle);
