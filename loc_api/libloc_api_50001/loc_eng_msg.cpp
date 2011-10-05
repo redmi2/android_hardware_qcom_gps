@@ -69,15 +69,17 @@ int loc_eng_msgsnd(void* msgqid, void * msgp, unsigned int size)
     return result;
 }
 
-int loc_eng_msgrcv(void* msgqid, void *msgp, unsigned int size)
+int loc_eng_msgrcv(void* msgqid, void **msgp)
 {
-    int result = -1;
-    void* msg;
+    int result = 0;
 
-    if (eMSG_Q_SUCCESS == msg_q_rcv(msgqid, &msg)) {
-        memcpy(msgp, msg, size);
-        free(msg);
-        result = 0;
+    *msgp = NULL;
+    if (eMSG_Q_SUCCESS != msg_q_rcv(msgqid, msgp)) {
+        if (NULL != *msgp) {
+            free(*msgp);
+            *msgp = NULL;
+        }
+        result = -1;
     }
 
     return result;

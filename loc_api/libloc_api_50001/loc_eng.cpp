@@ -2727,7 +2727,7 @@ SIDE EFFECTS
 static void loc_eng_deferred_action_thread(void* arg)
 {
    ENTRY_LOG();
-   union loc_eng_msg msg;
+   union loc_eng_msg* msg;
    static int cnt = 0;
 
    LOC_LOGD("loc_eng_deferred_action_thread started\n");
@@ -2740,35 +2740,35 @@ static void loc_eng_deferred_action_thread(void* arg)
        LOC_LOGD("%s:%d] %d listening ...\n", __func__, __LINE__, cnt++);
 
        loc_eng_data.release_wakelock_cb();
-       int result = loc_eng_msgrcv(loc_eng_data.deferred_q, (void *) &msg, sizeof(msg));
+       int result = loc_eng_msgrcv(loc_eng_data.deferred_q, (void **) &msg);
        loc_eng_data.acquire_wakelock_cb();
        if (result < 0) {
            LOC_LOGE("%s:%d] fail receiving msg\n", __func__, __LINE__);
            return;
        }
 
-       LOC_LOGD("%s:%d] received msg_id = %d\n", __func__, __LINE__, msg.msg.msgid);
+       LOC_LOGD("%s:%d] received msg_id = %d\n", __func__, __LINE__, msg->msg.msgid);
 
-       if (msg.msg.msgid == LOC_ENG_MSG_QUIT) {
+       if (msg->msg.msgid == LOC_ENG_MSG_QUIT) {
            break; /* exit thread */
        }
 
-       switch(msg.msg.msgid) {
+       switch(msg->msg.msgid) {
            case LOC_ENG_MSG_QUIT:
                /* processed before the switch statement */
                break;
 
            case LOC_ENG_MSG_LOC_EVENT:
-               if (msg.loc_event.client_handle != loc_eng_data.client_handle)
+               if (msg->loc_event.client_handle != loc_eng_data.client_handle)
                {
                   LOC_LOGE("loc client mismatch: received = %d, expected = %d \n",
-                        (int32) msg.loc_event.client_handle, (int32) loc_eng_data.client_handle);
+                        (int32) msg->loc_event.client_handle, (int32) loc_eng_data.client_handle);
                   break;
                }
-               loc_callback_log(  msg.loc_event.loc_event,
-                                    & msg.loc_event.loc_event_payload);
-               loc_eng_process_loc_event(  msg.loc_event.loc_event,
-                                         & msg.loc_event.loc_event_payload);
+               loc_callback_log(  msg->loc_event.loc_event,
+                                    & msg->loc_event.loc_event_payload);
+               loc_eng_process_loc_event(  msg->loc_event.loc_event,
+                                         & msg->loc_event.loc_event_payload);
                break;
 
            case LOC_ENG_MSG_MUTE_SESSION:
@@ -2790,23 +2790,23 @@ static void loc_eng_deferred_action_thread(void* arg)
                break;
 
            case LOC_ENG_MSG_DELETE_AIDING_DATA:
-               loc_eng_data.aiding_data_for_deletion |= msg.delete_aiding_data.type;
+               loc_eng_data.aiding_data_for_deletion |= msg->delete_aiding_data.type;
                break;
 
            case LOC_ENG_MSG_UPDATE_NETWORK_AVAILABILITY:
                loc_eng_agps_ril_update_network_availability_action(
-                   msg.update_network_availability.available,
-                   msg.update_network_availability.apn_name);
+                   msg->update_network_availability.available,
+                   msg->update_network_availability.apn_name);
                break;
 
            case LOC_ENG_MSG_INJECT_XTRA_DATA:
-               loc_eng_data.xtra_module_data.xtra_data_for_injection = msg.inject_xtra_data.xtra_data_for_injection;
-               loc_eng_data.xtra_module_data.xtra_data_len = msg.inject_xtra_data.xtra_data_len;
+               loc_eng_data.xtra_module_data.xtra_data_for_injection = msg->inject_xtra_data.xtra_data_for_injection;
+               loc_eng_data.xtra_module_data.xtra_data_len = msg->inject_xtra_data.xtra_data_len;
                break;
 
            case LOC_ENG_MSG_AGPS_DATA_OPEN_STATUS:
-               loc_eng_data.data_connection_bearer = msg.agps_open_status.bearerType;
-               loc_eng_set_apn(msg.agps_open_status.apn_name);
+               loc_eng_data.data_connection_bearer = msg->agps_open_status.bearerType;
+               loc_eng_set_apn(msg->agps_open_status.apn_name);
                loc_eng_ioctl_data_open_status(SUCCESS);
                break;
 
@@ -2826,11 +2826,11 @@ static void loc_eng_deferred_action_thread(void* arg)
                break;
 
            case LOC_ENG_MSG_IOCTL:
-               loc_eng_ioctl( msg.ioctl.client_handle,
-                              msg.ioctl.ioctl_type,
-                              & msg.ioctl.ioctl_data,
-                              msg.ioctl.timeout_msec,
-                              msg.ioctl.cb_data_ptr);
+               loc_eng_ioctl( msg->ioctl.client_handle,
+                              msg->ioctl.ioctl_type,
+                              & msg->ioctl.ioctl_data,
+                              msg->ioctl.timeout_msec,
+                              msg->ioctl.cb_data_ptr);
                break;
 
            case LOC_ENG_MSG_MODEM_DOWN:
@@ -2842,13 +2842,13 @@ static void loc_eng_deferred_action_thread(void* arg)
                break;
 
            default:
-               LOC_LOGE("unsupported msgid = %d\n", msg.msg.msgid);
+               LOC_LOGE("unsupported msgid = %d\n", msg->msg.msgid);
                break;
        }
 
-       if ( (msg.msg.msgid == LOC_ENG_MSG_AGPS_DATA_FAILED)  |
-            (msg.msg.msgid == LOC_ENG_MSG_AGPS_DATA_CLOSE_STATUS)  |
-            (msg.msg.msgid == LOC_ENG_MSG_AGPS_DATA_OPEN_STATUS) )
+       if ( (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_FAILED)  |
+            (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_CLOSE_STATUS)  |
+            (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_OPEN_STATUS) )
        {
            loc_eng_data.agps_request_pending = false;
            if (loc_eng_data.stop_request_pending) {
@@ -2870,6 +2870,8 @@ static void loc_eng_deferred_action_thread(void* arg)
        {
            loc_eng_inject_xtra_data_in_buffer();
        }
+
+       free(msg);
    }
 
    loc_eng_data.release_wakelock_cb();

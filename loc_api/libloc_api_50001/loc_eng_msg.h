@@ -146,7 +146,7 @@ union loc_eng_msg {
 int loc_eng_msgget(void ** p_req_msgq);
 int loc_eng_msgremove(void** req_msgq);
 int loc_eng_msgsnd(void* msgqid, void * msgp, unsigned int msgsz);
-int loc_eng_msgrcv(void* msgqid, void * msgp, unsigned int msgsz);
+int loc_eng_msgrcv(void* msgqid, void ** msgp);
 int loc_eng_msgflush(int msgqid);
 int loc_eng_msgunblock(int msgqid);
 
