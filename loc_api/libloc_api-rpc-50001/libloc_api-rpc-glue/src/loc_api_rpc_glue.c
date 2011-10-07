@@ -98,18 +98,18 @@ bool_t rpc_loc_event_cb_f_type_svc(
       rpc_loc_event_cb_f_type_rets *ret,
       struct svc_req *req)
 {
-   // The lower word of cd_id is the index
-   int index = argp->cb_id & 0xFFFF;
+    // The lower word of cd_id is the index
+    int index = argp->cb_id & 0xFFFF;
 
-   /* Callback not registered, or unexpected ID (shouldn't happen) */
-   if (index > LOC_API_CB_MAX_CLIENTS || loc_glue_callback_table[index].cb_func == NULL)
-   {
-      LOGE("Warning: No callback handler.\n");
-      ret->loc_event_cb_f_type_result = 0;
-      return 1; /* simply return */
-   }
+    /* Callback not registered, or unexpected ID (shouldn't happen) */
+    if (index >= LOC_API_CB_MAX_CLIENTS || loc_glue_callback_table[index].cb_func == NULL)
+    {
+        LOGE("Warning: No callback handler %d.\n", index);
+        ret->loc_event_cb_f_type_result = 0;
+        return 1; /* simply return */
+    }
 
-   LOGV("proc: %x  prog: %x  vers: %x\n",
+    LOGV("proc: %x  prog: %x  vers: %x\n",
          (int) req->rq_proc,
          (int) req->rq_prog,
          (int) req->rq_vers);
