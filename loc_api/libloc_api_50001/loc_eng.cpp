@@ -1578,13 +1578,11 @@ static void loc_eng_process_conn_request (const rpc_loc_server_request_s_type *s
       loc_eng_data.conn_type = (server_request_ptr->payload.rpc_loc_server_request_u_type_u.multi_open_req.connection_type
                                 == RPC_LOC_SERVER_CONNECTION_LBS) ? AGPS_TYPE_SUPL : AGPS_TYPE_WWAN_ANY;
       loc_eng_process_atl_action(loc_eng_data.conn_handle, GPS_REQUEST_AGPS_DATA_CONN, loc_eng_data.conn_type);
-      loc_eng_data.agps_request_pending = true;
       break;
    case RPC_LOC_SERVER_REQUEST_OPEN:
        loc_eng_data.conn_handle = server_request_ptr->payload.rpc_loc_server_request_u_type_u.open_req.conn_handle;
        loc_eng_data.conn_type = AGPS_TYPE_INVALID;
        loc_eng_process_atl_action(loc_eng_data.conn_handle, GPS_REQUEST_AGPS_DATA_CONN, loc_eng_data.conn_type);
-       loc_eng_data.agps_request_pending = true;
       break;
    default:
        loc_eng_data.conn_handle = server_request_ptr->payload.rpc_loc_server_request_u_type_u.close_req.conn_handle;
@@ -2479,11 +2477,13 @@ static void loc_eng_report_agps_status(AGpsType type,
       case GPS_REQUEST_AGPS_DATA_CONN:
             CALLBACK_LOG_CALLFLOW("agps_status_cb");
          loc_eng_data.agps_status_cb(&agpsStatus);
+         loc_eng_data.agps_request_pending = true;
          break;
       case GPS_RELEASE_AGPS_DATA_CONN:
          // This will not close always-on connection. Comment out if it does.
             CALLBACK_LOG_CALLFLOW("agps_status_cb");
          loc_eng_data.agps_status_cb(&agpsStatus);
+         loc_eng_data.agps_request_pending = false;
          break;
    }
 
@@ -2846,17 +2846,18 @@ static void loc_eng_deferred_action_thread(void* arg)
                break;
        }
 
-       if ( (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_FAILED)  |
-            (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_CLOSE_STATUS)  |
+       if ( (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_FAILED)  ||
+            (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_CLOSE_STATUS)  ||
             (msg->msg.msgid == LOC_ENG_MSG_AGPS_DATA_OPEN_STATUS) )
        {
            loc_eng_data.agps_request_pending = false;
-           if (loc_eng_data.stop_request_pending) {
-               loc_eng_stop_handler();
-               loc_eng_data.stop_request_pending = false;
-           }
        }
+
+       if (false == loc_eng_data.agps_request_pending &&
+           loc_eng_data.stop_request_pending) {
+           loc_eng_stop_handler();
            loc_eng_data.stop_request_pending = false;
+       }
 
        if (loc_eng_data.engine_status != GPS_STATUS_ENGINE_ON &&
            loc_eng_data.aiding_data_for_deletion != 0)
