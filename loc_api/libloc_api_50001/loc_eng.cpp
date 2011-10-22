@@ -2644,7 +2644,11 @@ static void loc_eng_deferred_action_thread(void* arg)
               if (loc_stop_fix(loc_eng_data.client_handle) != RPC_LOC_API_SUCCESS)
                {
                    LOC_LOGD ("loc_stop_fix failed!\n");
+               } else if (loc_eng_data.fix_session_status != GPS_STATUS_SESSION_BEGIN)
+               {
+                   loc_inform_gps_status(GPS_STATUS_SESSION_END);
                }
+              loc_eng_data.navigating = FALSE;
            }
            loc_eng_data.stop_request_pending = false;
            pthread_mutex_unlock(&(loc_eng_data.deferred_stop_mutex));
