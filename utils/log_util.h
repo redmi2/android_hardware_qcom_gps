@@ -72,8 +72,18 @@ extern const char ENTRY_TAG[];
 extern void loc_logger_init(unsigned long debug, unsigned long timestamp);
 extern char* get_timestamp(char* str, unsigned long buf_size);
 
-
+#ifndef USE_GLIB
+/* definitions for Android logging */
 #include <utils/Log.h>
+#else /* USE_GLIB */
+#include <stdio.h>
+#define LOGI(...)      fprintf(stdout,__VA_ARGS__)
+#define LOGE(...)      fprintf(stderr,__VA_ARGS__)
+#define LOGV(...)      fprintf(stderr,__VA_ARGS__)
+#define LOGD(...)      fprintf(stderr,__VA_ARGS__)
+#define LOGW(...)      fprintf(stderr,__VA_ARGS__)
+
+#endif /* USE_GLIB */
 
 #ifndef DEBUG_DMN_LOC_API
 

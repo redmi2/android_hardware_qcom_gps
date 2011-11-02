@@ -40,6 +40,12 @@
 #include <loc_cfg.h>
 #include <log_util.h>
 
+#ifdef USE_GLIB
+#include <glib.h>
+#define strlcat g_strlcat
+#define strlcpy g_strlcpy
+#endif /* USE_GLIB */
+
 /*=============================================================================
  *
  *                          GLOBAL DATA DECLARATION

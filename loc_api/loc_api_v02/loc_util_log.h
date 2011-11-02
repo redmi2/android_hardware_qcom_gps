@@ -28,11 +28,11 @@
 #ifndef LOC_UTIL_LOG_H
 #define LOC_UTIL_LOG_H
 
-#if defined(_ANDROID_)
+#if defined(_ANDROID_) || defined(USE_GLIB)
 #include "loc_api_v02_log.h"
 #include <log_util.h>
 
-#else // no _ANDROID_
+#else // no _ANDROID_ and USE_GLIB
 
 // common for QNX and Griffon
 
@@ -70,6 +70,6 @@
 
 #endif //LOC_UTIL_TARGET_OFF_TARGET
 
-#endif //_ANDROID_
+#endif //_ANDROID_ and USE_GLIB
 
 #endif //LOC_UTIL_LOG_H

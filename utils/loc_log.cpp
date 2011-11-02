@@ -37,6 +37,10 @@
 
 #include "log_util.h"
 
+#if defined(USE_GLIB)
+#include <time.h>
+#endif // USE_GLIB
+
 // Logging Improvements
 const char *loc_logger_boolStr[]={"False","True"};
 const char VOID_RET[]   = "None";

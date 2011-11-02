@@ -30,14 +30,14 @@
 #include "qmi_idl_lib.h"
 #include "qmi_cci_target_ext.h"
 
-#if defined( _ANDROID_)
+#if defined(_ANDROID_) || defined(USE_GLIB)
 #include "qmi_cci_target.h"
 #include "qmi_cci_common.h"
 #elif defined(LOC_UTIL_TARGET_OFF_TARGET)
 #include <stdlib.h>
 #include <sys/time.h>
 #include <errno.h>
-#endif //_ANDROID_
+#endif //_ANDROID_ || USE_GLIB
 
 #include <string.h>
 #include <stdint.h>
