@@ -43,15 +43,15 @@
 extern "C" {
 #endif
 
-#define LOC_API_TOOLVERS 0x0004002e
+#define LOC_API_TOOLVERS 0x00040030
 #define LOC_API_FEATURES 0x00000001
+#define RPC_LOC_EVENT_STATUS_REPORT 0x00000100
+#define RPC_LOC_EVENT_ASSISTANCE_DATA_REQUEST 0x00000020
+#define RPC_LOC_EVENT_WPS_NEEDED_REQUEST 0x00000200
 #define RPC_LOC_EVENT_SATELLITE_REPORT 0x00000002
 #define RPC_LOC_EVENT_PARSED_POSITION_REPORT 0x00000001
 #define RPC_LOC_EVENT_RESERVED 0x8000000000000000
-#define RPC_LOC_EVENT_STATUS_REPORT 0x00000100
 #define RPC_LOC_EVENT_LOCATION_SERVER_REQUEST 0x00000040
-#define RPC_LOC_EVENT_ASSISTANCE_DATA_REQUEST 0x00000020
-#define RPC_LOC_EVENT_WPS_NEEDED_REQUEST 0x00000200
 #define RPC_LOC_EVENT_NMEA_POSITION_REPORT 0x00000008
 #define RPC_LOC_EVENT_IOCTL_REPORT 0x00000080
 #define RPC_LOC_EVENT_NMEA_1HZ_REPORT 0x00000004
@@ -225,6 +225,7 @@ typedef struct rpc_loc_status_event_s_type rpc_loc_status_event_s_type;
 enum rpc_loc_server_addr_e_type {
     RPC_LOC_SERVER_ADDR_IPV4 = 1,
     RPC_LOC_SERVER_ADDR_URL = 2,
+    RPC_LOC_SERVER_ADDR_IPV6 = 3,
     RPC_LOC_SERVER_ADDR_MAX = 268435456,
 };
 typedef enum rpc_loc_server_addr_e_type rpc_loc_server_addr_e_type;
@@ -241,11 +242,18 @@ struct rpc_loc_server_addr_url_type {
 };
 typedef struct rpc_loc_server_addr_url_type rpc_loc_server_addr_url_type;
 
+struct rpc_loc_server_addr_ipv6_type {
+    rpc_uint16 addr[8];
+    rpc_uint32 port;
+};
+typedef struct rpc_loc_server_addr_ipv6_type rpc_loc_server_addr_ipv6_type;
+
 struct rpc_loc_server_addr_u_type {
     rpc_loc_server_addr_e_type disc;
     union {
         rpc_loc_server_addr_ipv4_type ipv4;
         rpc_loc_server_addr_url_type url;
+        rpc_loc_server_addr_ipv6_type ipv6;
     } rpc_loc_server_addr_u_type_u;
 };
 typedef struct rpc_loc_server_addr_u_type rpc_loc_server_addr_u_type;
@@ -557,9 +565,17 @@ enum rpc_loc_server_protocol_e_type {
 };
 typedef enum rpc_loc_server_protocol_e_type rpc_loc_server_protocol_e_type;
 
+enum rpc_loc_server_connection_e_type {
+    RPC_LOC_SERVER_CONNECTION_LBS = 0,
+    RPC_LOC_SERVER_CONNECTION_WWAN_INTERNET = 0 + 1,
+    RPC_LOC_SERVER_CONNECTION_MAX = 16777216,
+};
+typedef enum rpc_loc_server_connection_e_type rpc_loc_server_connection_e_type;
+
 enum rpc_loc_server_request_e_type {
     RPC_LOC_SERVER_REQUEST_OPEN = 1,
     RPC_LOC_SERVER_REQUEST_CLOSE = 2,
+    RPC_LOC_SERVER_REQUEST_MULTI_OPEN = 3,
     RPC_LOC_SERVER_REQUEST_MAX = 268435456,
 };
 typedef enum rpc_loc_server_request_e_type rpc_loc_server_request_e_type;
@@ -569,6 +585,13 @@ struct rpc_loc_server_open_req_s_type {
     rpc_loc_server_protocol_e_type protocol;
 };
 typedef struct rpc_loc_server_open_req_s_type rpc_loc_server_open_req_s_type;
+
+struct rpc_loc_server_multi_open_req_s_type {
+    rpc_loc_server_connection_handle conn_handle;
+    rpc_loc_server_protocol_e_type protocol;
+    rpc_loc_server_connection_e_type connection_type;
+};
+typedef struct rpc_loc_server_multi_open_req_s_type rpc_loc_server_multi_open_req_s_type;
 
 struct rpc_loc_server_close_req_s_type {
     rpc_loc_server_connection_handle conn_handle;
@@ -580,6 +603,7 @@ struct rpc_loc_server_request_u_type {
     union {
         rpc_loc_server_open_req_s_type open_req;
         rpc_loc_server_close_req_s_type close_req;
+        rpc_loc_server_multi_open_req_s_type multi_open_req;
     } rpc_loc_server_request_u_type_u;
 };
 typedef struct rpc_loc_server_request_u_type rpc_loc_server_request_u_type;
@@ -633,6 +657,8 @@ enum rpc_loc_ioctl_e_type {
     RPC_LOC_IOCTL_SEND_WIPER_POSITION_REPORT = 411,
     RPC_LOC_IOCTL_NOTIFY_WIPER_STATUS = 412,
     RPC_LOC_IOCTL_ACCESS_EFS_DATA = 413,
+    RPC_LOC_IOCTL_ERROR_ESTIMATE_CONFIG = 414,
+    RPC_LOC_IOCTL_INFORM_SERVER_MULTI_OPEN_STATUS = 415,
     RPC_LOC_IOCTL_NV_SETTINGS_START_INDEX = 800,
     RPC_LOC_IOCTL_SET_ENGINE_LOCK = 800,
     RPC_LOC_IOCTL_GET_ENGINE_LOCK = 801,
@@ -650,6 +676,13 @@ enum rpc_loc_ioctl_e_type {
     RPC_LOC_IOCTL_GET_ON_DEMAND_LPM = 813,
     RPC_LOC_IOCTL_SET_XTRA_T_SESSION_CONTROL = 814,
     RPC_LOC_IOCTL_GET_XTRA_T_SESSION_CONTROL = 815,
+    RPC_LOC_IOCTL_SET_LBS_APN_PROFILE = 816,
+    RPC_LOC_IOCTL_GET_LBS_APN_PROFILE = 817,
+    RPC_LOC_IOCTL_SET_XTRA_APN_PROFILE = 818,
+    RPC_LOC_IOCTL_GET_XTRA_APN_PROFILE = 819,
+    RPC_LOC_IOCTL_SET_DATA_ENABLE = 820,
+    RPC_LOC_IOCTL_SET_SUPL_VERSION = 821,
+    RPC_LOC_IOCTL_GET_SUPL_VERSION = 822,
     RPC_LOC_IOCTL_PROPRIETARY_START_INDEX = 1000,
     RPC_LOC_IOCTL_DELETE_ASSIST_DATA = 1000,
     RPC_LOC_IOCTL_SET_CUSTOM_PDE_SERVER_ADDR = 1001,
@@ -783,12 +816,29 @@ enum rpc_loc_server_open_status_e_type {
 };
 typedef enum rpc_loc_server_open_status_e_type rpc_loc_server_open_status_e_type;
 
+enum rpc_loc_server_pdp_type_e_type {
+    RPC_LOC_SERVER_PDP_IP = 0,
+    RPC_LOC_SERVER_PDP_PPP = 0 + 1,
+    RPC_LOC_SERVER_PDP_IPV6 = 0 + 2,
+    RPC_LOC_SERVER_PDP_IPV4V6 = 0 + 3,
+    RPC_LOC_SERVER_PDP_MAX = 268435456,
+};
+typedef enum rpc_loc_server_pdp_type_e_type rpc_loc_server_pdp_type_e_type;
+
 struct rpc_loc_server_open_status_s_type {
     rpc_loc_server_connection_handle conn_handle;
     rpc_loc_server_open_status_e_type open_status;
     char apn_name[100];
 };
 typedef struct rpc_loc_server_open_status_s_type rpc_loc_server_open_status_s_type;
+
+struct rpc_loc_server_multi_open_status_s_type {
+    rpc_loc_server_connection_handle conn_handle;
+    rpc_loc_server_open_status_e_type open_status;
+    rpc_loc_server_pdp_type_e_type pdp_type;
+    char apn_name[100];
+};
+typedef struct rpc_loc_server_multi_open_status_s_type rpc_loc_server_multi_open_status_s_type;
 
 enum rpc_loc_server_close_status_e_type {
     RPC_LOC_SERVER_CLOSE_SUCCESS = 1,
@@ -870,6 +920,21 @@ struct rpc_loc_efs_data_s_type {
 };
 typedef struct rpc_loc_efs_data_s_type rpc_loc_efs_data_s_type;
 
+enum rpc_loc_error_estimate_config_e_type {
+    RPC_LOC_ERROR_ESTIMATE_CONFIG_SET = 1,
+    RPC_LOC_ERROR_ESTIMATE_CONFIG_CLEAR = 2,
+    RPC_LOC_ERROR_ESTIMATE_MAX = 268435456,
+};
+typedef enum rpc_loc_error_estimate_config_e_type rpc_loc_error_estimate_config_e_type;
+
+struct rpc_loc_apn_profiles_type {
+    rpc_uint32 srv_system_type;
+    rpc_uint32 pdp_type;
+    rpc_uint32 reserved;
+    char apn_name[100];
+};
+typedef struct rpc_loc_apn_profiles_type rpc_loc_apn_profiles_type;
+
 enum rpc_loc_lock_e_type {
     RPC_LOC_LOCK_NONE = 1,
     RPC_LOC_LOCK_MI = 2,
@@ -909,7 +974,12 @@ struct rpc_loc_ioctl_data_u_type {
         rpc_loc_server_info_s_type server_addr;
         rpc_loc_assist_data_delete_s_type assist_data_delete;
         rpc_loc_efs_data_s_type efs_data;
+        rpc_loc_error_estimate_config_e_type error_estimate_config;
         rpc_uint8 xtra_t_session_control;
+        rpc_loc_apn_profiles_type apn_profiles[6];
+        rpc_boolean data_enable;
+        rpc_uint32 supl_version;
+        rpc_loc_server_multi_open_status_s_type multi_conn_open_status;
         rpc_loc_reserved_payload_s_type reserved;
     } rpc_loc_ioctl_data_u_type_u;
 };
@@ -928,6 +998,8 @@ struct rpc_loc_ioctl_callback_data_u_type {
         rpc_loc_predicted_orbits_data_source_s_type predicted_orbits_data_source;
         rpc_loc_predicted_orbits_data_validity_report_s_type predicted_orbits_data_validity;
         rpc_uint8 xtra_t_session_control;
+        rpc_loc_apn_profiles_type apn_profiles[6];
+        rpc_uint32 supl_version;
     } rpc_loc_ioctl_callback_data_u_type_u;
 };
 typedef struct rpc_loc_ioctl_callback_data_u_type rpc_loc_ioctl_callback_data_u_type;
@@ -981,6 +1053,7 @@ extern  bool_t xdr_rpc_loc_status_event_s_type (XDR *, rpc_loc_status_event_s_ty
 extern  bool_t xdr_rpc_loc_server_addr_e_type (XDR *, rpc_loc_server_addr_e_type*);
 extern  bool_t xdr_rpc_loc_server_addr_ipv4_type (XDR *, rpc_loc_server_addr_ipv4_type*);
 extern  bool_t xdr_rpc_loc_server_addr_url_type (XDR *, rpc_loc_server_addr_url_type*);
+extern  bool_t xdr_rpc_loc_server_addr_ipv6_type (XDR *, rpc_loc_server_addr_ipv6_type*);
 extern  bool_t xdr_rpc_loc_server_addr_u_type (XDR *, rpc_loc_server_addr_u_type*);
 extern  bool_t xdr_rpc_loc_server_info_s_type (XDR *, rpc_loc_server_info_s_type*);
 extern  bool_t xdr_rpc_loc_ni_notify_verify_e_type (XDR *, rpc_loc_ni_notify_verify_e_type*);
@@ -1018,8 +1091,10 @@ extern  bool_t xdr_rpc_loc_assist_data_request_payload_u_type (XDR *, rpc_loc_as
 extern  bool_t xdr_rpc_loc_assist_data_request_s_type (XDR *, rpc_loc_assist_data_request_s_type*);
 extern  bool_t xdr_rpc_loc_server_connection_handle (XDR *, rpc_loc_server_connection_handle*);
 extern  bool_t xdr_rpc_loc_server_protocol_e_type (XDR *, rpc_loc_server_protocol_e_type*);
+extern  bool_t xdr_rpc_loc_server_connection_e_type (XDR *, rpc_loc_server_connection_e_type*);
 extern  bool_t xdr_rpc_loc_server_request_e_type (XDR *, rpc_loc_server_request_e_type*);
 extern  bool_t xdr_rpc_loc_server_open_req_s_type (XDR *, rpc_loc_server_open_req_s_type*);
+extern  bool_t xdr_rpc_loc_server_multi_open_req_s_type (XDR *, rpc_loc_server_multi_open_req_s_type*);
 extern  bool_t xdr_rpc_loc_server_close_req_s_type (XDR *, rpc_loc_server_close_req_s_type*);
 extern  bool_t xdr_rpc_loc_server_request_u_type (XDR *, rpc_loc_server_request_u_type*);
 extern  bool_t xdr_rpc_loc_server_request_s_type (XDR *, rpc_loc_server_request_s_type*);
@@ -1042,7 +1117,9 @@ extern  bool_t xdr_rpc_loc_assist_data_time_s_type (XDR *, rpc_loc_assist_data_t
 extern  bool_t xdr_rpc_loc_assist_pos_valid_mask_type (XDR *, rpc_loc_assist_pos_valid_mask_type*);
 extern  bool_t xdr_rpc_loc_assist_data_pos_s_type (XDR *, rpc_loc_assist_data_pos_s_type*);
 extern  bool_t xdr_rpc_loc_server_open_status_e_type (XDR *, rpc_loc_server_open_status_e_type*);
+extern  bool_t xdr_rpc_loc_server_pdp_type_e_type (XDR *, rpc_loc_server_pdp_type_e_type*);
 extern  bool_t xdr_rpc_loc_server_open_status_s_type (XDR *, rpc_loc_server_open_status_s_type*);
+extern  bool_t xdr_rpc_loc_server_multi_open_status_s_type (XDR *, rpc_loc_server_multi_open_status_s_type*);
 extern  bool_t xdr_rpc_loc_server_close_status_e_type (XDR *, rpc_loc_server_close_status_e_type*);
 extern  bool_t xdr_rpc_loc_server_close_status_s_type (XDR *, rpc_loc_server_close_status_s_type*);
 extern  bool_t xdr_rpc_loc_wiper_fix_time_s_type (XDR *, rpc_loc_wiper_fix_time_s_type*);
@@ -1053,6 +1130,8 @@ extern  bool_t xdr_rpc_loc_wiper_position_report_s_type (XDR *, rpc_loc_wiper_po
 extern  bool_t xdr_rpc_loc_wiper_status_e_type (XDR *, rpc_loc_wiper_status_e_type*);
 extern  bool_t xdr_rpc_loc_fs_operation_e_type (XDR *, rpc_loc_fs_operation_e_type*);
 extern  bool_t xdr_rpc_loc_efs_data_s_type (XDR *, rpc_loc_efs_data_s_type*);
+extern  bool_t xdr_rpc_loc_error_estimate_config_e_type (XDR *, rpc_loc_error_estimate_config_e_type*);
+extern  bool_t xdr_rpc_loc_apn_profiles_type (XDR *, rpc_loc_apn_profiles_type*);
 extern  bool_t xdr_rpc_loc_lock_e_type (XDR *, rpc_loc_lock_e_type*);
 extern  bool_t xdr_rpc_loc_nmea_sentence_type (XDR *, rpc_loc_nmea_sentence_type*);
 extern  bool_t xdr_rpc_loc_assist_data_type (XDR *, rpc_loc_assist_data_type*);
@@ -1085,6 +1164,7 @@ extern bool_t xdr_rpc_loc_status_event_s_type ();
 extern bool_t xdr_rpc_loc_server_addr_e_type ();
 extern bool_t xdr_rpc_loc_server_addr_ipv4_type ();
 extern bool_t xdr_rpc_loc_server_addr_url_type ();
+extern bool_t xdr_rpc_loc_server_addr_ipv6_type ();
 extern bool_t xdr_rpc_loc_server_addr_u_type ();
 extern bool_t xdr_rpc_loc_server_info_s_type ();
 extern bool_t xdr_rpc_loc_ni_notify_verify_e_type ();
@@ -1122,8 +1202,10 @@ extern bool_t xdr_rpc_loc_assist_data_request_payload_u_type ();
 extern bool_t xdr_rpc_loc_assist_data_request_s_type ();
 extern bool_t xdr_rpc_loc_server_connection_handle ();
 extern bool_t xdr_rpc_loc_server_protocol_e_type ();
+extern bool_t xdr_rpc_loc_server_connection_e_type ();
 extern bool_t xdr_rpc_loc_server_request_e_type ();
 extern bool_t xdr_rpc_loc_server_open_req_s_type ();
+extern bool_t xdr_rpc_loc_server_multi_open_req_s_type ();
 extern bool_t xdr_rpc_loc_server_close_req_s_type ();
 extern bool_t xdr_rpc_loc_server_request_u_type ();
 extern bool_t xdr_rpc_loc_server_request_s_type ();
@@ -1146,7 +1228,9 @@ extern bool_t xdr_rpc_loc_assist_data_time_s_type ();
 extern bool_t xdr_rpc_loc_assist_pos_valid_mask_type ();
 extern bool_t xdr_rpc_loc_assist_data_pos_s_type ();
 extern bool_t xdr_rpc_loc_server_open_status_e_type ();
+extern bool_t xdr_rpc_loc_server_pdp_type_e_type ();
 extern bool_t xdr_rpc_loc_server_open_status_s_type ();
+extern bool_t xdr_rpc_loc_server_multi_open_status_s_type ();
 extern bool_t xdr_rpc_loc_server_close_status_e_type ();
 extern bool_t xdr_rpc_loc_server_close_status_s_type ();
 extern bool_t xdr_rpc_loc_wiper_fix_time_s_type ();
@@ -1157,6 +1241,8 @@ extern bool_t xdr_rpc_loc_wiper_position_report_s_type ();
 extern bool_t xdr_rpc_loc_wiper_status_e_type ();
 extern bool_t xdr_rpc_loc_fs_operation_e_type ();
 extern bool_t xdr_rpc_loc_efs_data_s_type ();
+extern bool_t xdr_rpc_loc_error_estimate_config_e_type ();
+extern bool_t xdr_rpc_loc_apn_profiles_type ();
 extern bool_t xdr_rpc_loc_lock_e_type ();
 extern bool_t xdr_rpc_loc_nmea_sentence_type ();
 extern bool_t xdr_rpc_loc_assist_data_type ();

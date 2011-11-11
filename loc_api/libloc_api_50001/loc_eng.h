@@ -57,8 +57,6 @@ typedef unsigned char boolean;
 
 // The system sees GPS engine turns off after inactive for this period of time
 #define GPS_AUTO_OFF_TIME         2  /* secs */
-//To signify that when requesting a data connection HAL need not specify whether CDMA or UMTS
-#define DONT_CARE                 0
 #define MIN_POSSIBLE_FIX_INTERVAL 1000 /* msec */
 #define SUCCESS              TRUE
 #define FAILURE                 FALSE
@@ -117,7 +115,7 @@ typedef struct
 
    boolean                        client_opened;
    boolean                        navigating;
-   boolean                        data_connection_is_on;
+   AGpsBearerType                 data_connection_bearer;
 
    // ATL variables
    char                           apn_name[100];
@@ -125,6 +123,7 @@ typedef struct
    // connections to MPC & PDE
    loc_eng_atl_info_s_type       atl_conn_info[MAX_NUM_ATL_CONNECTIONS];
    rpc_loc_server_connection_handle  conn_handle;
+   AGpsType                       conn_type;
    // GPS engine status
    GpsStatusValue                 engine_status;
    GpsStatusValue                 fix_session_status;
