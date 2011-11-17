@@ -272,23 +272,25 @@ AgpsState* AgpsPendingState::onRsrcEvent(AgpsRsrcStatus event, void* data)
         Subscriber* subscriber = (Subscriber*) data;
         if (subscriber->waitForCloseComplete()) {
             subscriber->setInactive();
-            if (!mStateMachine->hasActiveSubscribers()) {
-                // no more subscribers, move to RELEASED state
-                nextState = mReleasingState;
-            }
         } else {
             // auto notify this subscriber of the unsubscribe
             Notification notification(subscriber, event, true);
             mStateMachine->notifySubscribers(notification);
+        }
 
-            // now check if there is any subscribers left
-            if (!mStateMachine->hasSubscribers()) {
-                // no more subscribers, move to RELEASED state
-                nextState = mReleasedState;
+        // now check if there is any subscribers left
+        if (!mStateMachine->hasSubscribers()) {
+            // no more subscribers, move to RELEASED state
+            nextState = mReleasedState;
 
-                // tell connecivity service we can release NIF
-                mStateMachine->sendRsrcRequest(GPS_RELEASE_AGPS_DATA_CONN);
-            }
+            // tell connecivity service we can release NIF
+            mStateMachine->sendRsrcRequest(GPS_RELEASE_AGPS_DATA_CONN);
+        } else if (!mStateMachine->hasActiveSubscribers()) {
+            // only inactive subscribers, move to RELEASING state
+            nextState = mReleasingState;
+
+            // tell connecivity service we can release NIF
+            mStateMachine->sendRsrcRequest(GPS_RELEASE_AGPS_DATA_CONN);
         }
     }
         break;
@@ -377,13 +379,13 @@ AgpsState* AgpsAcquiredState::onRsrcEvent(AgpsRsrcStatus event, void* data)
         // now check if there is any subscribers left
         if (!mStateMachine->hasSubscribers()) {
             // no more subscribers, move to RELEASED state
-            nextState = mReleasingState;
+            nextState = mReleasedState;
 
             // tell connecivity service we can release NIF
             mStateMachine->sendRsrcRequest(GPS_RELEASE_AGPS_DATA_CONN);
         } else if (!mStateMachine->hasActiveSubscribers()) {
-            // no more subscribers, move to RELEASED state
-            nextState = mReleasedState;
+            // only inactive subscribers, move to RELEASING state
+            nextState = mReleasingState;
 
             // tell connecivity service we can release NIF
             mStateMachine->sendRsrcRequest(GPS_RELEASE_AGPS_DATA_CONN);
@@ -466,20 +468,13 @@ AgpsState* AgpsReleasingState::onRsrcEvent(AgpsRsrcStatus event, void* data)
         // now check if there is any subscribers left
         if (!mStateMachine->hasSubscribers()) {
             // no more subscribers, move to RELEASED state
-            nextState = mReleasingState;
-
-            // tell connecivity service we can release NIF
-            mStateMachine->sendRsrcRequest(GPS_RELEASE_AGPS_DATA_CONN);
-        } else if (!mStateMachine->hasActiveSubscribers()) {
-            // no more subscribers, move to RELEASED state
             nextState = mReleasedState;
-
-            // tell connecivity service we can release NIF
-            mStateMachine->sendRsrcRequest(GPS_RELEASE_AGPS_DATA_CONN);
         }
     }
         break;
 
+    case RSRC_DENIED:
+        // A race condition subscriber unsubscribes before AFW denies resource.
     case RSRC_RELEASED:
     {
         nextState = mAcquiredState;
@@ -499,7 +494,6 @@ AgpsState* AgpsReleasingState::onRsrcEvent(AgpsRsrcStatus event, void* data)
         break;
 
     case RSRC_GRANTED:
-    case RSRC_DENIED:
     default:
         LOC_LOGE("%s: unrecognized event %d", whoami(), event);
         // no state change.
@@ -639,7 +633,7 @@ void AgpsStateMachine::addSubscriber(Subscriber* subscriber) const
 void AgpsStateMachine::sendRsrcRequest(AGpsStatusValue action) const
 {
     Subscriber* s = NULL;
-    Notification notification(Notification::BROADCAST_ALL);
+    Notification notification(Notification::BROADCAST_ACTIVE);
     linked_list_search(mSubscribers, (void**)&s, hasSubscriber,
                        (void*)&notification, false);
 
