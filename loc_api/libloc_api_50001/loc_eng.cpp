@@ -91,6 +91,47 @@ pthread_mutex_t LocEngContext::lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t LocEngContext::cond = PTHREAD_COND_INITIALIZER;
 LocEngContext* LocEngContext::me = NULL;
 
+loc_gps_cfg_s_type gps_conf;
+
+/* Parameter spec table */
+static loc_param_s_type loc_parameter_table[] =
+{
+  {"INTERMEDIATE_POS",               &gps_conf.INTERMEDIATE_POS,               NULL, 'n'},
+  {"ACCURACY_THRES",                 &gps_conf.ACCURACY_THRES,                 NULL, 'n'},
+  {"ENABLE_WIPER",                   &gps_conf.ENABLE_WIPER,                   NULL, 'n'},
+  {"SUPL_VER",                       &gps_conf.SUPL_VER,                       NULL, 'n'},
+  {"CAPABILITIES",                   &gps_conf.CAPABILITIES,                   NULL, 'n'},
+  {"GYRO_BIAS_RANDOM_WALK",          &gps_conf.GYRO_BIAS_RANDOM_WALK,          &gps_conf.GYRO_BIAS_RANDOM_WALK_VALID, 'f'},
+  {"SENSOR_ACCEL_BATCHES_PER_SEC",   &gps_conf.SENSOR_ACCEL_BATCHES_PER_SEC,   NULL, 'n'},
+  {"SENSOR_ACCEL_SAMPLES_PER_BATCH", &gps_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH, NULL, 'n'},
+  {"SENSOR_GYRO_BATCHES_PER_SEC",    &gps_conf.SENSOR_GYRO_BATCHES_PER_SEC,    NULL, 'n'},
+  {"SENSOR_GYRO_SAMPLES_PER_BATCH",  &gps_conf.SENSOR_GYRO_SAMPLES_PER_BATCH,  NULL, 'n'},
+  {"SENSOR_CONTROL_MODE",            &gps_conf.SENSOR_CONTROL_MODE,            NULL, 'n'},
+  {"SENSOR_USAGE",                   &gps_conf.SENSOR_USAGE,                   NULL, 'n'},
+};
+
+static void loc_default_parameters(void)
+{
+   /* defaults */
+   gps_conf.INTERMEDIATE_POS = 0;
+   gps_conf.ACCURACY_THRES = 0;
+   gps_conf.ENABLE_WIPER = 0;
+   gps_conf.SUPL_VER = 0x10000;
+   gps_conf.CAPABILITIES = 0x7;
+
+   gps_conf.GYRO_BIAS_RANDOM_WALK = 0;
+   gps_conf.SENSOR_ACCEL_BATCHES_PER_SEC = 2;
+   gps_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH = 5;
+   gps_conf.SENSOR_GYRO_BATCHES_PER_SEC = 2;
+   gps_conf.SENSOR_GYRO_SAMPLES_PER_BATCH = 5;
+   gps_conf.SENSOR_CONTROL_MODE = 0; /* AUTO */
+   gps_conf.SENSOR_USAGE = 0; /* Enabled */
+
+   /* Value MUST be set by OEMs in configuration for sensor-assisted
+      navigation to work. There is NO default value */
+   gps_conf.GYRO_BIAS_RANDOM_WALK_VALID = 0;
+}
+
 LocEngContext::LocEngContext(gps_create_thread threadCreator) :
     deferred_q((const void*)loc_eng_create_msg_q()),
     deferred_action_thread(threadCreator("loc_eng",loc_eng_deferred_action_thread, this)),
@@ -106,10 +147,13 @@ LocEngContext* LocEngContext::get(gps_create_thread threadCreator)
     pthread_mutex_lock(&lock);
     // gonna need mutex protection here...
     if (NULL == me) {
+        // Initialize our defaults before reading of configuration file overwrites them.
+        loc_default_parameters();
+
         // gps.conf is not part of the context class. But we only want to parse the conf
         // file once. This is the only good place to ensure that.
         // In fact one day the conf file should go into context as well.
-        loc_read_gps_conf();
+        UTIL_READ_CONF(GPS_CONF_FILE, loc_parameter_table);
 
         me = new LocEngContext(threadCreator);
     }
