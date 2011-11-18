@@ -45,7 +45,6 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include "loc_api_v02_client.h"
-#include "loc_api_v02_log.h"
 
 #define LOG_NDEBUG 0
 #define LOG_TAG "LocSvc_api_v02"
@@ -467,7 +466,7 @@ static locClientStatusEnumType convertQmiResponseToLocStatus(
   locClientStatusEnumType status =  eLOC_CLIENT_FAILURE_INTERNAL;
 
   // if result == SUCCESS don't look at error code
-  if(pResponse->resp.result == QMI_RESULT_SUCCESS )
+  if(pResponse->resp.result == QMI_RESULT_SUCCESS_V01 )
   {
     status  = eLOC_CLIENT_SUCCESS;
   }
@@ -761,6 +760,13 @@ static bool locClientHandleIndication(
                                                         indBuffer, indSize);
       break;
     }
+
+    case QMI_LOC_GET_FIX_CRITERIA_IND_V02:
+    {
+      status = true;
+      break;
+    }
+
     // predicted orbits data response indication
     case QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_IND_V02:
     {
@@ -1438,6 +1444,9 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
 
   QMI_CCI_OS_SIGNAL_WAIT(&os_params, LOC_CLIENT_SERVICE_TIMEOUT);
 
+  /* release the notifier handle */
+  qmi_client_release(notifier);
+
   if(QMI_CCI_OS_SIGNAL_TIMED_OUT(&os_params))
   {
     // timed out, return with error
@@ -1592,6 +1601,8 @@ locClientStatusEnumType locClientOpen (
     {
       free(pCallbackData);
       pCallbackData = NULL;
+      LOC_LOGE ("%s:%d] locClientQmiCtrlPointInit returned %d\n",
+                    __func__, __LINE__, status);
       break;
     }
 
@@ -1634,11 +1645,15 @@ locClientStatusEnumType locClientOpen (
   if(eLOC_CLIENT_SUCCESS != status)
   {
     *pLocClientHandle = LOC_CLIENT_INVALID_HANDLE_VALUE;
+    LOC_LOGE("%s:%d]: Error! status = %d\n", __func__, __LINE__,status);
   }
 
-  LOC_LOGD("%s:%d]: returning handle = 0x%x, user_handle=0x%x, status = %d\n",
+  else
+  {
+    LOC_LOGD("%s:%d]: returning handle = 0x%x, user_handle=0x%x, status = %d\n",
                 __func__, __LINE__, *pLocClientHandle,
                 pCallbackData->userHandle, status);
+  }
 
   return(status);
 }
