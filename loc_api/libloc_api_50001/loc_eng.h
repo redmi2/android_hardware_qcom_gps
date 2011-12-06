@@ -129,6 +129,25 @@ typedef struct
     int    mpc_port_buf;
 } loc_eng_data_s_type;
 
+/* GPS.conf support */
+typedef struct loc_gps_cfg_s
+{
+  unsigned long  INTERMEDIATE_POS;
+  unsigned long  ACCURACY_THRES;
+  unsigned long  ENABLE_WIPER;
+  unsigned long  SUPL_VER;
+  unsigned long  CAPABILITIES;
+  uint8_t        GYRO_BIAS_RANDOM_WALK_VALID;
+  double         GYRO_BIAS_RANDOM_WALK;
+  unsigned long  SENSOR_ACCEL_BATCHES_PER_SEC;
+  unsigned long  SENSOR_ACCEL_SAMPLES_PER_BATCH;
+  unsigned long  SENSOR_GYRO_BATCHES_PER_SEC;
+  unsigned long  SENSOR_GYRO_SAMPLES_PER_BATCH;
+  unsigned long  SENSOR_CONTROL_MODE;
+  unsigned long  SENSOR_USAGE;
+} loc_gps_cfg_s_type;
+
+extern loc_gps_cfg_s_type gps_conf;
 
 int  loc_eng_init(loc_eng_data_s_type &loc_eng_data,
                   LocCallbacks* callbacks,
