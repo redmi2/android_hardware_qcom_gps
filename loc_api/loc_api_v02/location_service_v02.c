@@ -25,7 +25,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include "stdint.h"
 #include "qmi_idl_lib_internal.h"
 #include "location_service_v02.h"
@@ -472,6 +471,25 @@ static const uint8_t qmiLocApnProfilesStructT_data_v02[] = {
   QMI_IDL_FLAG_END_VALUE
 };
 
+static const uint8_t qmiLocApplicationIdStructT_data_v02[] = {
+  QMI_IDL_FLAGS_IS_ARRAY | QMI_IDL_FLAGS_IS_VARIABLE_LEN | QMI_IDL_STRING,
+  QMI_IDL_OFFSET8(qmiLocApplicationIdStructT_v02, applicationProvider),
+  QMI_LOC_MAX_APP_ID_PROVIDER_LENGTH_V02,
+
+  QMI_IDL_FLAGS_IS_ARRAY | QMI_IDL_FLAGS_IS_VARIABLE_LEN | QMI_IDL_STRING,
+  QMI_IDL_OFFSET8(qmiLocApplicationIdStructT_v02, applicationName),
+  QMI_LOC_MAX_APP_ID_NAME_LENGTH_V02,
+
+  QMI_IDL_GENERIC_1_BYTE,
+  QMI_IDL_OFFSET8(qmiLocApplicationIdStructT_v02, applicationVersion_valid),
+
+  QMI_IDL_FLAGS_IS_ARRAY | QMI_IDL_FLAGS_IS_VARIABLE_LEN | QMI_IDL_STRING,
+  QMI_IDL_OFFSET8(qmiLocApplicationIdStructT_v02, applicationVersion),
+  QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02,
+
+  QMI_IDL_FLAG_END_VALUE
+};
+
 /*Message Definitions*/
 static const uint8_t qmiLocGenRespMsgT_data_v02[] = {
   QMI_IDL_TLV_FLAGS_LAST_TLV | 0x02,
@@ -512,10 +530,16 @@ static const uint8_t qmiLocStartReqMsgT_data_v02[] = {
   QMI_IDL_GENERIC_4_BYTE,
   QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, intermediateReportState),
 
-  QMI_IDL_TLV_FLAGS_LAST_TLV | QMI_IDL_TLV_FLAGS_OPTIONAL | (QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, minInterval) - QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, minInterval_valid)),
+  QMI_IDL_TLV_FLAGS_OPTIONAL | (QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, minInterval) - QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, minInterval_valid)),
   0x13,
   QMI_IDL_GENERIC_4_BYTE,
-  QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, minInterval)
+  QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, minInterval),
+
+  QMI_IDL_TLV_FLAGS_LAST_TLV | QMI_IDL_TLV_FLAGS_OPTIONAL | (QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, applicationId) - QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, applicationId_valid)),
+  0x14,
+  QMI_IDL_AGGREGATE,
+  QMI_IDL_OFFSET8(qmiLocStartReqMsgT_v02, applicationId),
+  29, 0
 };
 
 static const uint8_t qmiLocStopReqMsgT_data_v02[] = {
@@ -872,10 +896,16 @@ static const uint8_t qmiLocGetFixCriteriaIndMsgT_data_v02[] = {
   QMI_IDL_GENERIC_4_BYTE,
   QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, intermediateReportState),
 
-  QMI_IDL_TLV_FLAGS_LAST_TLV | QMI_IDL_TLV_FLAGS_OPTIONAL | (QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, minInterval) - QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, minInterval_valid)),
+  QMI_IDL_TLV_FLAGS_OPTIONAL | (QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, minInterval) - QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, minInterval_valid)),
   0x12,
   QMI_IDL_GENERIC_4_BYTE,
-  QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, minInterval)
+  QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, minInterval),
+
+  QMI_IDL_TLV_FLAGS_LAST_TLV | QMI_IDL_TLV_FLAGS_OPTIONAL | (QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, applicationId) - QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, applicationId_valid)),
+  0x13,
+  QMI_IDL_AGGREGATE,
+  QMI_IDL_OFFSET8(qmiLocGetFixCriteriaIndMsgT_v02, applicationId),
+  29, 0
 };
 
 static const uint8_t qmiLocNiUserRespReqMsgT_data_v02[] = {
@@ -1892,7 +1922,8 @@ static const qmi_idl_type_table_entry  loc_type_table_v02[] = {
   {sizeof(qmiLocWifiApInfoStructT_v02), qmiLocWifiApInfoStructT_data_v02},
   {sizeof(qmiLoc3AxisSensorSampleStructT_v02), qmiLoc3AxisSensorSampleStructT_data_v02},
   {sizeof(qmiLoc3AxisSensorSampleListStructT_v02), qmiLoc3AxisSensorSampleListStructT_data_v02},
-  {sizeof(qmiLocApnProfilesStructT_v02), qmiLocApnProfilesStructT_data_v02}
+  {sizeof(qmiLocApnProfilesStructT_v02), qmiLocApnProfilesStructT_data_v02},
+  {sizeof(qmiLocApplicationIdStructT_v02), qmiLocApplicationIdStructT_data_v02}
 };
 
 /* Message Table */
@@ -2031,7 +2062,7 @@ static const qmi_idl_type_table_object loc_qmi_idl_type_table_object_v02 = {
 static const qmi_idl_service_message_table_entry loc_service_command_messages_v02[] = {
   {QMI_LOC_INFORM_CLIENT_REVISION_REQ_V02, TYPE16(0, 1), 7},
   {QMI_LOC_REG_EVENTS_REQ_V02, TYPE16(0, 2), 11},
-  {QMI_LOC_START_REQ_V02, TYPE16(0, 3), 32},
+  {QMI_LOC_START_REQ_V02, TYPE16(0, 3), 103},
   {QMI_LOC_STOP_REQ_V02, TYPE16(0, 4), 4},
   {QMI_LOC_GET_SERVICE_REVISION_REQ_V02, TYPE16(0, 19), 0},
   {QMI_LOC_GET_FIX_CRITERIA_REQ_V02, TYPE16(0, 21), 0},
@@ -2150,7 +2181,7 @@ static const qmi_idl_service_message_table_entry loc_service_indication_messages
   {QMI_LOC_EVENT_SET_SPI_STREAMING_REPORT_IND_V02, TYPE16(0, 17), 4},
   {QMI_LOC_EVENT_LOCATION_SERVER_CONNECTION_REQ_IND_V02, TYPE16(0, 18), 21},
   {QMI_LOC_GET_SERVICE_REVISION_IND_V02, TYPE16(0, 20), 14},
-  {QMI_LOC_GET_FIX_CRITERIA_IND_V02, TYPE16(0, 22), 28},
+  {QMI_LOC_GET_FIX_CRITERIA_IND_V02, TYPE16(0, 22), 99},
   {QMI_LOC_NI_USER_RESPONSE_IND_V02, TYPE16(0, 24), 7},
   {QMI_LOC_INJECT_PREDICTED_ORBITS_DATA_IND_V02, TYPE16(0, 26), 12},
   {QMI_LOC_GET_PREDICTED_ORBITS_DATA_SOURCE_IND_V02, TYPE16(0, 28), 790},
@@ -2199,7 +2230,7 @@ static const qmi_idl_service_message_table_entry loc_service_indication_messages
 
 /*Service Object*/
 const struct qmi_idl_service_object loc_qmi_idl_service_object_v02 = {
-  0x02,
+  0x04,
   0x02,
   16,
   2248,

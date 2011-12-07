@@ -25,7 +25,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include <stdio.h>
 #include <assert.h>
 #include <errno.h>
@@ -36,7 +35,6 @@
 #include <stdint.h>
 
 #include "loc_api_v02_client.h"
-#include "loc_api_v02_log.h"
 #include "loc_api_sync_req.h"
 
 /* Logging */

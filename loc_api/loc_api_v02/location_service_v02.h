@@ -25,6 +25,7 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #ifndef LOC_SERVICE_H
 #define LOC_SERVICE_H
 /**
@@ -82,9 +83,9 @@ extern "C" {
 /** Major Version Number of the IDL used to generate this file */
 #define LOC_V02_IDL_MAJOR_VERS 0x02
 /** Revision Number of the IDL used to generate this file */
-#define LOC_V02_IDL_MINOR_VERS 0x04
+#define LOC_V02_IDL_MINOR_VERS 0x06
 /** Major Version Number of the qmi_idl_compiler used to generate this file */
-#define LOC_V02_IDL_TOOL_VERS 0x02
+#define LOC_V02_IDL_TOOL_VERS 0x04
 /** Maximum Defined Message ID */
 #define LOC_V02_MAX_MESSAGE_ID 0x005F;
 /**
@@ -95,6 +96,15 @@ extern "C" {
 /** @addtogroup loc_qmi_consts
     @{
   */
+
+/**  Maximum string length for the "Provider" field in application id  */
+#define QMI_LOC_MAX_APP_ID_PROVIDER_LENGTH_V02 24
+
+/**  Maximum string length for the "Name" field in application id  */
+#define QMI_LOC_MAX_APP_ID_NAME_LENGTH_V02 32
+
+/**  Maximum string length for the "Version" field in application id  */
+#define QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 8
 
 /**  Maximum number of satellites in the satellite report.  */
 #define QMI_LOC_SV_INFO_LIST_MAX_SIZE_V02 80
@@ -257,7 +267,38 @@ typedef struct {
 
        Multiple events can be registered by ORing the individual masks and
        sending them in this TLV. All unused bits in this mask must be set to 0.
-   */
+
+ The control point must enable this mask to receive position report
+       event indications.
+ The control point must enable this mask to receive satellite report
+       event indications. These reports are sent at a 1 Hz rate.
+ The control point must enable this mask to receive NMEA reports for
+       position and satellites in view. The report is at a 1 Hz rate.
+ The control point must enable this mask to receive NI notify verify request
+       event indications.
+ The control point must enable this mask to receive time injection request
+       event indications.
+ The control point must enable this mask to receive predicted orbits request
+       event indications.
+ The control point must enable this mask to receive position injection request
+       event indications.
+ The control point must enable this mask to receive engine state report
+       event indications.
+ The control point must enable this mask to receive fix session status report
+       event indications.
+ The control point must enable this mask to receive WiFi position request
+       event indications.
+ The control point must enable this mask to receive notifications from the
+       GPS engine indicating its readiness to accept data from the
+       sensors (accelerometer, gyrometer, etc.).
+ The control point must enable this mask to receive time-sync requests from
+       the GPS engine. Time sync enables the GPS engine to synchronize
+       its clock with the sensor processor's clock.
+ The control point must enable this mask to receive Stationary Position
+     Indicator (SPI) streaming report indications.
+ The control point must enable this mask to receive location server requests.
+     These requests are generated when the service wishes to establish a
+     connection with a location server. */
 }qmiLocRegEventsReqMsgT_v02;  /* Message */
 /**
     @}
@@ -302,6 +343,29 @@ typedef enum {
   eQMI_LOC_INTERMEDIATE_REPORTS_OFF_V02 = 2,
   QMILOCINTERMEDIATEREPORTSTATEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
 }qmiLocIntermediateReportStateEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_aggregates
+    @{
+  */
+typedef struct {
+
+  char applicationProvider[QMI_LOC_MAX_APP_ID_PROVIDER_LENGTH_V02 + 1];
+  /**<   Application Provider  */
+
+  char applicationName[QMI_LOC_MAX_APP_ID_NAME_LENGTH_V02 + 1];
+  /**<   Application Name  */
+
+  uint8_t applicationVersion_valid;
+  /**<   specifies if the application version string contains a valid value.
+      - 0x00 (FALSE) -- application version string is invalid \n
+      - 0x01 (TRUE) -- application version string is valid  */
+
+  char applicationVersion[QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 + 1];
+  /**<   Application Version  */
+}qmiLocApplicationIdStructT_v02;  /* Type */
 /**
     @}
   */
@@ -376,6 +440,12 @@ typedef struct {
        - Units: Milliseconds \n
        - Default: 1000 ms
    */
+
+  /* Optional */
+  /*  Id of the application which sent this request */
+  uint8_t applicationId_valid;  /**< Must be set to true if applicationId is being passed */
+  qmiLocApplicationIdStructT_v02 applicationId;
+  /**<   Application provider, name and version. */
 }qmiLocStartReqMsgT_v02;  /* Message */
 /**
     @}
@@ -766,7 +836,10 @@ typedef struct {
        Valid bitmasks: \n
          - 0x00000001 -- SATELLITE \n
          - 0x00000002 -- CELLID    \n
-         - 0x00000004 -- WIFI  */
+         - 0x00000004 -- WIFI
+ Satellites were used to generate the fix.
+ Cell towers were used to generate the fix.
+ WiFi access points were used to generate the fix.  */
 
   /* Optional */
   /*  Dilution of Precision */
@@ -2321,6 +2394,12 @@ typedef struct {
   /**<   Time that must elapse before alerting the client. \n
        - Type: Unsigned integer \n
        - Units: Milliseconds  */
+
+  /* Optional */
+  /*  Id of the application which sent the position request */
+  uint8_t applicationId_valid;  /**< Must be set to true if applicationId is being passed */
+  qmiLocApplicationIdStructT_v02 applicationId;
+  /**<   Application provider, name and version. */
 }qmiLocGetFixCriteriaIndMsgT_v02;  /* Message */
 /**
     @}
@@ -3179,6 +3258,8 @@ typedef uint32_t qmiLocNmeaSentenceMaskT_v02;
 #define QMI_LOC_NMEA_MASK_GSV_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000004) /**<  Enable GSV type.  */
 #define QMI_LOC_NMEA_MASK_GSA_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000008) /**<  Enable GSA type.  */
 #define QMI_LOC_NMEA_MASK_VTG_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000010) /**<  Enable VTG type.  */
+#define QMI_LOC_NMEA_MASK_PQXFI_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000020) /**<  Enable PQXFI type  */
+#define QMI_LOC_NMEA_MASK_PSTIS_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000040) /**<  Enable PSTIS type  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -3195,8 +3276,17 @@ typedef struct {
          - 0x00000002 -- NMEA_MASK_RMC \n
          - 0x00000004 -- NMEA_MASK_GSV \n
          - 0x00000008 -- NMEA_MASK_GSA \n
-         - 0x00000010 -- NMEA_MASK_VTG
-          */
+         - 0x00000010 -- NMEA_MASK_VTG \n
+         - 0x00000020 -- NMEA_MASK_PQXFI \n
+         - 0x00000040 -- NMEA_MASK_PSTIS
+
+ Enable GGA type.
+ Enable RMC type.
+ Enable GSV type.
+ Enable GSA type.
+ Enable VTG type.
+ Enable PQXFI type
+ Enable PSTIS type  */
 }qmiLocSetNmeaTypesReqMsgT_v02;  /* Message */
 /**
     @}
@@ -3266,8 +3356,17 @@ typedef struct {
          - 0x00000002 -- NMEA_MASK_RMC \n
          - 0x00000004 -- NMEA_MASK_GSV \n
          - 0x00000008 -- NMEA_MASK_GSA \n
-         - 0x00000010 -- NMEA_MASK_VTG
-          */
+         - 0x00000010 -- NMEA_MASK_VTG \n
+         - 0x00000020 -- NMEA_MASK_PQXFI \n
+         - 0x00000040 -- NMEA_MASK_PSTIS
+
+ Enable GGA type.
+ Enable RMC type.
+ Enable GSV type.
+ Enable GSA type.
+ Enable VTG type.
+ Enable PQXFI type
+ Enable PSTIS type  */
 }qmiLocGetNmeaTypesIndMsgT_v02;  /* Message */
 /**
     @}
@@ -3468,7 +3567,10 @@ typedef struct {
          - 0x01 -- IPV4 \n
          - 0x02 -- IPV6 \n
          - 0x04 -- URL
-   */
+
+ IPV4 server address type.
+ IPV6 server address type.
+ URL server address type.  */
 }qmiLocGetServerReqMsgT_v02;  /* Message */
 /**
     @}
@@ -3665,7 +3767,26 @@ typedef struct {
        - 0x00010000 -- DELETE_RTI \n
        - 0x00020000 -- DELETE_SV_NO_EXIST \n
        - 0x00040000 -- DELETE_FREQ_BIAS_EST
-   */
+
+ Mask to delete GPS SVDIR.
+ Mask to delete GPS SVSTEER.
+ Mask to delete GPS time.
+ Mask to delete almanac correlation.
+ Mask to delete GLONASS SVDIR.
+ Mask to delete GLONASS SVSTEER.
+ Mask to delete GLONASS time.
+ Mask to delete GLONASS almanac correlation
+ Mask to delete SBAS SVDIR
+ Mask to delete SBAS SVSTEER
+ Mask to delete position estimate
+ Mask to delete time estimate
+ Mask to delete IONO
+ Mask to delete UTC estimate
+ Mask to delete SV health record
+ Mask to delete SADATA
+ Mask to delete RTI
+ Mask to delete SV_NO_EXIST
+ Mask to delete frequency bias estimate  */
 
   /* Optional */
   /*  Delete Cell Database */
@@ -3683,7 +3804,17 @@ typedef struct {
        - 0x00000080 -- DELETE_CELLDB_LAST_SRV_CELL \n
        - 0x00000100 -- DELETE_CELLDB_CUR_SRV_CELL \n
        - 0x00000200 -- DELETE_CELLDB_NEIGHBOR_INFO
-   */
+
+ Mask to delete cell database position
+ Mask to delete cell database latest GPS position
+ Mask to delete cell database OTA position
+ Mask to delete cell database external reference position
+ Mask to delete cell database time tag
+ Mask to delete cell database cell ID
+ Mask to delete cell database cached cell ID
+ Mask to delete cell database last service cell
+ Mask to delete cell database current service cell
+ Mask to delete cell database neighbor information  */
 
   /* Optional */
   /*  Delete Clock Info */
@@ -3702,7 +3833,18 @@ typedef struct {
        - 0x00000100 -- DELETE_CLOCK_INFO_GLO4YEAR_NUMBER \n
        - 0x00000200 -- DELETE_CLOCK_INFO_GLO_RF_GRP_DELAY \n
        - 0x00000400 -- DELETE_CLOCK_INFO_DISABLE_TT
-   */
+
+ Mask to delete time estimate from clock information
+ Mask to delete frequency estimate from clock information
+ Mask to delete week number from clock information
+ Mask to delete RTC time from clock information
+ Mask to delete time transfer from clock information
+ Mask to delete GPS time estimate from clock information
+ Mask to delete GLONASS time estimate from clock information
+ Mask to delete GLONASS day number from clock information
+ Mask to delete GLONASS four year number from clock information
+ Mask to delete GLONASS RF GRP delay from clock information
+ Mask to delete disable TT from clock information   */
 }qmiLocDeleteAssistDataReqMsgT_v02;  /* Message */
 /**
     @}
@@ -4111,7 +4253,38 @@ typedef struct {
          - 0x00000800 -- TIME_SYNC_REQ \n
          - 0x00001000 -- SET_SPI_STREAMING_REPORT \n
          - 0x00002000 -- LOCATION_SERVER__CONNECTION_REQ
-             */
+
+ The control point must enable this mask to receive position report
+       event indications.
+ The control point must enable this mask to receive satellite report
+       event indications. These reports are sent at a 1 Hz rate.
+ The control point must enable this mask to receive NMEA reports for
+       position and satellites in view. The report is at a 1 Hz rate.
+ The control point must enable this mask to receive NI notify verify request
+       event indications.
+ The control point must enable this mask to receive time injection request
+       event indications.
+ The control point must enable this mask to receive predicted orbits request
+       event indications.
+ The control point must enable this mask to receive position injection request
+       event indications.
+ The control point must enable this mask to receive engine state report
+       event indications.
+ The control point must enable this mask to receive fix session status report
+       event indications.
+ The control point must enable this mask to receive WiFi position request
+       event indications.
+ The control point must enable this mask to receive notifications from the
+       GPS engine indicating its readiness to accept data from the
+       sensors (accelerometer, gyrometer, etc.).
+ The control point must enable this mask to receive time-sync requests from
+       the GPS engine. Time sync enables the GPS engine to synchronize
+       its clock with the sensor processor's clock.
+ The control point must enable this mask to receive Stationary Position
+     Indicator (SPI) streaming report indications.
+ The control point must enable this mask to receive location server requests.
+     These requests are generated when the service wishes to establish a
+     connection with a location server. */
 }qmiLocGetRegisteredEventsIndMsgT_v02;  /* Message */
 /**
     @}
@@ -4959,7 +5132,10 @@ typedef struct {
          - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
          - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
          - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
-   */
+
+ Mask for the SUPL security configuration parameter.
+ Mask for the VX version configuration parameter.
+ Mask for the SUPL version configuration parameter.       */
 }qmiLocSetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -4981,7 +5157,10 @@ typedef struct {
          - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
          - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
          - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
-   */
+
+ Mask for the SUPL security configuration parameter.
+ Mask for the VX version configuration parameter.
+ Mask for the SUPL version configuration parameter.       */
 }qmiLocGetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5365,7 +5544,10 @@ typedef struct {
        - 0x0000000000000001 -- PERFORMANCE_MODE \n
        - 0x0000000000000002 -- ACCEL_SAMPLING_SPEC \n
        - 0x0000000000000004 -- GYRO_SAMPLING_SPEC
-   */
+
+ Failed to set the performance mode.
+ Failed to set the accelerometer sampling specification.
+ Failed to set the gyroscope sampling specification.  */
 }qmiLocSetSensorPerformanceControlConfigIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5628,7 +5810,13 @@ typedef struct {
          - 0x00000001 -- INJECTED_POSITION_CONTROL \n
          - 0x00000002 -- FILTER_SV_USAGE \n
          - 0x00000004 -- STORE_ASSIST_DATA
-   */
+
+ This field denotes if the position engine uses the
+       injected position in direct position calculation.
+ This field denotes if the position engine filters the
+       SV usage in the fix.
+ This field denotes if the position engine stores assistance data
+       in the persistent memory.       */
 }qmiLocSetPositionEngineConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5649,7 +5837,13 @@ typedef struct {
         - 0x00000001 -- INJECTED_POSITION_CONTROL \n
         - 0x00000002 -- FILTER_SV_USAGE \n
         - 0x00000004 -- STORE_ASSIST_DATA
-   */
+
+ This field denotes if the position engine uses the
+       injected position in direct position calculation.
+ This field denotes if the position engine filters the
+       SV usage in the fix.
+ This field denotes if the position engine stores assistance data
+       in the persistent memory.       */
 }qmiLocGetPositionEngineConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
