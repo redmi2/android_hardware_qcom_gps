@@ -78,6 +78,7 @@ enum loc_sess_status {
     LOC_SESS_FAILURE
 };
 
+void loc_ulp_msg_sender(void* loc_eng_data_p, void* msg);
 
 #ifdef __cplusplus
 }

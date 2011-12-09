@@ -77,6 +77,21 @@ enum loc_mute_session_e_type {
    LOC_MUTE_SESS_IN_SESSION
 };
 
+struct LocEngContext {
+    // Data variables used by deferred action thread
+    const void* deferred_q;
+    const void* ulp_q;
+    const pthread_t deferred_action_thread;
+    static LocEngContext* get(gps_create_thread threadCreator);
+    void drop();
+    static pthread_mutex_t lock;
+    static pthread_cond_t cond;
+private:
+    int counter;
+    static LocEngContext *me;
+    LocEngContext(gps_create_thread threadCreator);
+};
+
 // Module data
 typedef struct
 {
@@ -89,6 +104,8 @@ typedef struct
     gps_ni_notify_callback         ni_notify_cb;
     gps_acquire_wakelock           acquire_wakelock_cb;
     gps_release_wakelock           release_wakelock_cb;
+    ulp_network_location_request   ulp_network_callback;
+    ulp_request_phone_context      ulp_phone_context_req_cb;
     boolean                        intermediateFix;
     AGpsStatusValue                agps_status;
     // used to defer stopping the GPS engine until AGPS data calls are done
@@ -127,7 +144,10 @@ typedef struct
     int    mpc_host_set;
     char   mpc_host_buf[101];
     int    mpc_port_buf;
+    bool   ulp_initialized;
 } loc_eng_data_s_type;
+
+#include "ulp.h"
 
 /* GPS.conf support */
 typedef struct loc_gps_cfg_s
@@ -151,7 +171,10 @@ extern loc_gps_cfg_s_type gps_conf;
 
 int  loc_eng_init(loc_eng_data_s_type &loc_eng_data,
                   LocCallbacks* callbacks,
-                  LOC_API_ADAPTER_EVENT_MASK_T event);
+                  LOC_API_ADAPTER_EVENT_MASK_T event,
+                  void (*loc_external_msg_sender) (void*, void*),
+                   const ulpInterface ** loc_eng_ulp_inf );
+int loc_eng_ulp_init(loc_eng_data_s_type &loc_eng_data, const ulpInterface * loc_eng_ulpInf);
 int  loc_eng_start(loc_eng_data_s_type &loc_eng_data);
 int  loc_eng_stop(loc_eng_data_s_type &loc_eng_data);
 void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data);
@@ -207,7 +230,14 @@ extern void loc_eng_ni_request_handler(loc_eng_data_s_type &loc_eng_data,
                                    const GpsNiNotification *notif,
                                    const void* passThrough);
 extern void loc_eng_ni_reset_on_engine_restart(loc_eng_data_s_type &loc_eng_data);
+int loc_eng_ulp_network_init(loc_eng_data_s_type &loc_eng_data, UlpNetworkLocationCallbacks *callbacks);
 
+int loc_eng_ulp_phone_context_settings_update(loc_eng_data_s_type &loc_eng_data,
+                                              UlpPhoneContextSettings *settings);
+int loc_eng_ulp_phone_context_init(loc_eng_data_s_type &loc_eng_data,
+                                   UlpPhoneContextCallbacks *callback);
+int loc_eng_ulp_send_network_position(loc_eng_data_s_type &loc_eng_data,
+                                             UlpNetworkPositionReport *position_report);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

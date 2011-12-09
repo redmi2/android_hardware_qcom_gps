@@ -33,6 +33,7 @@
 #include <hardware/gps.h>
 #include <loc_eng.h>
 #include <loc_log.h>
+#include <msg_q.h>
 
 static gps_location_callback gps_loc_cb = NULL;
 static gps_sv_status_callback gps_sv_cb = NULL;
@@ -52,7 +53,12 @@ static int  loc_set_position_mode(GpsPositionMode mode, GpsPositionRecurrence re
                                   uint32_t min_interval, uint32_t preferred_accuracy,
                                   uint32_t preferred_time);
 static const void* loc_get_extension(const char* name);
-static int  loc_update_criteria(UlpLocationCriteria criteria);
+//ULP/Hybrid provider Function definitions
+static int loc_update_criteria(UlpLocationCriteria criteria);
+static int loc_ulp_network_init(UlpNetworkLocationCallbacks *callbacks);
+static int loc_ulp_send_network_position(UlpNetworkPositionReport *position_report);
+static int loc_ulp_phone_context_init(UlpPhoneContextCallbacks *callback);
+static int loc_ulp_phone_context_settings_update(UlpPhoneContextSettings *settings);
 
 // Defines the GpsInterface in gps.h
 static const GpsInterface sLocEngInterface =
@@ -134,6 +140,19 @@ static const InjectRawCmdInterface sLocEngInjectRawCmdInterface =
    loc_inject_raw_command
 };
 
+//ULP/Hybrid provider interfaces
+static const UlpNetworkInterface sUlpNetworkInterface =
+{
+   sizeof(UlpNetworkInterface),
+   loc_ulp_network_init,
+   loc_ulp_send_network_position
+};
+static const UlpPhoneContextInterface sLocEngUlpPhoneContextInterface =
+{
+    sizeof(UlpPhoneContextInterface),
+    loc_ulp_phone_context_init,
+    loc_ulp_phone_context_settings_update
+};
 static loc_eng_data_s_type loc_afw_data;
 
 /*===========================================================================
@@ -179,6 +198,19 @@ extern "C" const GpsInterface* get_gps_interface()
 {
     return &sLocEngInterface;
 }
+
+static void loc_free_msg(void* msg)
+{
+    delete (loc_eng_msg*)msg;
+}
+
+
+void loc_ulp_msg_sender(void* loc_eng_data_p, void* msg)
+{
+    LocEngContext* loc_eng_context = (LocEngContext*)((loc_eng_data_s_type*)loc_eng_data_p)->context;
+    msg_q_snd((void*)loc_eng_context->ulp_q, msg, loc_free_msg);
+}
+
 /*===========================================================================
 FUNCTION    loc_init
 
@@ -220,11 +252,13 @@ static int loc_init(GpsCallbacks* callbacks)
                                     NULL  /* sv_ext_parser */};
     gps_loc_cb = callbacks->location_cb;
     gps_sv_cb = callbacks->sv_status_cb;
-
-    int ret_val = loc_eng_init(loc_afw_data, &clientCallbacks, event);
-
-    EXIT_LOG(%d, ret_val);
-    return ret_val;
+    const ulpInterface * loc_eng_ulp_inf = NULL;
+    int retVal = loc_eng_init(loc_afw_data, &clientCallbacks, event,
+                              loc_ulp_msg_sender, &loc_eng_ulp_inf );
+    int ret_val1 = loc_eng_ulp_init(loc_afw_data, loc_eng_ulp_inf);
+    LOC_LOGD("loc_eng_ulp_init returned %d\n",ret_val1);
+    EXIT_LOG(%d, retVal);
+    return retVal;
 }
 
 /*===========================================================================
@@ -493,6 +527,14 @@ static const void* loc_get_extension(const char* name)
    else if (strcmp(name, ULP_RAW_CMD_INTERFACE) == 0)
    {
       ret_val = &sLocEngInjectRawCmdInterface;
+   }
+   else if(strcmp(name, ULP_PHONE_CONTEXT_INTERFACE) == 0)
+   {
+     ret_val = &sLocEngUlpPhoneContextInterface;
+   }
+   else if(strcmp(name, ULP_NETWORK_INTERFACE) == 0)
+   {
+      ret_val = &sUlpNetworkInterface;
    }
    else
    {
@@ -812,4 +854,101 @@ static void sv_cb(GpsSvStatus* sv_status, void* svExt)
         gps_sv_cb(sv_status);
     }
     EXIT_LOG(%s, VOID_RET);
+}
+/*===========================================================================
+FUNCTION    loc_ulp_network_init
+
+DESCRIPTION
+   Initialize the ULP network interface.
+
+DEPENDENCIES
+   NONE
+
+RETURN VALUE
+   0
+
+SIDE EFFECTS
+   N/A
+
+===========================================================================*/
+static int loc_ulp_phone_context_init(UlpPhoneContextCallbacks *callbacks)
+{
+    ENTRY_LOG();
+    int ret_val = loc_eng_ulp_phone_context_init(loc_afw_data, callbacks);
+    EXIT_LOG(%d, ret_val);
+    return ret_val;
+}
+/*===========================================================================
+FUNCTION    loc_ulp_phone_context_settings_update
+
+DESCRIPTION
+   This is used to inform the ULP module of phone settings changes carried out
+   by the users
+DEPENDENCIES
+   N/A
+
+RETURN VALUE
+   0: success
+
+SIDE EFFECTS
+   N/A
+
+===========================================================================*/
+
+static int loc_ulp_phone_context_settings_update(UlpPhoneContextSettings *settings)
+{
+    ENTRY_LOG();
+    int ret_val = -1;
+    ret_val = loc_eng_ulp_phone_context_settings_update(loc_afw_data, settings);
+    EXIT_LOG(%d, ret_val);
+    return ret_val;
+}
+
+/*===========================================================================
+FUNCTION    loc_ulp_network_init
+
+DESCRIPTION
+   Initialize the ULP network interface.
+
+DEPENDENCIES
+   NONE
+
+RETURN VALUE
+   0
+
+SIDE EFFECTS
+   N/A
+
+===========================================================================*/
+static int loc_ulp_network_init(UlpNetworkLocationCallbacks *callbacks)
+{
+   ENTRY_LOG();
+   int ret_val = loc_eng_ulp_network_init(loc_afw_data, callbacks);
+   EXIT_LOG(%d, ret_val);
+   return ret_val;
+}
+
+/*===========================================================================
+FUNCTION    loc_eng_ulp_send_network_position
+
+DESCRIPTION
+   Ulp send data
+
+DEPENDENCIES
+   NONE
+
+RETURN VALUE
+   0
+
+SIDE EFFECTS
+   N/A
+
+===========================================================================*/
+int loc_ulp_send_network_position(UlpNetworkPositionReport *position_report)
+{
+    ENTRY_LOG();
+    int ret_val = -1;
+    ret_val = loc_eng_ulp_send_network_position(loc_afw_data, position_report);
+    EXIT_LOG(%d, ret_val);
+    return ret_val;
 }

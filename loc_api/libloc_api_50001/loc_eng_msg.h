@@ -50,10 +50,12 @@ struct loc_eng_msg {
         owner(instance), msgid(id)
     {
         LOC_LOGV("creating msg %s", loc_get_msg_name(msgid));
+        LOC_LOGV("creating msg ox%x", msgid);
     }
     virtual ~loc_eng_msg()
     {
         LOC_LOGV("deleting msg %s", loc_get_msg_name(msgid));
+        LOC_LOGV("deleting msg ox%x", msgid);
     }
 };
 
@@ -136,12 +138,12 @@ struct loc_eng_msg_position_mode : public loc_eng_msg {
         pMode(mode), pRecurrence(recurrence), minInterval(min_interval),
         preferredAccuracy(preferred_accuracy), preferredTime(preferred_time)
     {
-        LOC_LOGV("Position mode: %s\n  Position recurrence: %s\n  min interval: %d\n  preferred accuracy: %d\n  preferred time: %d",
-                 loc_get_position_mode_name(pMode),
-                 loc_get_position_recurrence_name(pRecurrence),
-                 minInterval,
-                 preferredAccuracy,
-                 preferredTime);
+      LOC_LOGV("Position mode: %s\n  Position recurrence: %s\n  min interval: %d\n  preferred accuracy: %d\n  preferred time: %d",
+                      loc_get_position_mode_name(pMode),
+                      loc_get_position_recurrence_name(pRecurrence),
+                      minInterval,
+                      preferredAccuracy,
+                      preferredTime);
     }
 };
 
@@ -193,11 +195,10 @@ struct loc_eng_msg_report_position : public loc_eng_msg {
         loc_eng_msg(instance, LOC_ENG_MSG_REPORT_POSITION),
         location(loc), locationExt(locExt), status(st)
     {
-        LOC_LOGV("flags: %d\n  source: %d\n  latitude: %f\n  longitude: %f\n  altitude: %f\n  speed: %f\n  bearing: %f\n  accuracy: %f\n  timestamp: %lld\n  rawDataSize: %d\n  rawData: %p\n  Session status: %s",
+        LOC_LOGV("flags: %d\n  source: %d\n  latitude: %f\n  longitude: %f\n  altitude: %f\n  speed: %f\n  bearing: %f\n  accuracy: %f\n  timestamp: %lld\n  rawDataSize: %d\n  rawData: %p\n  Session status: %d",
                  location.flags, location.position_source, location.latitude, location.longitude,
                  location.altitude, location.speed, location.bearing, location.accuracy,
-                 location.timestamp, location.rawDataSize, location.rawData,
-                 loc_get_position_sess_status_name(status));
+                 location.timestamp, location.rawDataSize, location.rawData,status);
     }
 };
 
@@ -514,6 +515,98 @@ struct loc_eng_msg_set_data_enable : public loc_eng_msg {
     inline ~loc_eng_msg_set_data_enable()
     {
         delete[] apn;
+    }
+};
+
+struct loc_eng_msg_request_network_position : public loc_eng_msg {
+    const UlpNetworkRequestPos networkPosRequest;
+    inline loc_eng_msg_request_network_position (void* instance, UlpNetworkRequestPos networkPosReq) :
+        loc_eng_msg(instance, LOC_ENG_MSG_REQUEST_NETWORK_POSIITON),
+        networkPosRequest(networkPosReq)
+    {
+        LOC_LOGV("network position request: desired pos source %d\n  request type: %d\n interval ms: %d ",
+             networkPosReq.desired_position_source,
+             networkPosReq.request_type,
+             networkPosReq.interval_ms);
+    }
+};
+
+struct loc_eng_msg_request_phone_context : public loc_eng_msg {
+    const UlpPhoneContextRequest contextRequest;
+    inline loc_eng_msg_request_phone_context (void* instance, UlpPhoneContextRequest contextReq) :
+        loc_eng_msg(instance, LOC_ENG_MSG_REQUEST_PHONE_CONTEXT),
+        contextRequest(contextReq)
+    {
+        LOC_LOGV("phone context request: request type %d context type: %d ",
+             contextRequest.request_type,
+             contextRequest.context_type);
+    }
+};
+
+struct ulp_msg_update_criteria : public loc_eng_msg {
+    const UlpLocationCriteria locationCriteria;
+    inline ulp_msg_update_criteria (void* instance, UlpLocationCriteria criteria) :
+        loc_eng_msg(instance, ULP_MSG_UPDATE_CRITERIA),
+        locationCriteria(criteria)
+    {
+        LOC_LOGV("location criteria: aciton %d\n  valid mask: %d\n provider source: %d\n accuracy %d\n recurrence type %d\n min interval %d\n power consumption %d\n intermediate pos %d ",
+             locationCriteria.action,
+             locationCriteria.valid_mask,
+             locationCriteria.provider_source,
+             locationCriteria.preferred_horizontal_accuracy,
+             locationCriteria.recurrence_type,
+             locationCriteria.min_interval,
+             locationCriteria.preferred_power_consumption,
+             locationCriteria.intermediate_pos_report_enabled);
+    }
+};
+
+struct ulp_msg_inject_phone_context_settings : public loc_eng_msg {
+    const UlpPhoneContextSettings phoneSetting;
+    inline ulp_msg_inject_phone_context_settings(void* instance, UlpPhoneContextSettings setting) :
+        loc_eng_msg(instance, ULP_MSG_INJECT_PHONE_CONTEXT_SETTINGS),
+        phoneSetting(setting)
+    {
+        LOC_LOGV("context type: %d\n  gps enabled: %d\n network position available %d\n wifi setting enabled %d\n battery charging %d",
+             phoneSetting.context_type,
+             phoneSetting.is_gps_enabled,
+             phoneSetting.is_network_position_available,
+             phoneSetting.is_wifi_setting_enabled,
+             phoneSetting.is_battery_charging);
+    }
+};
+
+struct ulp_msg_inject_network_position : public loc_eng_msg {
+    const UlpNetworkPositionReport networkPosition;
+    inline ulp_msg_inject_network_position(void* instance, UlpNetworkPositionReport networkPos) :
+        loc_eng_msg(instance, ULP_MSG_INJECT_NETWORK_POSITION),
+        networkPosition(networkPos)
+    {
+        LOC_LOGV("flags: %d\n  source: %d\n  latitude: %f\n  longitude: %f\n  accuracy %d",
+             networkPosition.valid_flag,
+             networkPosition.position.pos_source,
+             networkPosition.position.latitude,
+             networkPosition.position.longitude,
+             networkPosition.position.HEPE);
+    }
+};
+
+// Shall we deprecate this message and use the same one as loc_eng_msg_report_position
+
+struct ulp_msg_report_position : public loc_eng_msg {
+    const GpsLocation location;
+    const void* locationExt;
+    const enum loc_sess_status status;
+    inline ulp_msg_report_position(void* instance, GpsLocation &loc, void* locExt,
+                                       enum loc_sess_status st) :
+        loc_eng_msg(instance, LOC_ENG_MSG_REPORT_POSITION),
+        location(loc), locationExt(locExt), status(st)
+    {
+        LOC_LOGV("flags: %d\n  source: %d\n  latitude: %f\n  longitude: %f\n  altitude: %f\n  speed: %f\n  bearing: %f\n  accuracy: %f\n  timestamp: %lld\n  rawDataSize: %d\n  rawData: %p\n  Session status: %s",
+                 location.flags, location.position_source, location.latitude, location.longitude,
+                 location.altitude, location.speed, location.bearing, location.accuracy,
+                 location.timestamp, location.rawDataSize, location.rawData,
+                 loc_get_position_sess_status_name(status));
     }
 };
 

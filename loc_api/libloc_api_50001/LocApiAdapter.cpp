@@ -44,11 +44,12 @@ LocEng::LocEng(void* caller,
                gps_acquire_wakelock acqwl,
                gps_release_wakelock relwl,
                loc_msg_sender msgSender,
+               loc_msg_sender msgUlpSender,
                loc_ext_parser posParser,
                loc_ext_parser svParser) :
         owner(caller),
         eventMask(emask), acquireWakelock(acqwl),
-        releaseWakeLock(relwl), sendMsge(msgSender),
+        releaseWakeLock(relwl), sendMsge(msgSender), sendUlpMsg(msgUlpSender),
         extPosInfo(NULL == posParser ? noProc : posParser),
         extSvInfo(NULL == svParser ? noProc : svParser)
 {
@@ -119,7 +120,12 @@ void LocApiAdapter::reportPosition(GpsLocation &location,
                                                                      location,
                                                                      locationExt,
                                                                      status));
-    locEngHandle.sendMsge(locEngHandle.owner, msg);
+    //TODO:Temp change to rout all position reports to HAL till libulp can start processing them
+    //if (locEngHandle.sendUlpMsg) {
+     //   locEngHandle.sendUlpMsg(locEngHandle.owner, msg);
+    //} else {
+        locEngHandle.sendMsge(locEngHandle.owner, msg);
+    //}
 }
 
 void LocApiAdapter::reportSv(GpsSvStatus &svStatus, void* svExt)

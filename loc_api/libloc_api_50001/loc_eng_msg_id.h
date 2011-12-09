@@ -80,7 +80,34 @@ enum loc_eng_msg_ids_t {
     LOC_ENG_MSG_INFORM_NI_RESPONSE,
     LOC_ENG_MSG_REQUEST_XTRA_DATA,
     LOC_ENG_MSG_REQUEST_TIME,
-    LOC_ENG_MSG_REQUEST_POSITION
+    LOC_ENG_MSG_REQUEST_POSITION,
+
+    // The following messages are added for ulp
+    LOC_ENG_MSG_REQUEST_PHONE_CONTEXT,
+    LOC_ENG_MSG_REQUEST_NETWORK_POSIITON,
+
+    /* Following messages are for ulp, start at index 0x600 */
+
+    // Message is sent by GPS HAL layer to add/remove unique request criteria
+    ULP_MSG_UPDATE_CRITERIA = 0x600,
+
+    // Message is sent by GPS HAL layer to request ULP to start producing position fixes
+
+    ULP_MSG_START_FIX,
+
+    // Message is sent by Android framework(GpsLocationProvider)
+    // to request ULP to stop producing position fixes
+    ULP_MSG_STOP_FIX,
+
+    // Message is sent by Android framework(GpsLocationProvider)
+    // to inject phone context setting  include initial phone context setting and subsequent changes
+    ULP_MSG_INJECT_PHONE_CONTEXT_SETTINGS,
+
+    // Message is sent by network provider to INJECT the position in UlpNetworkPositionReport format
+    ULP_MSG_INJECT_NETWORK_POSITION,
+
+    // Message is sent by provider in order to report the position in GpsPosition format
+    ULP_MSG_REPORT_POSITION,
 };
 
 #ifdef __cplusplus

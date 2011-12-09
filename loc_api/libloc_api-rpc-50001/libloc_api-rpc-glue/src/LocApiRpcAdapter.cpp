@@ -652,7 +652,9 @@ void LocApiRpcAdapter::reportPosition(const rpc_loc_parsed_position_s_type *loca
                     location.flags    |= GPS_LOCATION_HAS_ACCURACY;
                     location.accuracy = location_report_ptr->hor_unc_circular;
                 }
-
+                //Mark the location source as from GNSS
+                location.flags |= LOCATION_HAS_SOURCE_INFO;
+                location.position_source = ULP_LOCATION_IS_FROM_GNSS;
                 LOC_LOGV("reportPosition: fire callback\n");
                 LocApiAdapter::reportPosition(location,
                                               locEngHandle.extPosInfo((void*)location_report_ptr),

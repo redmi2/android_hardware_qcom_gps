@@ -85,6 +85,7 @@ struct LocEng {
     const gps_acquire_wakelock acquireWakelock;
     const gps_release_wakelock releaseWakeLock;
     const loc_msg_sender       sendMsge;
+    const loc_msg_sender       sendUlpMsg;
     const loc_ext_parser       extPosInfo;
     const loc_ext_parser       extSvInfo;
 
@@ -93,6 +94,7 @@ struct LocEng {
            gps_acquire_wakelock acqwl,
            gps_release_wakelock relwl,
            loc_msg_sender msgSender,
+           loc_msg_sender msgUlpSender,
            loc_ext_parser posParser,
            loc_ext_parser svParser);
 };
