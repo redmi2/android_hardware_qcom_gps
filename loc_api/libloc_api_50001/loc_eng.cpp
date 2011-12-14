@@ -1415,6 +1415,13 @@ static void loc_eng_deferred_action_thread(void* arg)
         }
         break;
 
+        case LOC_ENG_MSG_EXT_POWER_CONFIG:
+        {
+            loc_eng_msg_ext_power_config *pwrMsg = (loc_eng_msg_ext_power_config*)msg;
+            loc_eng_data_p->client_handle->setExtPowerConfig(pwrMsg->isBatteryCharging);
+        }
+        break;
+
         case LOC_ENG_MSG_REPORT_POSITION:
             if (loc_eng_data_p->mute_session_state != LOC_MUTE_SESS_IN_SESSION)
             {
@@ -1840,9 +1847,9 @@ int loc_eng_ulp_phone_context_settings_update(loc_eng_data_s_type &loc_eng_data,
                                               UlpPhoneContextSettings *settings)
 {
     ENTRY_LOG();
-    int ret_val = 0;
+    int ret_val = -1;
 
-    LOC_LOGD("loc_eng_ulp_phone_context_settings: context_type - 0x%d is_agps_enabled - %d "
+    LOC_LOGD("loc_eng_ulp_phone_context_settings: context_type - 0x%x is_agps_enabled - %d "
              "is_battery_charging %d ,is_gps_enabled %d, is_network_position_available %d,"
              "is_wifi_setting_enabled %d\n",
              settings->context_type ,settings->is_agps_enabled,settings->is_battery_charging,
@@ -1850,14 +1857,19 @@ int loc_eng_ulp_phone_context_settings_update(loc_eng_data_s_type &loc_eng_data,
 
     if((loc_eng_data.ulp_initialized == true) && (gps_conf.CAPABILITIES & ULP_CAPABILITY))
     {
-     ulp_msg_inject_phone_context_settings *msg
+        ulp_msg_inject_phone_context_settings *msg
          (new ulp_msg_inject_phone_context_settings(&loc_eng_data, *settings));
-     msg_q_snd( (void*)((LocEngContext*)(loc_eng_data.context))->ulp_q, msg, loc_eng_free_msg);
-     ret_val = 0;
-    }else
-    {
-        ret_val = -1;
+        msg_q_snd( (void*)((LocEngContext*)(loc_eng_data.context))->ulp_q, msg, loc_eng_free_msg);
+        ret_val = 0;
     }
+
+    // Send battery information to modem for processing.
+    if(settings->context_type & ULP_PHONE_CONTEXT_BATTERY_CHARGING_STATE)
+    {
+        loc_eng_msg_ext_power_config *msg(new loc_eng_msg_ext_power_config(&loc_eng_data, settings->is_battery_charging));
+        msg_q_snd( (void*)((LocEngContext*)(loc_eng_data.context))->deferred_q, msg, loc_eng_free_msg);
+    }
+
     EXIT_LOG(%d, ret_val);
     return ret_val;
 }

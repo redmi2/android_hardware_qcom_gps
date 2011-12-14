@@ -69,6 +69,16 @@ struct loc_eng_msg_suple_version : public loc_eng_msg {
         }
 };
 
+struct loc_eng_msg_ext_power_config : public loc_eng_msg {
+    const int isBatteryCharging;
+    inline loc_eng_msg_ext_power_config(void* instance, int isBattCharging) :
+            loc_eng_msg(instance, LOC_ENG_MSG_EXT_POWER_CONFIG),
+            isBatteryCharging(isBattCharging)
+        {
+            LOC_LOGV("isBatteryCharging: %d", isBatteryCharging);
+        }
+};
+
 struct loc_eng_msg_sensor_control_config : public loc_eng_msg {
     const int sensorsDisabled;
     inline loc_eng_msg_sensor_control_config(void* instance, int disabled) :

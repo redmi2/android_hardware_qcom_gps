@@ -91,7 +91,8 @@ static loc_name_val_s_type loc_eng_msgs[] =
     NAME_VAL( LOC_ENG_MSG_REQUEST_NI ),
     NAME_VAL( LOC_ENG_MSG_INFORM_NI_RESPONSE ),
     NAME_VAL( LOC_ENG_MSG_REQUEST_XTRA_DATA ),
-    NAME_VAL( LOC_ENG_MSG_REQUEST_TIME )
+    NAME_VAL( LOC_ENG_MSG_REQUEST_TIME ),
+    NAME_VAL( LOC_ENG_MSG_EXT_POWER_CONFIG )
 };
 static int loc_eng_msgs_num = sizeof(loc_eng_msgs) / sizeof(loc_name_val_s_type);
 

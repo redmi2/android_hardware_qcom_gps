@@ -181,11 +181,9 @@ public:
     setSensorProperties(float gyroBiasVarianceRandomWalk);
 
   virtual enum loc_api_adapter_err
-    setSensorPerfControlConfig(int controlMode,
-                               int accelSamplesPerBatch,
-                               int accelBatchesPerSec,
-                               int gyroSamplesPerBatch,
-                               int gyroBatchesPerSec);
+    setSensorPerfControlConfig(int controlMode, int accelSamplesPerBatch, int accelBatchesPerSec,
+                               int gyroSamplesPerBatch, int gyroBatchesPerSec);
+  virtual enum loc_api_adapter_err setExtPowerConfig(int isBatteryCharging);
 };
 
 #endif //LOC_API_V_0_2_ADAPTER_H

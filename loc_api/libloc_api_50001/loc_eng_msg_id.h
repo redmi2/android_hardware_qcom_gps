@@ -81,6 +81,7 @@ enum loc_eng_msg_ids_t {
     LOC_ENG_MSG_REQUEST_XTRA_DATA,
     LOC_ENG_MSG_REQUEST_TIME,
     LOC_ENG_MSG_REQUEST_POSITION,
+    LOC_ENG_MSG_EXT_POWER_CONFIG,
 
     // The following messages are added for ulp
     LOC_ENG_MSG_REQUEST_PHONE_CONTEXT,
