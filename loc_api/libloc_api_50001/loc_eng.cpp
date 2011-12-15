@@ -93,6 +93,7 @@ static loc_param_s_type loc_parameter_table[] =
   {"SENSOR_GYRO_SAMPLES_PER_BATCH",  &gps_conf.SENSOR_GYRO_SAMPLES_PER_BATCH,  NULL, 'n'},
   {"SENSOR_CONTROL_MODE",            &gps_conf.SENSOR_CONTROL_MODE,            NULL, 'n'},
   {"SENSOR_USAGE",                   &gps_conf.SENSOR_USAGE,                   NULL, 'n'},
+  {"QUIPC_ENABLED",                  &gps_conf.QUIPC_ENABLED,                  NULL, 'n'},
 };
 
 static void loc_default_parameters(void)
@@ -287,7 +288,8 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
 
     if (loc_external_msg_sender) {
        *loc_eng_ulp_inf = loc_eng_get_ulp_inf();
-       if (*loc_eng_ulp_inf == NULL) loc_external_msg_sender = NULL;
+       if ((gps_conf.QUIPC_ENABLED == 0) || (*loc_eng_ulp_inf == NULL))
+            loc_external_msg_sender = NULL;
     }
 
     LocEng locEngHandle(&loc_eng_data, event, loc_eng_data.acquire_wakelock_cb,
@@ -1699,7 +1701,16 @@ const ulpInterface * loc_eng_get_ulp_inf(void)
        goto exit;
     }
     dlerror();    /* Clear any existing error */
+
+    if (gps_conf.QUIPC_ENABLED == 0)
+    {
     handle = dlopen ("libulp.so", RTLD_NOW);
+    }
+    else
+    {
+        handle = dlopen ("libulp2.so", RTLD_NOW);
+    }
+
     if (!handle)
     {
         if ((error = dlerror()) != NULL)  {

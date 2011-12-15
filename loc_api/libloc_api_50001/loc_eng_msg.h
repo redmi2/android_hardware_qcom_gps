@@ -601,22 +601,19 @@ struct ulp_msg_inject_network_position : public loc_eng_msg {
     }
 };
 
-// Shall we deprecate this message and use the same one as loc_eng_msg_report_position
-
-struct ulp_msg_report_position : public loc_eng_msg {
+struct ulp_msg_report_quipc_position : public loc_eng_msg {
     const GpsLocation location;
-    const void* locationExt;
-    const enum loc_sess_status status;
-    inline ulp_msg_report_position(void* instance, GpsLocation &loc, void* locExt,
-                                       enum loc_sess_status st) :
-        loc_eng_msg(instance, LOC_ENG_MSG_REPORT_POSITION),
-        location(loc), locationExt(locExt), status(st)
+    const int  quipc_error_code;
+    inline ulp_msg_report_quipc_position(void* instance, GpsLocation &loc,
+                                         int  quipc_err) :
+        loc_eng_msg(instance, ULP_MSG_REPORT_QUIPC_POSITION),
+        location(loc), quipc_error_code(quipc_err)
     {
-        LOC_LOGV("flags: %d\n  source: %d\n  latitude: %f\n  longitude: %f\n  altitude: %f\n  speed: %f\n  bearing: %f\n  accuracy: %f\n  timestamp: %lld\n  rawDataSize: %d\n  rawData: %p\n  Session status: %s",
+        LOC_LOGV("flags: %d\n  source: %d\n  latitude: %f\n  longitude: %f\n  altitude: %f\n  speed: %f\n  bearing: %f\n  accuracy: %f\n  timestamp: %lld\n  rawDataSize: %d\n  rawData: %p\n  Quipc error: %d",
                  location.flags, location.position_source, location.latitude, location.longitude,
                  location.altitude, location.speed, location.bearing, location.accuracy,
                  location.timestamp, location.rawDataSize, location.rawData,
-                 loc_get_position_sess_status_name(status));
+                 quipc_error_code);
     }
 };
 

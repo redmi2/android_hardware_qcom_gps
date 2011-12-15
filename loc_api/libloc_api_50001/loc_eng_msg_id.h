@@ -107,8 +107,11 @@ enum loc_eng_msg_ids_t {
     // Message is sent by network provider to INJECT the position in UlpNetworkPositionReport format
     ULP_MSG_INJECT_NETWORK_POSITION,
 
-    // Message is sent by provider in order to report the position in GpsPosition format
-    ULP_MSG_REPORT_POSITION,
+    // Message is sent by QUIPC provider in order to report the position in GpsPosition format with QUIPC status
+    ULP_MSG_REPORT_QUIPC_POSITION,
+
+    // Message is sent by QUIPC module in order to request some info from ULP
+    ULP_MSG_REQUEST_COARSE_POSITION,
 };
 
 #ifdef __cplusplus
