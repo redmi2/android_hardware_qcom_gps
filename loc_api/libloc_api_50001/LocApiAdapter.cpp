@@ -120,18 +120,24 @@ void LocApiAdapter::reportPosition(GpsLocation &location,
                                                                      location,
                                                                      locationExt,
                                                                      status));
-    //TODO:Temp change to rout all position reports to HAL till libulp can start processing them
-    //if (locEngHandle.sendUlpMsg) {
-     //   locEngHandle.sendUlpMsg(locEngHandle.owner, msg);
-    //} else {
+    if (locEngHandle.sendUlpMsg) {
+        locEngHandle.sendUlpMsg(locEngHandle.owner, msg);
+    } else {
         locEngHandle.sendMsge(locEngHandle.owner, msg);
-    //}
+    }
 }
 
 void LocApiAdapter::reportSv(GpsSvStatus &svStatus, void* svExt)
 {
     loc_eng_msg_report_sv *msg(new loc_eng_msg_report_sv(locEngHandle.owner, svStatus, svExt));
-    locEngHandle.sendMsge(locEngHandle.owner, msg);
+
+    //We want to send SV info to ULP to help it in determining GNSS signal strength
+    //ULP will forward the SV reports to HAL without any modifications
+    if (locEngHandle.sendUlpMsg) {
+        locEngHandle.sendUlpMsg(locEngHandle.owner, msg);
+    } else {
+        locEngHandle.sendMsge(locEngHandle.owner, msg);
+    }
 }
 
 void LocApiAdapter::reportStatus(GpsStatusValue status)

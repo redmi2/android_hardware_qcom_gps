@@ -288,7 +288,7 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
 
     if (loc_external_msg_sender) {
        *loc_eng_ulp_inf = loc_eng_get_ulp_inf();
-       if ((gps_conf.QUIPC_ENABLED == 0) || (*loc_eng_ulp_inf == NULL))
+       if (*loc_eng_ulp_inf == NULL)
             loc_external_msg_sender = NULL;
     }
 
