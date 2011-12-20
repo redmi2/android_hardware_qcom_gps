@@ -36,6 +36,7 @@ extern "C" {
 
 // Uncomment to keep all LOG messages (LOGD, LOGI, LOGV, etc.)
 #define MAX_NUM_ATL_CONNECTIONS  2
+
 // Define boolean type to be used by libgps on loc api module
 typedef unsigned char boolean;
 
@@ -129,8 +130,6 @@ typedef struct
 
     void*                          context;
 
-    loc_eng_msg_position_mode      position_mode;
-
     // For muting session broadcast
     loc_mute_session_e_type        mute_session_state;
 
@@ -188,9 +187,7 @@ int  loc_eng_inject_location(loc_eng_data_s_type &loc_eng_data,
 void loc_eng_delete_aiding_data(loc_eng_data_s_type &loc_eng_data,
                                 GpsAidingData f);
 int  loc_eng_set_position_mode(loc_eng_data_s_type &loc_eng_data,
-                               LocPositionMode mode, GpsPositionRecurrence recurrence,
-                               uint32_t min_interval, uint32_t preferred_accuracy,
-                               uint32_t preferred_time);
+                               LocPosMode &params);
 const void* loc_eng_get_extension(loc_eng_data_s_type &loc_eng_data,
                                   const char* name);
 int  loc_eng_update_criteria(loc_eng_data_s_type &loc_eng_data,

@@ -57,7 +57,7 @@ LocEng::LocEng(void* caller,
 }
 
 LocApiAdapter::LocApiAdapter(LocEng &locEng) :
-    locEngHandle(locEng)
+    locEngHandle(locEng), fixCriteria()
 {
     LOC_LOGD("LocApiAdapter created");
 }

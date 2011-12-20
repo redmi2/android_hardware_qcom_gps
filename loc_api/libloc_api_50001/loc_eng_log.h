@@ -37,7 +37,7 @@ extern "C"
 
 #include <ctype.h>
 #include <hardware/gps.h>
-#include "loc_eng_msg_id.h"
+#include <loc.h>
 
 const char* loc_get_gps_status_name(GpsStatusValue gps_status);
 const char* loc_get_msg_name(int id);

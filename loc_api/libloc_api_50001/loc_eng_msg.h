@@ -35,13 +35,61 @@
 #include <string.h>
 #include "log_util.h"
 #include "loc.h"
-#include "loc_eng_log.h"
+#include <loc_eng_log.h>
 #include "loc_eng_msg_id.h"
 
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+
+struct LocPosMode
+{
+    LocPositionMode mode;
+    GpsPositionRecurrence recurrence;
+    uint32_t min_interval;
+    uint32_t preferred_accuracy;
+    uint32_t preferred_time;
+    char credentials[14];
+    char provider[8];
+    LocPosMode(LocPositionMode m, GpsPositionRecurrence recr,
+               uint32_t gap, uint32_t accu, uint32_t time,
+               const char* cred, const char* prov) :
+        mode(m), recurrence(recr),
+        min_interval(gap < MIN_POSSIBLE_FIX_INTERVAL ? MIN_POSSIBLE_FIX_INTERVAL : gap),
+        preferred_accuracy(accu), preferred_time(time) {
+        memset(credentials, 0, sizeof(credentials));
+        memset(provider, 0, sizeof(provider));
+        if (NULL != cred) {
+            memcpy(credentials, cred, sizeof(credentials)-1);
+        }
+        if (NULL != prov) {
+            memcpy(provider, prov, sizeof(provider)-1);
+        }
+    }
+
+    LocPosMode() :
+        mode(LOC_POSITION_MODE_MS_BASED), recurrence(GPS_POSITION_RECURRENCE_PERIODIC),
+        min_interval(MIN_POSSIBLE_FIX_INTERVAL), preferred_accuracy(50), preferred_time(120000) {
+        memset(credentials, 0, sizeof(credentials));
+        memset(provider, 0, sizeof(provider));
+    }
+
+    inline bool equals(const LocPosMode &anotherMode) const
+    { return 0 == memcmp(this, &anotherMode, sizeof(*this)); }
+
+    inline void logv() const
+    {
+        LOC_LOGV ("Position mode: %s\n  Position recurrence: %s\n  min interval: %d\n  preferred accuracy: %d\n  preferred time: %d\n  credentials: %s  provider: %s",
+                  loc_get_position_mode_name(mode),
+                  loc_get_position_recurrence_name(recurrence),
+                  min_interval,
+                  preferred_accuracy,
+                  preferred_time,
+                  credentials,
+                  provider);
+    }
+};
 
 struct loc_eng_msg {
     const void* owner;
@@ -128,32 +176,13 @@ struct loc_eng_msg_sensor_perf_control_config : public loc_eng_msg {
 
 
 struct loc_eng_msg_position_mode : public loc_eng_msg {
-    const LocPositionMode pMode;
-    const GpsPositionRecurrence pRecurrence;
-    const uint32_t minInterval;
-    const uint32_t preferredAccuracy;
-    const uint32_t preferredTime;
-    inline loc_eng_msg_position_mode() :
-        loc_eng_msg(NULL, LOC_ENG_MSG_SET_POSITION_MODE),
-        pMode(LOC_POSITION_MODE_STANDALONE),
-        pRecurrence(0), minInterval(0),
-        preferredAccuracy(0), preferredTime(0) {}
+    const LocPosMode pMode;
     inline loc_eng_msg_position_mode(void* instance,
-                                     LocPositionMode mode,
-                                     GpsPositionRecurrence recurrence,
-                                     uint32_t min_interval,
-                                     uint32_t preferred_accuracy,
-                                     uint32_t preferred_time) :
+                                     LocPosMode &mode) :
         loc_eng_msg(instance, LOC_ENG_MSG_SET_POSITION_MODE),
-        pMode(mode), pRecurrence(recurrence), minInterval(min_interval),
-        preferredAccuracy(preferred_accuracy), preferredTime(preferred_time)
+        pMode(mode)
     {
-      LOC_LOGV("Position mode: %s\n  Position recurrence: %s\n  min interval: %d\n  preferred accuracy: %d\n  preferred time: %d",
-                      loc_get_position_mode_name(pMode),
-                      loc_get_position_recurrence_name(pRecurrence),
-                      minInterval,
-                      preferredAccuracy,
-                      preferredTime);
+        pMode.logv();
     }
 };
 

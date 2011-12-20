@@ -31,7 +31,6 @@
 #define LOG_TAG "LocSvc_eng"
 
 #include "hardware/gps.h"
-#include "loc.h"
 #include "loc_log.h"
 #include "loc_eng_log.h"
 #include "loc_eng_msg_id.h"

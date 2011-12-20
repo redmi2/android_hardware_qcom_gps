@@ -34,25 +34,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-/* Fix criteria structure*/
-struct LocApiV02FixCriteria
-{
-  LocPositionMode mode;
-  GpsPositionRecurrence recurrence;
-  uint32_t min_interval ;
-  uint32_t preferred_accuracy ;
-  uint32_t preferred_time;
-
-  /* Constructor for the structure  */
-  inline LocApiV02FixCriteria (LocPositionMode mode,
-                               GpsPositionRecurrence recur,
-                               uint32_t min_int,
-                               uint32_t pref_acc,
-                               uint32_t pref_time) :
-    mode(mode), recurrence(recur), min_interval(min_int),
-    preferred_accuracy(pref_acc), preferred_time(pref_time) {}
-};
-
 /* This class derives from the LocApiAdapter class.
    The members of this class are responsible for converting
    the Loc API V02 data structures into Loc Engine data structures.
@@ -68,12 +49,6 @@ class LocApiV02Adapter : public LocApiAdapter {
 
   /* current session state */
   bool navigating;
-
-  /* current fix criteria, for Loc aPI V02 this is
-     stored when set_position_mode is called and
-     sent out with Loc aPI V02 start message when the
-     start_fix() is called by loc engine. */
-  LocApiV02FixCriteria fixCriteria;
 
   /* Convert event mask from loc eng to loc_api_v02 format */
   locClientEventMaskType convertMask(LOC_API_ADAPTER_EVENT_MASK_T mask);
@@ -145,9 +120,7 @@ public:
   virtual enum loc_api_adapter_err stopFix();
 
   virtual enum loc_api_adapter_err
-    setPositionMode(LocPositionMode mode, GpsPositionRecurrence recurrence,
-                    uint32_t min_interval, uint32_t preferred_accuracy,
-                    uint32_t preferred_time);
+    setPositionMode(const LocPosMode *mode);
 
   virtual enum loc_api_adapter_err
     setTime(GpsUtcTime time, int64_t timeReference, int uncertainty);

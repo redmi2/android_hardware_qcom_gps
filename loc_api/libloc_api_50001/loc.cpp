@@ -371,9 +371,10 @@ static int  loc_set_position_mode(GpsPositionMode mode,
         locMode = LOC_POSITION_MODE_STANDALONE;
         break;
     }
-    int ret_val = loc_eng_set_position_mode(loc_afw_data, locMode,
-                                            recurrence, min_interval,
-                                            preferred_accuracy, preferred_time);
+
+    LocPosMode params(locMode, recurrence, min_interval,
+                      preferred_accuracy, preferred_time, NULL, NULL);
+    int ret_val = loc_eng_set_position_mode(loc_afw_data, params);
 
     EXIT_LOG(%d, ret_val);
     return ret_val;
