@@ -298,9 +298,7 @@ LocApiRpcAdapter::stopFix() {
 }
 
 enum loc_api_adapter_err
-LocApiRpcAdapter::setPositionMode(LocPositionMode mode,
-            GpsPositionRecurrence recurrence, uint32_t min_interval,
-            uint32_t preferred_accuracy, uint32_t preferred_time)
+LocApiRpcAdapter::setPositionMode(const LocPosMode *posMode)
 {
     rpc_loc_ioctl_data_u_type    ioctl_data;
     rpc_loc_fix_criteria_s_type *fix_criteria_ptr;
@@ -308,10 +306,13 @@ LocApiRpcAdapter::setPositionMode(LocPositionMode mode,
     rpc_loc_operation_mode_e_type op_mode;
     int                          ret_val;
 
-    LOGD ("loc_eng_set_position mode, client = %d, interval = %d, mode = %d\n",
-          (int32) client_handle, min_interval, mode);
+    if (NULL != posMode)
+        fixCriteria = *posMode;
 
-    switch (mode)
+    LOGD ("loc_eng_set_position mode, client = %d, interval = %d, mode = %d\n",
+          (int32) client_handle, fixCriteria.min_interval, fixCriteria.mode);
+
+    switch (fixCriteria.mode)
     {
     case LOC_POSITION_MODE_MS_BASED:
         op_mode = RPC_LOC_OPER_MODE_MSB;
@@ -339,29 +340,22 @@ LocApiRpcAdapter::setPositionMode(LocPositionMode mode,
     fix_criteria_ptr = &ioctl_data.rpc_loc_ioctl_data_u_type_u.fix_criteria;
     fix_criteria_ptr->valid_mask = RPC_LOC_FIX_CRIT_VALID_PREFERRED_OPERATION_MODE |
                                    RPC_LOC_FIX_CRIT_VALID_RECURRENCE_TYPE;
-    fix_criteria_ptr->min_interval = min_interval;
+    fix_criteria_ptr->min_interval = fixCriteria.min_interval;
     fix_criteria_ptr->preferred_operation_mode = op_mode;
 
-    if (min_interval > 0) {
-        fix_criteria_ptr->min_interval = min_interval;
-        fix_criteria_ptr->valid_mask |= RPC_LOC_FIX_CRIT_VALID_MIN_INTERVAL;
-    }else if(min_interval == 0)
-    {
-        /*If the framework passes in 0 transalate it into the maximum frequency we can report positions
-          which is 1 Hz or once very second */
-        fix_criteria_ptr->min_interval = MIN_POSSIBLE_FIX_INTERVAL;
-        fix_criteria_ptr->valid_mask |= RPC_LOC_FIX_CRIT_VALID_MIN_INTERVAL;
-    }
-    if (preferred_accuracy > 0) {
-        fix_criteria_ptr->preferred_accuracy = preferred_accuracy;
+    fix_criteria_ptr->min_interval = fixCriteria.min_interval;
+    fix_criteria_ptr->valid_mask |= RPC_LOC_FIX_CRIT_VALID_MIN_INTERVAL;
+
+    if (fixCriteria.preferred_accuracy > 0) {
+        fix_criteria_ptr->preferred_accuracy = fixCriteria.preferred_accuracy;
         fix_criteria_ptr->valid_mask |= RPC_LOC_FIX_CRIT_VALID_PREFERRED_ACCURACY;
     }
-    if (preferred_time > 0) {
-        fix_criteria_ptr->preferred_response_time = preferred_time;
+    if (fixCriteria.preferred_time > 0) {
+        fix_criteria_ptr->preferred_response_time = fixCriteria.preferred_time;
         fix_criteria_ptr->valid_mask |= RPC_LOC_FIX_CRIT_VALID_PREFERRED_RESPONSE_TIME;
     }
 
-    switch (recurrence) {
+    switch (fixCriteria.recurrence) {
     case GPS_POSITION_RECURRENCE_SINGLE:
         fix_criteria_ptr->recurrence_type = RPC_LOC_SINGLE_FIX;
         break;

@@ -32,9 +32,9 @@
 #include <ctype.h>
 #include <hardware/gps.h>
 #include <loc.h>
+#include <loc_eng_log.h>
 #include <log_util.h>
-
-#define MIN_POSSIBLE_FIX_INTERVAL 1000 /* msec */
+#include <loc_eng_msg.h>
 
 enum loc_api_adapter_err {
     LOC_API_ADAPTER_ERR_SUCCESS             = 0,
@@ -102,6 +102,7 @@ struct LocEng {
 class LocApiAdapter {
 protected:
     const LocEng locEngHandle;
+    LocPosMode fixCriteria;
 
     LocApiAdapter(LocEng &locEng);
 
@@ -166,9 +167,7 @@ public:
         atlCloseStatus(int handle, int is_succ)
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
     inline virtual enum loc_api_adapter_err
-        setPositionMode(LocPositionMode mode, GpsPositionRecurrence recurrence,
-                        uint32_t min_interval, uint32_t preferred_accuracy,
-                        uint32_t preferred_time)
+        setPositionMode(const LocPosMode *posMode)
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
     inline virtual enum loc_api_adapter_err
         setServer(const char* url, int len)

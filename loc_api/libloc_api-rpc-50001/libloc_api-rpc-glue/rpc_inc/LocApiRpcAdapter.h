@@ -71,8 +71,7 @@ public:
     virtual enum loc_api_adapter_err
         stopFix();
     virtual enum loc_api_adapter_err
-        setPositionMode(LocPositionMode mode, GpsPositionRecurrence recurrence,
-            uint32_t min_interval, uint32_t preferred_accuracy, uint32_t preferred_time);
+        setPositionMode(const LocPosMode *mode);
     virtual enum loc_api_adapter_err
         enableData(int enable);
     virtual enum loc_api_adapter_err

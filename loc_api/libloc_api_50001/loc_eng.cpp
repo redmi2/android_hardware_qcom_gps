@@ -594,18 +594,12 @@ SIDE EFFECTS
 
 ===========================================================================*/
 int loc_eng_set_position_mode(loc_eng_data_s_type &loc_eng_data,
-                              LocPositionMode mode,
-                              GpsPositionRecurrence recurrence,
-                              uint32_t min_interval,
-                              uint32_t preferred_accuracy,
-                              uint32_t preferred_time)
+                              LocPosMode &params)
 {
     ENTRY_LOG_CALLFLOW();
     INIT_CHECK(loc_eng_data.context, return -1);
     loc_eng_msg_position_mode *msg(
-        new loc_eng_msg_position_mode(&loc_eng_data, mode,
-                                      recurrence, min_interval,
-                                      preferred_accuracy, preferred_time));
+        new loc_eng_msg_position_mode(&loc_eng_data, params));
     msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
               msg, loc_eng_free_msg);
 
@@ -1245,12 +1239,8 @@ void loc_eng_handle_engine_up(loc_eng_data_s_type &loc_eng_data)
 
     // modem is back up.  If we crashed in the middle of navigating, we restart.
     if (loc_eng_data.navigating) {
-        loc_eng_data.client_handle->setPositionMode(
-            loc_eng_data.position_mode.pMode,
-            loc_eng_data.position_mode.pRecurrence,
-            loc_eng_data.position_mode.minInterval,
-            loc_eng_data.position_mode.preferredAccuracy,
-            loc_eng_data.position_mode.preferredTime);
+        // This sets the copy in adapter to modem
+        loc_eng_data.client_handle->setPositionMode(NULL);
         // not mutex protected, assuming fw won't call start twice without a
         // stop call in between.
         loc_eng_start_handler(loc_eng_data);
@@ -1349,10 +1339,7 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_SET_POSITION_MODE:
         {
             loc_eng_msg_position_mode *pmMsg = (loc_eng_msg_position_mode*)msg;
-            loc_eng_data_p->client_handle->setPositionMode(pmMsg->pMode, pmMsg->pRecurrence,
-                                                           pmMsg->minInterval,pmMsg->preferredAccuracy,
-                                                           pmMsg->preferredTime);
-            memcpy((void*)&loc_eng_data_p->position_mode, (void*)pmMsg, sizeof(*pmMsg));
+            loc_eng_data_p->client_handle->setPositionMode(&(pmMsg->pMode));
         }
         break;
 

@@ -26,6 +26,9 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define LOG_NDEBUG 0
+#define LOG_TAG "LocSvc_adapter"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -40,9 +43,6 @@
 #include "loc_api_v02_log.h"
 #include "loc_api_sync_req.h"
 #include "LocApiAdapter.h"
-
-#define LOG_NDEBUG 0
-#define LOG_TAG "LocSvc_adapter"
 #include "loc_util_log.h"
 
 
@@ -161,10 +161,7 @@ locClientCallbacksType globalCallbacks =
 /* Constructor for LocApiV02Adapter */
 LocApiV02Adapter :: LocApiV02Adapter(LocEng &locEng):
   LocApiAdapter(locEng), clientHandle( LOC_CLIENT_INVALID_HANDLE_VALUE),
-  eventMask(convertMask(locEng.eventMask)), navigating(false),
-   fixCriteria (LOC_POSITION_MODE_MS_BASED, GPS_POSITION_RECURRENCE_PERIODIC,
-                LOC_API_V02_DEF_MIN_INTERVAL, LOC_API_V02_DEF_HORZ_ACCURACY,
-                LOC_API_V02_DEF_TIMEOUT )
+  eventMask(convertMask(locEng.eventMask)), navigating(false)
 {
   // initialize loc_sync_req interface
   loc_sync_req_init();
@@ -236,6 +233,7 @@ enum loc_api_adapter_err LocApiV02Adapter :: startFix()
   memset (&set_mode_ind, 0, sizeof(set_mode_ind));
 
   LOC_LOGV("%s:%d]: start \n", __func__, __LINE__);
+  fixCriteria.logv();
 
   // fill in the start request
   switch(fixCriteria.mode)
@@ -277,11 +275,8 @@ enum loc_api_adapter_err LocApiV02Adapter :: startFix()
     return LOC_API_ADAPTER_ERR_GENERAL_FAILURE; // error
   }
 
-  if(fixCriteria.min_interval > 0)
-  {
-    start_msg.minInterval_valid = 1;
-    start_msg.minInterval = fixCriteria.min_interval;
-  }
+  start_msg.minInterval_valid = 1;
+  start_msg.minInterval = fixCriteria.min_interval;
 
   start_msg.horizontalAccuracyLevel_valid = 1;
 
@@ -313,7 +308,25 @@ enum loc_api_adapter_err LocApiV02Adapter :: startFix()
 
   //dummy session id
   // TBD: store session ID, check for session id in pos reports.
-  start_msg.sessionId = LOC_API_V02_DEF_SESSION_ID;;
+  start_msg.sessionId = LOC_API_V02_DEF_SESSION_ID;
+
+  if (fixCriteria.credentials[0] != 0) {
+      int size1 = sizeof(start_msg.applicationId.applicationName);
+      int size2 = sizeof(fixCriteria.credentials);
+      int len = ((size1 < size2) ? size1 : size2) - 1;
+      memcpy(start_msg.applicationId.applicationName,
+             fixCriteria.credentials,
+             len);
+
+      size1 = sizeof(start_msg.applicationId.applicationProvider);
+      size2 = sizeof(fixCriteria.provider);
+      len = ((size1 < size2) ? size1 : size2) - 1;
+      memcpy(start_msg.applicationId.applicationProvider,
+             fixCriteria.provider,
+             len);
+
+      start_msg.applicationId_valid = 1;
+  }
 
   req_union.pStartReq = &start_msg;
 
@@ -366,42 +379,28 @@ enum loc_api_adapter_err LocApiV02Adapter :: stopFix()
 
 /* set the positioning fix criteria */
 enum loc_api_adapter_err LocApiV02Adapter ::  setPositionMode(
-  LocPositionMode mode, GpsPositionRecurrence recurrence,
-  uint32_t min_interval, uint32_t preferred_accuracy,
-  uint32_t preferred_time)
+  const LocPosMode *posMode)
 {
+    LOC_LOGV ("%s:%d]: posMode %p",__func__, __LINE__, posMode);
 
-  LOC_LOGV ("%s:%d]: interval = %d, mode = %d, recurrence = %d, preferred_accuracy = %d\n",__func__, __LINE__,
-                 min_interval, mode, recurrence, preferred_accuracy);
+    if (NULL != posMode &&
+        !fixCriteria.equals(*posMode)) {
+        //making a copy of the fix criteria
+        fixCriteria = *posMode;
 
-  //store the fix criteria
-  fixCriteria.mode = mode;
+        LOC_LOGD ("%s:%d]: new fix criteria", __func__, __LINE__);
 
-  fixCriteria.recurrence = recurrence;
+        if(true == navigating)
+        {
+            //fix is in progress, send a restart
+            LOC_LOGD ("%s:%d]: fix is in progress restarting the fix with new "
+                      "criteria\n", __func__, __LINE__);
 
-  if(min_interval == 0)
-  {
-    fixCriteria.min_interval = MIN_POSSIBLE_FIX_INTERVAL;
-  }
-  else
-  {
-    fixCriteria.min_interval = min_interval;
-  }
+            return( startFix());
+        }
+    }
 
-  fixCriteria.preferred_accuracy = preferred_accuracy;
-
-  fixCriteria.preferred_time = preferred_time;
-
-  if(true == navigating)
-  {
-      //fix is in progress, send a restart
-    LOC_LOGD ("%s:%d]: fix is in progress restarting the fix with new "
-                   "criteria\n", __func__, __LINE__);
-
-    return( startFix());
-  }
-
-  return LOC_API_ADAPTER_ERR_SUCCESS;
+    return LOC_API_ADAPTER_ERR_SUCCESS;
 }
 
 /* inject time into the position engine */
