@@ -2818,9 +2818,9 @@ static void loc_eng_deferred_action_thread(void* arg)
            case LOC_ENG_MSG_AGPS_DATA_FAILED:
                if(loc_eng_data.data_connection_bearer != AGPS_APN_BEARER_INVALID)
                {
-                  loc_eng_ioctl_data_open_status(FAILURE);
-               } else {
                   loc_eng_ioctl_data_close_status(FAILURE);
+               } else {
+                  loc_eng_ioctl_data_open_status(FAILURE);
                }
                loc_eng_data.data_connection_bearer = AGPS_APN_BEARER_INVALID;
                break;
