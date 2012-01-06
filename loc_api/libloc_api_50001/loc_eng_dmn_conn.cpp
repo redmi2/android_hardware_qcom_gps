@@ -80,6 +80,7 @@ static int loc_api_server_proc(void *context)
     LOC_LOGD("%s:%d] %d listening on %s...\n", __func__, __LINE__, cnt, (char *) context);
     length = loc_eng_dmn_conn_glue_msgrcv(loc_api_server_msgqid, p_cmsgbuf, sz);
     if (length <= 0) {
+        free(p_cmsgbuf);
         LOC_LOGE("%s:%d] fail receiving msg from gpsone_daemon, retry later\n", __func__, __LINE__);
         usleep(1000);
         return 0;
