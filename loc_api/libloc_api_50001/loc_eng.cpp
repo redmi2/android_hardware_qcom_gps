@@ -1,4 +1,4 @@
-/* Copyright (c) 2009,2011 Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2009,2012 Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -1708,7 +1708,7 @@ static void loc_eng_agps_reinit()
    memset(loc_eng_data.apn_name, 0, sizeof loc_eng_data.apn_name);
    loc_eng_data.data_connection_bearer = AGPS_APN_BEARER_INVALID;
    int i=0;
-   for(i=0;i <= MAX_NUM_ATL_CONNECTIONS; i++ )
+   for(i=0;i < MAX_NUM_ATL_CONNECTIONS; i++ )
    {
       loc_eng_data.atl_conn_info[i].active = FALSE;
       loc_eng_data.atl_conn_info[i].conn_state = LOC_CONN_IDLE;
