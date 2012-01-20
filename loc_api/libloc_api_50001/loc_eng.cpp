@@ -1241,8 +1241,7 @@ void loc_eng_handle_engine_up(loc_eng_data_s_type &loc_eng_data)
     if (loc_eng_data.navigating) {
         // This sets the copy in adapter to modem
         loc_eng_data.client_handle->setPositionMode(NULL);
-        // not mutex protected, assuming fw won't call start twice without a
-        // stop call in between.
+        loc_eng_data.navigating = false;
         loc_eng_start_handler(loc_eng_data);
     }
     EXIT_LOG(%s, VOID_RET);
@@ -1437,6 +1436,9 @@ static void loc_eng_deferred_action_thread(void* arg)
                                                     (void*)rpMsg->locationExt);
                     }
                 }
+                // we are done navigating if this is singleshot
+                loc_eng_data_p->navigating = loc_eng_data_p->client_handle->
+                        getPositionMode().recurrence != GPS_POSITION_RECURRENCE_SINGLE;
             }
 
             break;
