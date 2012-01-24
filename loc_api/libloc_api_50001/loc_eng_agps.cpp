@@ -150,16 +150,24 @@ bool ATLSubscriber::notifyRsrcStatus(Notification &notification)
             ((LocApiAdapter*)mLocAdapter)->atlCloseStatus(ID, 1);
             break;
         case RSRC_DENIED:
+        {
+            AGpsType type = mBackwardCompatibleMode ?
+                              AGPS_TYPE_INVALID : mStateMachine->getType();
             ((LocApiAdapter*)mLocAdapter)->atlOpenStatus(ID, 0,
                                             (char*)mStateMachine->getAPN(),
                                             mStateMachine->getBearer(),
-                                            mStateMachine->getType());
+                                            type);
+        }
             break;
         case RSRC_GRANTED:
+        {
+            AGpsType type = mBackwardCompatibleMode ?
+                              AGPS_TYPE_INVALID : mStateMachine->getType();
             ((LocApiAdapter*)mLocAdapter)->atlOpenStatus(ID, 1,
                                             (char*)mStateMachine->getAPN(),
                                             mStateMachine->getBearer(),
-                                            mStateMachine->getType());
+                                            type);
+        }
             break;
         default:
             notify = false;

@@ -1494,12 +1494,15 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_REQUEST_ATL:
         {
             loc_eng_msg_request_atl* arqMsg = (loc_eng_msg_request_atl*)msg;
-            AgpsStateMachine* stateMachine = (AGPS_TYPE_SUPL == arqMsg->type) ?
+            boolean backwardCompatibleMode = AGPS_TYPE_INVALID == arqMsg->type;
+            AgpsStateMachine* stateMachine = (AGPS_TYPE_SUPL == arqMsg->type ||
+                                              backwardCompatibleMode) ?
                                              loc_eng_data_p->agnss_nif :
                                              loc_eng_data_p->internet_nif;
             ATLSubscriber subscriber(arqMsg->handle,
                                      stateMachine,
-                                     loc_eng_data_p->client_handle);
+                                     loc_eng_data_p->client_handle,
+                                     backwardCompatibleMode);
 
             stateMachine->subscribeRsrc((Subscriber*)&subscriber);
         }
@@ -1510,12 +1513,14 @@ static void loc_eng_deferred_action_thread(void* arg)
             loc_eng_msg_release_atl* arlMsg = (loc_eng_msg_release_atl*)msg;
             ATLSubscriber s1(arlMsg->handle,
                              loc_eng_data_p->agnss_nif,
-                             loc_eng_data_p->client_handle);
+                             loc_eng_data_p->client_handle,
+                             false);
             // attempt to unsubscribe from agnss_nif first
             if (! loc_eng_data_p->agnss_nif->unsubscribeRsrc((Subscriber*)&s1)) {
                 ATLSubscriber s2(arlMsg->handle,
                                  loc_eng_data_p->internet_nif,
-                                 loc_eng_data_p->client_handle);
+                                 loc_eng_data_p->client_handle,
+                                 false);
                 // if unsuccessful, try internet_nif
                 loc_eng_data_p->internet_nif->unsubscribeRsrc((Subscriber*)&s2);
             }

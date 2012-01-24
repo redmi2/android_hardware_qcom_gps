@@ -252,10 +252,13 @@ private:
 // ATLSubscriber, created with requests from ATL
 struct ATLSubscriber : public Subscriber {
     const LocApiAdapter* mLocAdapter;
+    const bool mBackwardCompatibleMode;
     inline ATLSubscriber(const int id,
                          const AgpsStateMachine* stateMachine,
-                         const LocApiAdapter* adapter) :
-        Subscriber(id, stateMachine), mLocAdapter(adapter) {}
+                         const LocApiAdapter* adapter,
+                         const bool compatibleMode) :
+        Subscriber(id, stateMachine), mLocAdapter(adapter),
+        mBackwardCompatibleMode(compatibleMode){}
     virtual bool notifyRsrcStatus(Notification &notification);
 
     inline virtual void setIPAddresses(int &v4, char* v6)
@@ -263,7 +266,8 @@ struct ATLSubscriber : public Subscriber {
 
     inline virtual Subscriber* clone()
     {
-        return new ATLSubscriber(ID, mStateMachine, mLocAdapter);
+        return new ATLSubscriber(ID, mStateMachine, mLocAdapter,
+                                 mBackwardCompatibleMode);
     }
 };
 
