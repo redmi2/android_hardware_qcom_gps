@@ -278,22 +278,24 @@ enum loc_api_adapter_err LocApiV02Adapter :: startFix()
   start_msg.minInterval_valid = 1;
   start_msg.minInterval = fixCriteria.min_interval;
 
-  start_msg.horizontalAccuracyLevel_valid = 1;
+  if (fixCriteria.preferred_accuracy > 0) {
+      start_msg.horizontalAccuracyLevel_valid = 1;
 
-  if (fixCriteria.preferred_accuracy <= 100)
-  {
-    // fix needs high accuracy
-    start_msg.horizontalAccuracyLevel =  eQMI_LOC_ACCURACY_HIGH_V02;
-  }
-  else if (fixCriteria.preferred_accuracy <= 1000)
-  {
-    //fix needs med accuracy
-    start_msg.horizontalAccuracyLevel =  eQMI_LOC_ACCURACY_MED_V02;
-  }
-  else
-  {
-    //fix needs low accuracy
-    start_msg.horizontalAccuracyLevel =  eQMI_LOC_ACCURACY_LOW_V02;
+      if (fixCriteria.preferred_accuracy <= 100)
+      {
+          // fix needs high accuracy
+          start_msg.horizontalAccuracyLevel =  eQMI_LOC_ACCURACY_HIGH_V02;
+      }
+      else if (fixCriteria.preferred_accuracy <= 1000)
+      {
+          //fix needs med accuracy
+          start_msg.horizontalAccuracyLevel =  eQMI_LOC_ACCURACY_MED_V02;
+      }
+      else
+      {
+          //fix needs low accuracy
+          start_msg.horizontalAccuracyLevel =  eQMI_LOC_ACCURACY_LOW_V02;
+      }
   }
 
   start_msg.fixRecurrence_valid = 1;
