@@ -1,16 +1,11 @@
-AM_CFLAGS = -I${WORKSPACE}/hardware/libhardware/include/ \
-            -I${WORKSPACE}/qmi-framework/inc/ \
-            -I${WORKSPACE}/qmi-framework/qcci/inc/ \
-            -I${WORKSPACE}/qmi-framework/common/inc/ \
+AM_CFLAGS = \
+            ${QMIF_CFLAGS} \
             -I../../utils \
             -I../libloc_api_50001/ \
-            -I${WORKSPACE}/system/core/include/ \
             -DHAVE_LIBLOG
 
 requiredlibs = \
-            -lqmi_cci \
-            -lqmi_csi \
-            -lqmi_common_so \
+            ${QMIF_LIBS} \
             ../libloc_api_50001/libloc_adapter_so.la \
             ../../utils/libgps_utils_so.la
 

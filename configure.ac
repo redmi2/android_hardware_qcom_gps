@@ -26,6 +26,34 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
+PKG_PROG_PKG_CONFIG
+
+# Checks for libraries.
+PKG_CHECK_MODULES([QMIF], [qmi-framework])
+AC_SUBST([QMIF_CFLAGS])
+AC_SUBST([QMIF_LIBS])
+
+AC_ARG_WITH([libhardware_includes],
+      AC_HELP_STRING([--with-libhardware-includes=@<:@dir@:>@],
+         [Specify the location of the libhardware headers]),
+      [libhardware_incdir=$withval],
+      with_libhardware_includes=no)
+
+if test "x$with_libhardware_includes" != "xno"; then
+   CPPFLAGS="${CPPFLAGS} -I${libhardware_incdir}"
+fi
+
+AC_ARG_WITH([core_includes],
+      AC_HELP_STRING([--with-core-includes=@<:@dir@:>@],
+         [Specify the location of the core headers]),
+      [core_incdir=$withval],
+      with_core_includes=no)
+
+if test "x$with_core_includes" != "xno"; then
+   CPPFLAGS="${CPPFLAGS} -I${core_incdir}"
+fi
+
+AC_SUBST([CPPFLAGS])
 
 AC_ARG_WITH([glib],
       AC_HELP_STRING([--with-glib],

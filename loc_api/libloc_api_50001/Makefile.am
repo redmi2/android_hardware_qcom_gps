@@ -1,5 +1,4 @@
-AM_CFLAGS = -I${WORKSPACE}/hardware/libhardware/include/ \
-            -I${WORKSPACE}/system/core/include/ \
+AM_CFLAGS = \
             -I../../utils \
             -DHAVE_LIBLOG
 
