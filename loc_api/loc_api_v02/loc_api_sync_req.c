@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -160,7 +160,7 @@ void loc_sync_process_ind(
 )
 {
 
-   LOC_LOGV("%s:%d]: received indication, handle = %d ind_id = %d \n",
+   LOC_LOGV("%s:%d]: received indication, handle = %p ind_id = %u \n",
                  __func__,__LINE__, client_handle, ind_id);
 
    pthread_mutex_lock(&loc_sync_call_mutex);
@@ -351,7 +351,7 @@ static int loc_sync_select_ind(
 {
    int select_id = loc_alloc_slot();
 
-   LOC_LOGV("%s:%d]: client handle %d, ind_id %u, req_id %u \n",
+   LOC_LOGV("%s:%d]: client handle %p, ind_id %u, req_id %u \n",
                  __func__, __LINE__, client_handle, ind_id, req_id);
 
    if (select_id < 0)
