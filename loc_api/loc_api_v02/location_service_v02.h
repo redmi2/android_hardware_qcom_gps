@@ -25,7 +25,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #ifndef LOC_SERVICE_H
 #define LOC_SERVICE_H
 /**
@@ -83,11 +82,11 @@ extern "C" {
 /** Major Version Number of the IDL used to generate this file */
 #define LOC_V02_IDL_MAJOR_VERS 0x02
 /** Revision Number of the IDL used to generate this file */
-#define LOC_V02_IDL_MINOR_VERS 0x06
+#define LOC_V02_IDL_MINOR_VERS 0x08
 /** Major Version Number of the qmi_idl_compiler used to generate this file */
 #define LOC_V02_IDL_TOOL_VERS 0x04
 /** Maximum Defined Message ID */
-#define LOC_V02_MAX_MESSAGE_ID 0x005F;
+#define LOC_V02_MAX_MESSAGE_ID 0x0066;
 /**
     @}
   */
@@ -97,13 +96,13 @@ extern "C" {
     @{
   */
 
-/**  Maximum string length for the "Provider" field in application id  */
+/**  Maximum string length for the Provider field in the application ID.  */
 #define QMI_LOC_MAX_APP_ID_PROVIDER_LENGTH_V02 24
 
-/**  Maximum string length for the "Name" field in application id  */
+/**  Maximum string length for the Name field in the application ID.  */
 #define QMI_LOC_MAX_APP_ID_NAME_LENGTH_V02 32
 
-/**  Maximum string length for the "Version" field in application id  */
+/**  Maximum string length for the Version field in the application ID.  */
 #define QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 8
 
 /**  Maximum number of satellites in the satellite report.  */
@@ -143,6 +142,15 @@ extern "C" {
      engine.  */
 #define QMI_LOC_MAX_PREDICTED_ORBITS_SERVERS_V02 3
 
+/**  Maximum GNSS Measurement Engine Firmware Version string length.  */
+#define QMI_LOC_GNSS_ME_VERSION_STRING_MAX_LENGTH_V02 127
+
+/**  Maximum GNSS Measurement Engine Hosted Software Version string length.  */
+#define QMI_LOC_GNSS_HOSTED_SW_VERSION_STRING_MAX_LENGTH_V02 127
+
+/**  Maximum GNSS Measurement Engine Full Version string length.  */
+#define QMI_LOC_GNSS_SW_VERSION_STRING_MAX_LENGTH_V02 255
+
 /**  Maximum part length that can be injected. The client should
      also look at the maxPartSize field in the predicted orbits injection
      request indication and pick the minimum of the two.   */
@@ -166,7 +174,7 @@ extern "C" {
 /**  Maximum APN profiles supported. */
 #define QMI_LOC_MAX_APN_PROFILES_V02 6
 
-/**  Maximum length of SUPL CERT. */
+/**  Maximum length of the SUPL certificate. */
 #define QMI_LOC_MAX_SUPL_CERT_LENGTH_V02 2000
 /**
     @}
@@ -228,15 +236,25 @@ typedef uint64_t qmiLocEventRegMaskT_v02;
        event indications.  */
 #define QMI_LOC_EVENT_MASK_SENSOR_STREAMING_READY_STATUS_V02 ((qmiLocEventRegMaskT_v02)0x00000400) /**<  The control point must enable this mask to receive notifications from the
        GPS engine indicating its readiness to accept data from the
-       sensors (accelerometer, gyrometer, etc.).  */
-#define QMI_LOC_EVENT_MASK_TIME_SYNC_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000800) /**<  The control point must enable this mask to receive time-sync requests from
-       the GPS engine. Time sync enables the GPS engine to synchronize
+       sensors (accelerometer, gyroscope, etc.).  */
+#define QMI_LOC_EVENT_MASK_TIME_SYNC_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000800) /**<  The control point must enable this mask to receive time-sync requests
+       from the GPS engine. Time sync enables the GPS engine to synchronize
        its clock with the sensor processor's clock.  */
 #define QMI_LOC_EVENT_MASK_SET_SPI_STREAMING_REPORT_V02 ((qmiLocEventRegMaskT_v02)0x00001000) /**<  The control point must enable this mask to receive Stationary Position
-     Indicator (SPI) streaming report indications.  */
-#define QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00002000) /**<  The control point must enable this mask to receive location server requests.
-     These requests are generated when the service wishes to establish a
-     connection with a location server. */
+       Indicator (SPI) streaming report indications.  */
+#define QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00002000) /**<  The control point must enable this mask to receive location server
+       requests. These requests are generated when the service wishes to
+       establish a connection with a location server. */
+#define QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00004000) /**<  The control point must enable this mask to receive notifications
+       related to network initiated Geofences. These events notify the client
+       when a network initiated Geofence is added, deleted or edited.  */
+#define QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT_V02 ((qmiLocEventRegMaskT_v02)0x00008000) /**<  The control point must enable this mask to receive Geofence alerts.
+       These alerts are generated to inform the client of the changes that may
+       affect Geofence. For example if GPS is turned off, or if the network is
+       unavailable.  */
+#define QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00010000) /**<  The control point must enable this mask to receive notifications when
+       a Geofence is breached. These events are generated when the UE enters
+       or leaves the perimeter of a Geofence.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -263,8 +281,10 @@ typedef struct {
        - 0x00000400 -- SENSOR_STREAMING_READY_STATUS \n
        - 0x00000800 -- TIME_SYNC_REQ \n
        - 0x00001000 -- SET_SPI_STREAMING_REPORT \n
-       - 0x00002000 -- LOCATION_SERVER_CONNECTION_REQ
-
+       - 0x00002000 -- LOCATION_SERVER_CONNECTION_REQ \n
+       - 0x00004000 -- NI_GEOFENCE_NOTIFICATION \n
+       - 0x00008000 -- GEOFENCE_GEN_ALERT \n
+       - 0x00010000 -- GEOFENCE_BREACH_NOTIFICATION \n
        Multiple events can be registered by ORing the individual masks and
        sending them in this TLV. All unused bits in this mask must be set to 0.
 
@@ -290,15 +310,25 @@ typedef struct {
        event indications.
  The control point must enable this mask to receive notifications from the
        GPS engine indicating its readiness to accept data from the
-       sensors (accelerometer, gyrometer, etc.).
- The control point must enable this mask to receive time-sync requests from
-       the GPS engine. Time sync enables the GPS engine to synchronize
+       sensors (accelerometer, gyroscope, etc.).
+ The control point must enable this mask to receive time-sync requests
+       from the GPS engine. Time sync enables the GPS engine to synchronize
        its clock with the sensor processor's clock.
  The control point must enable this mask to receive Stationary Position
-     Indicator (SPI) streaming report indications.
- The control point must enable this mask to receive location server requests.
-     These requests are generated when the service wishes to establish a
-     connection with a location server. */
+       Indicator (SPI) streaming report indications.
+ The control point must enable this mask to receive location server
+       requests. These requests are generated when the service wishes to
+       establish a connection with a location server.
+ The control point must enable this mask to receive notifications
+       related to network initiated Geofences. These events notify the client
+       when a network initiated Geofence is added, deleted or edited.
+ The control point must enable this mask to receive Geofence alerts.
+       These alerts are generated to inform the client of the changes that may
+       affect Geofence. For example if GPS is turned off, or if the network is
+       unavailable.
+ The control point must enable this mask to receive notifications when
+       a Geofence is breached. These events are generated when the UE enters
+       or leaves the perimeter of a Geofence.  */
 }qmiLocRegEventsReqMsgT_v02;  /* Message */
 /**
     @}
@@ -353,18 +383,18 @@ typedef enum {
 typedef struct {
 
   char applicationProvider[QMI_LOC_MAX_APP_ID_PROVIDER_LENGTH_V02 + 1];
-  /**<   Application Provider  */
+  /**<   Application provider.  */
 
   char applicationName[QMI_LOC_MAX_APP_ID_NAME_LENGTH_V02 + 1];
-  /**<   Application Name  */
+  /**<   Application name.  */
 
   uint8_t applicationVersion_valid;
-  /**<   specifies if the application version string contains a valid value.
-      - 0x00 (FALSE) -- application version string is invalid \n
-      - 0x01 (TRUE) -- application version string is valid  */
+  /**<   Specifies whether the application version string contains a valid value: \n
+      - 0x00 (FALSE) -- Application version string is invalid \n
+      - 0x01 (TRUE) -- Application version string is valid  */
 
   char applicationVersion[QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 + 1];
-  /**<   Application Version  */
+  /**<   Application version.  */
 }qmiLocApplicationIdStructT_v02;  /* Type */
 /**
     @}
@@ -442,10 +472,10 @@ typedef struct {
    */
 
   /* Optional */
-  /*  Id of the application which sent this request */
+  /*  ID of the Application that Sent this Request */
   uint8_t applicationId_valid;  /**< Must be set to true if applicationId is being passed */
   qmiLocApplicationIdStructT_v02 applicationId;
-  /**<   Application provider, name and version. */
+  /**<   \n Application provider, name, and version. */
 }qmiLocStartReqMsgT_v02;  /* Message */
 /**
     @}
@@ -542,7 +572,7 @@ typedef struct {
 
 typedef uint32_t qmiLocSensorUsageMaskT_v02;
 #define QMI_LOC_SENSOR_MASK_USED_ACCEL_V02 ((qmiLocSensorUsageMaskT_v02)0x00000001) /**<  Bitmask to specify whether an accelerometer was used.  */
-#define QMI_LOC_SENSOR_MASK_USED_GYRO_V02 ((qmiLocSensorUsageMaskT_v02)0x00000002) /**<  Bitmask to specify whether a gyrometer was used.  */
+#define QMI_LOC_SENSOR_MASK_USED_GYRO_V02 ((qmiLocSensorUsageMaskT_v02)0x00000002) /**<  Bitmask to specify whether a gyroscope was used.  */
 typedef uint32_t qmiLocSensorAidedMaskT_v02;
 #define QMI_LOC_SENSOR_AIDED_MASK_HEADING_V02 ((qmiLocSensorAidedMaskT_v02)0x00000001) /**<  Bitmask to specify whether a sensor was used to calculate heading.  */
 #define QMI_LOC_SENSOR_AIDED_MASK_SPEED_V02 ((qmiLocSensorAidedMaskT_v02)0x00000002) /**<  Bitmask to specify whether a sensor was used to calculate speed.  */
@@ -866,7 +896,7 @@ typedef struct {
          - Units: Seconds  */
 
   /* Optional */
-  /*  GPS Time \n */
+  /*  GPS Time */
   uint8_t gpsTime_valid;  /**< Must be set to true if gpsTime is being passed */
   qmiLocGPSTimeStructT_v02 gpsTime;
   /**<   \n The number of weeks since Jan. 5, 1980, and
@@ -2161,10 +2191,10 @@ typedef struct {
     */
 
   /* Optional */
-  /*  Gyrometer Accept Ready */
+  /*  Gyroscope Accept Ready */
   uint8_t gyroReady_valid;  /**< Must be set to true if gyroReady is being passed */
   qmiLocSensorReadyStatusStructT_v02 gyroReady;
-  /**<   \n Whether the GNSS location engine is ready to accept gyrometer sensor
+  /**<   \n Whether the GNSS location engine is ready to accept gyroscope sensor
          data.
    */
 }qmiLocEventSensorStreamingReadyStatusIndMsgT_v02;  /* Message */
@@ -2278,15 +2308,277 @@ typedef struct {
     @{
   */
 typedef enum {
+  QMILOCNIGEOFENCEOPERATIONENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_NI_GEOFENCE_ADDED_V02 = 1, /**<  An NI Geofence was added.   */
+  eQMI_LOC_NI_GEOFENCE_DELETED_V02 = 2, /**<  An NI Geofence was deleted.
+ An NI Geofence was edited. The control point can query the
+       Geofence to find the current state of the Geofence.  */
+  eQMI_LOC_NI_GEOFENCE_EDITED_V02 = 3,
+  QMILOCNIGEOFENCEOPERATIONENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocNiGeofenceOperationEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Notification to inform the control point about
+                    Network Initiated Geofences.  */
+typedef struct {
+
+  /* Mandatory */
+  /*  Geofence Id */
+  uint32_t geofenceId;
+  /**<   ID of the Geofence for which this
+       notification was generated.
+       - Type: Unsigned Integer \n  */
+
+  /* Mandatory */
+  /*  Operation Type */
+  qmiLocNiGeofenceOperationEnumT_v02 operationType;
+  /**<   Operation for which this notification was generated.
+       Valid values : \n
+       - 0x00000001 --  NI_GEOFENCE_ADDED
+       - 0x00000002 --  NI_GEOFENCE_DELETED
+       - 0x00000003 --  NI_GEOFENCE_EDITED
+   */
+}qmiLocEventNiGeofenceNotificationIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCGEOFENCEGENALERTENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_GEOFENCE_GEN_ALERT_GNSS_UNAVAILABLE_V02 = 1, /**<  GNSS is unavailable and GNSS position fixes
+       cannot be used to monitor Geofences.   */
+  eQMI_LOC_GEOFENCE_GEN_ALERT_GNSS_AVAILABLE_V02 = 2, /**<  GNSS is now available and GNSS postion fixes can
+       be used to monitor Geofences.  */
+  eQMI_LOC_GEOFENCE_GEN_ALERT_OOS_V02 = 3, /**<  The engine is out of service and no Cell Id coverage
+       information is available.
+ The engine has invalid time.  */
+  eQMI_LOC_GEOFENCE_GEN_ALERT_TIME_INVALID_V02 = 4,
+  QMILOCGEOFENCEGENALERTENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocGeofenceGenAlertEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Notification to inform the control point about
+                    Geofence status.  */
+typedef struct {
+
+  /* Mandatory */
+  /*  Geofence General Alert  */
+  qmiLocGeofenceGenAlertEnumT_v02 geofenceAlert;
+  /**<   Specifies the Geofence general alert type
+       Valid values : \n
+       - 0x00000001 --  GEOFENCE_GEN_ALERT_GNSS_UNAVAILABLE
+       - 0x00000002 --  GEOFENCE_GEN_ALERT_GNSS_AVAILABLE
+       - 0x00000003 --  GEOFENCE_GEN_ALERT_OOS
+       - 0x00000004 --  GEOFENCE_GEN_ALERT_TIME_INVALID
+   */
+}qmiLocEventGeofenceGenAlertIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCGEOFENCEBREACHTYPEENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_GEOFENCE_BREACH_TYPE_ENTERING_V02 = 1, /**<  Denotes that a client entered the Geofence.
+ Denotes that a client left the Geofence.  */
+  eQMI_LOC_GEOFENCE_BREACH_TYPE_LEAVING_V02 = 2,
+  QMILOCGEOFENCEBREACHTYPEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocGeofenceBreachTypeEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_aggregates
+    @{
+  */
+typedef struct {
+
+  /*  UTC Timestamp */
+  uint64_t timestampUtc;
+  /**<   UTC timestamp. \n
+       - Type: Unsigned integer \n
+       - Units: Milliseconds since Jan. 1, 1970  */
+
+  /*  Latitude */
+  double latitude;
+  /**<   Latitude (specified in WGS84 datum). \n
+       - Type: Floating point \n
+       - Units: Degrees \n
+       - Range: -90.0 to 90.0 \n
+       - Positive values indicate northern latitude \n
+       - Negative values indicate southern latitude  */
+
+  /*   Longitude */
+  double longitude;
+  /**<   Longitude (specified in WGS84 datum).\n
+       - Type: Floating point \n
+       - Units: Degrees \n
+       - Range: -180.0 to 180.0 \n
+       - Positive values indicate eastern longitude \n
+       - Negative values indicate western longitude  */
+
+  /*  Horizontal Elliptical Uncertainty (Semi-Minor Axis) */
+  float horUncEllipseSemiMinor;
+  /**<   Semi-minor axis of horizontal elliptical uncertainty.\n
+       - Type: Floating point \n
+       - Units: Meters  */
+
+  /*  Horizontal Elliptical Uncertainty (Semi-Major Axis) */
+  float horUncEllipseSemiMajor;
+  /**<   Semi-major axis of horizontal elliptical uncertainty.\n
+       - Type: Floating point \n
+       - Units: Meters  */
+
+  /*  Elliptical Horizontal Uncertainty Azimuth */
+  float horUncEllipseOrientAzimuth;
+  /**<   Elliptical horizontal uncertainty azimuth of orientation.\n
+       - Type: Floating point \n
+       - Units: Decimal degrees \n
+       - Range: 0 to 180  */
+
+  /*  Horizontal Speed validity bit */
+  uint8_t speedHorizontal_valid;
+  /**<   Indicates if the Horizontal speed field contains valid
+       information.
+        - 0x01 (TRUE)  --  Horizontal speed is valid
+        - 0x00 (FALSE) --  Horizontal speed is invalid
+                           and should be ignored  */
+
+  /*  Horizontal Speed */
+  float speedHorizontal;
+  /**<   Horizontal speed.\n
+       - Type: Floating point \n
+       - Units: Meters/second  */
+
+  /*  Altitude validity bit */
+  uint8_t altitudeWrtEllipsoid_valid;
+  /**<   Indicates if the altitude field contains valid
+       information.
+        - 0x01 (TRUE)  --  Altitude field is valid
+        - 0x00 (FALSE) --  Atitude field is invalid
+                           and should be ignored  */
+
+  /*  Altitude With Respect to Ellipsoid */
+  float altitudeWrtEllipsoid;
+  /**<   Altitude with respect to the WGS84 ellipsoid.\n
+       - Type: Floating point \n
+       - Units: Meters \n
+       - Range: -500 to 15883  */
+
+  /*  Vertical Uncertainty validity bit */
+  uint8_t vertUnc_valid;
+  /**<   Indicates if the Vertical Uncertainty field contains valid
+       information.
+        - 0x01 (TRUE)  --  Vertical uncertainty field is valid
+        - 0x00 (FALSE) --  Vertical uncertainty field is invalid
+                           and should be ignored  */
+
+  /*  Vertical Uncertainty */
+  float vertUnc;
+  /**<   Vertical uncertainty.\n
+       - Type: Floating point \n
+       - Units: Meters  */
+
+  /*  Vertical Speed validity bit */
+  uint8_t speedVertical_valid;
+  /**<   Indicates if the Vertical Speed field contains valid
+       information.
+        - 0x01 (TRUE)  --  Vertical Speed field is valid
+        - 0x00 (FALSE) --  Vertical Speed field is invalid
+                           and should be ignored  */
+
+  /*  Vertical Speed */
+  float speedVertical;
+  /**<   Vertical speed.\n
+       - Type: Floating point \n
+       - Units: Meters/second  */
+
+  /*  heading validity bit */
+  uint8_t heading_valid;
+  /**<   Indicates if the heading field contains valid
+       information.
+        - 0x01 (TRUE)  --  heading field is valid
+        - 0x00 (FALSE) --  heading field is invalid
+                           and should be ignored  */
+
+  /*  Heading */
+  float heading;
+  /**<   Heading.\n
+        - Type: Floating point \n
+        - Units: Degrees \n
+        - Range: 0 to 359.999   */
+}qmiLocGeofencePositionStructT_v02;  /* Type */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Notification to inform the control point about
+                    a Geofence breach event.  */
+typedef struct {
+
+  /* Mandatory */
+  /*  Geofence Id */
+  uint32_t geofenceId;
+  /**<   ID of the Geofence for which this
+       notification was generated.
+       - Type: Unsigned Integer \n  */
+
+  /* Mandatory */
+  /*  Geofence Breach Type */
+  qmiLocGeofenceBreachTypeEnumT_v02 breachType;
+  /**<   The type of breach that generated this event.
+       Valid values : \n
+       - 0x00000001 -- GEOFENCE_BREACH_TYPE_ENTERING
+       - 0x00000001 -- GEOFENCE_BREACH_TYPE_LEAVING
+   */
+
+  /* Optional */
+  /*  Geofence Position */
+  uint8_t geofencePosition_valid;  /**< Must be set to true if geofencePosition is being passed */
+  qmiLocGeofencePositionStructT_v02 geofencePosition;
+  /**<   Position of the client when it breached the Geofence.
+       This field is included if the client configures the
+       Geofence to report position.
+         */
+}qmiLocEventGeofenceBreachIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
   QMILOCSTATUSENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
   eQMI_LOC_SUCCESS_V02 = 0, /**<  Request was completed successfully.       */
   eQMI_LOC_GENERAL_FAILURE_V02 = 1, /**<  Request failed because of a general failure.  */
   eQMI_LOC_UNSUPPORTED_V02 = 2, /**<  Request failed because it is unsupported.  */
   eQMI_LOC_INVALID_PARAMETER_V02 = 3, /**<  Request failed because it contained invalid parameters.    */
   eQMI_LOC_ENGINE_BUSY_V02 = 4, /**<  Request failed because the engine is busy.  */
-  eQMI_LOC_PHONE_OFFLINE_V02 = 5, /**<  Request failed because the phone is offline.
- Request failed because it timed out.  */
-  eQMI_LOC_TIMEOUT_V02 = 6,
+  eQMI_LOC_PHONE_OFFLINE_V02 = 5, /**<  Request failed because the phone is offline.  */
+  eQMI_LOC_TIMEOUT_V02 = 6, /**<  Request failed because it timed out.  */
+  eQMI_LOC_CONFIG_NOT_SUPPORTED_V02 = 7, /**<  Request failed because an undefined configuration was requested
+ Request failed because the engine could not allocate sufficent
+       memory for the request.  */
+  eQMI_LOC_INSUFFICIENT_MEMORY_V02 = 8,
   QMILOCSTATUSENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
 }qmiLocStatusEnumT_v02;
 /**
@@ -2317,7 +2609,7 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 
   /* Mandatory */
@@ -2327,6 +2619,36 @@ typedef struct {
        the service implements. Minor revision updates of the service are always
        backward compatible. \n
        - Type: Unsigned integer  */
+
+  /* Optional */
+  /*  GNSS Measurement Engine Firmware Version String. This string will only
+ be provided on platforms that have a measurement engine that supports
+ this version string. On all other platforms, this optional TLV shall not
+ be provided. */
+  uint8_t gnssMeFWVerString_valid;  /**< Must be set to true if gnssMeFWVerString is being passed */
+  char gnssMeFWVerString[QMI_LOC_GNSS_ME_VERSION_STRING_MAX_LENGTH_V02 + 1];
+  /**<   Version of the GNSS measurement engine Sw running under the Loc API. \n
+       - Type: NULL terminated String
+       - Maximum string length (including NULL terminator): 128  */
+
+  /* Optional */
+  /*  GNSS Hosted Software Version String. This string will only be provided on
+ hosted architectures (measurement and position engine running on different
+ processors) that support this version string. On all other platforms, this
+ optional TLV shall not be provided. */
+  uint8_t gnssHostSWVerString_valid;  /**< Must be set to true if gnssHostSWVerString is being passed */
+  char gnssHostSWVerString[QMI_LOC_GNSS_HOSTED_SW_VERSION_STRING_MAX_LENGTH_V02 + 1];
+  /**<   Version of the GNSS hosted software running under the Loc API. \n
+       - Type: NULL terminated String
+       - Maximum string length (including NULL terminator): 128  */
+
+  /* Optional */
+  /*  GNSS Software Version String */
+  uint8_t gnssSWVerString_valid;  /**< Must be set to true if gnssSWVerString is being passed */
+  char gnssSWVerString[QMI_LOC_GNSS_SW_VERSION_STRING_MAX_LENGTH_V02 + 1];
+  /**<   Aggregate version of the GNSS software. \n
+       - Type: NULL terminated String
+       - Maximum string length (including NULL terminator): 256  */
 }qmiLocGetServiceRevisionIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2356,7 +2678,7 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -2388,7 +2710,7 @@ typedef struct {
    */
 
   /* Optional */
-  /*  Mimimum Interval Between Fixes */
+  /*  Minimum Interval Between Fixes */
   uint8_t minInterval_valid;  /**< Must be set to true if minInterval is being passed */
   uint32_t minInterval;
   /**<   Time that must elapse before alerting the client. \n
@@ -2396,10 +2718,10 @@ typedef struct {
        - Units: Milliseconds  */
 
   /* Optional */
-  /*  Id of the application which sent the position request */
+  /*  ID of the Application that Sent the Position Request */
   uint8_t applicationId_valid;  /**< Must be set to true if applicationId is being passed */
   qmiLocApplicationIdStructT_v02 applicationId;
-  /**<   Application provider, name and version. */
+  /**<   \n Application provider, name, and version. */
 }qmiLocGetFixCriteriaIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2498,7 +2820,7 @@ typedef struct {
             - 0x00000003 -- INVALID_PARAMETER \n
             - 0x00000004 -- ENGINE_BUSY \n
             - 0x00000005 -- PHONE_OFFLINE \n
-            - 0x00000006 -- LOC_TIMEOUT
+            - 0x00000006 -- TIMEOUT
    */
 }qmiLocNiUserRespIndMsgT_v02;  /* Message */
 /**
@@ -2584,7 +2906,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -2623,7 +2945,7 @@ typedef struct {
            - 0x00000003 -- INVALID_PARAMETER \n
            - 0x00000004 -- ENGINE_BUSY \n
            - 0x00000005 -- PHONE_OFFLINE \n
-           - 0x00000006 -- LOC_TIMEOUT
+           - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -2688,7 +3010,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -2744,7 +3066,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocInjectUtcTimeIndMsgT_v02;  /* Message */
 /**
@@ -2860,12 +3182,12 @@ typedef struct {
   */
 typedef enum {
   QMILOCPOSITIONSRCENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_POSITION_SRC_GNSS_V02 = 0, /**<  Position Source is GNSS.  */
-  eQMI_LOC_POSITION_SRC_CELLID_V02 = 1, /**<  Position Source is Cell ID.  */
-  eQMI_LOC_POSITION_SRC_ENH_CELLID_V02 = 2, /**<  Position Source is Enhanced Cell ID.  */
-  eQMI_LOC_POSITION_SRC_WIFI_V02 = 3, /**<  Position Source is WiFi.  */
-  eQMI_LOC_POSITION_SRC_TERRESTRIAL_V02 = 4, /**<  Position Source is Terrestrial.  */
-  eQMI_LOC_POSITION_SRC_GNSS_TERRESTRIAL_HYBRID_V02 = 5, /**<  Position Source is GNSS Terrestrial Hybrid.
+  eQMI_LOC_POSITION_SRC_GNSS_V02 = 0, /**<  Position source is GNSS.  */
+  eQMI_LOC_POSITION_SRC_CELLID_V02 = 1, /**<  Position source is Cell ID.  */
+  eQMI_LOC_POSITION_SRC_ENH_CELLID_V02 = 2, /**<  Position source is Enhanced Cell ID.  */
+  eQMI_LOC_POSITION_SRC_WIFI_V02 = 3, /**<  Position source is WiFi.  */
+  eQMI_LOC_POSITION_SRC_TERRESTRIAL_V02 = 4, /**<  Position source is Terrestrial.  */
+  eQMI_LOC_POSITION_SRC_GNSS_TERRESTRIAL_HYBRID_V02 = 5, /**<  Position source is GNSS Terrestrial Hybrid.
  Other sources.   */
   eQMI_LOC_POSITION_SRC_OTHER_V02 = 6,
   QMILOCPOSITIONSRCENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
@@ -3017,7 +3339,7 @@ typedef struct {
   /*  Position Source */
   uint8_t positionSrc_valid;  /**< Must be set to true if positionSrc is being passed */
   qmiLocPositionSrcEnumT_v02 positionSrc;
-  /**<   Source from where this position was obtained.
+  /**<   Source from which this position was obtained. \n
         Valid values: \n
           - 0x00000000 -- eQMI_LOC_POSITION_SRC_GNSS \n
           - 0x00000001 -- eQMI_LOC_POSITION_SRC_CELLID \n
@@ -3027,11 +3349,11 @@ typedef struct {
           - 0x00000005 -- eQMI_LOC_POSITION_SRC_GNSS_TERRESTRIAL_HYBRID \n
           - 0x00000006 -- eQMI_LOC_POSITION_SRC_OTHER \n
 
-       If altitude is specified and altitude source is not specified, the engine
-       assumes that altitude was obtained using the specified Position source.
-       If altitude and altitude source both are specified then the engine assumes
-       that only latitude, longitude were obtained using the specified Position
-       Source.
+       If altitude is specified and the altitude source is not specified, the engine
+       assumes that the altitude was obtained using the specified position source. \n
+       If both altitude and altitude source are specified, the engine assumes
+       that only latitude and longitude were obtained using the specified position
+       source.
     */
 }qmiLocInjectPositionReqMsgT_v02;  /* Message */
 /**
@@ -3056,7 +3378,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocInjectPositionIndMsgT_v02;  /* Message */
 /**
@@ -3120,7 +3442,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetEngineLockIndMsgT_v02;  /* Message */
 /**
@@ -3151,7 +3473,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -3206,7 +3528,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetSbasConfigIndMsgT_v02;  /* Message */
 /**
@@ -3237,7 +3559,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -3258,8 +3580,8 @@ typedef uint32_t qmiLocNmeaSentenceMaskT_v02;
 #define QMI_LOC_NMEA_MASK_GSV_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000004) /**<  Enable GSV type.  */
 #define QMI_LOC_NMEA_MASK_GSA_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000008) /**<  Enable GSA type.  */
 #define QMI_LOC_NMEA_MASK_VTG_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000010) /**<  Enable VTG type.  */
-#define QMI_LOC_NMEA_MASK_PQXFI_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000020) /**<  Enable PQXFI type  */
-#define QMI_LOC_NMEA_MASK_PSTIS_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000040) /**<  Enable PSTIS type  */
+#define QMI_LOC_NMEA_MASK_PQXFI_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000020) /**<  Enable PQXFI type.  */
+#define QMI_LOC_NMEA_MASK_PSTIS_V02 ((qmiLocNmeaSentenceMaskT_v02)0x00000040) /**<  Enable PSTIS type.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -3285,8 +3607,8 @@ typedef struct {
  Enable GSV type.
  Enable GSA type.
  Enable VTG type.
- Enable PQXFI type
- Enable PSTIS type  */
+ Enable PQXFI type.
+ Enable PSTIS type.  */
 }qmiLocSetNmeaTypesReqMsgT_v02;  /* Message */
 /**
     @}
@@ -3310,7 +3632,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetNmeaTypesIndMsgT_v02;  /* Message */
 /**
@@ -3341,7 +3663,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -3365,8 +3687,8 @@ typedef struct {
  Enable GSV type.
  Enable GSA type.
  Enable VTG type.
- Enable PQXFI type
- Enable PSTIS type  */
+ Enable PQXFI type.
+ Enable PSTIS type.  */
 }qmiLocGetNmeaTypesIndMsgT_v02;  /* Message */
 /**
     @}
@@ -3407,7 +3729,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetLowPowerModeIndMsgT_v02;  /* Message */
 /**
@@ -3438,7 +3760,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -3530,7 +3852,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetServerIndMsgT_v02;  /* Message */
 /**
@@ -3594,7 +3916,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Mandatory */
@@ -3869,7 +4191,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocDeleteAssistDataIndMsgT_v02;  /* Message */
 /**
@@ -3911,7 +4233,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetXtraTSessionControlIndMsgT_v02;  /* Message */
 /**
@@ -3943,7 +4265,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -4138,7 +4460,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocInjectWifiPositionIndMsgT_v02;  /* Message */
 /**
@@ -4197,7 +4519,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocNotifyWifiStatusIndMsgT_v02;  /* Message */
 /**
@@ -4229,7 +4551,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -4276,15 +4598,25 @@ typedef struct {
        event indications.
  The control point must enable this mask to receive notifications from the
        GPS engine indicating its readiness to accept data from the
-       sensors (accelerometer, gyrometer, etc.).
- The control point must enable this mask to receive time-sync requests from
-       the GPS engine. Time sync enables the GPS engine to synchronize
+       sensors (accelerometer, gyroscope, etc.).
+ The control point must enable this mask to receive time-sync requests
+       from the GPS engine. Time sync enables the GPS engine to synchronize
        its clock with the sensor processor's clock.
  The control point must enable this mask to receive Stationary Position
-     Indicator (SPI) streaming report indications.
- The control point must enable this mask to receive location server requests.
-     These requests are generated when the service wishes to establish a
-     connection with a location server. */
+       Indicator (SPI) streaming report indications.
+ The control point must enable this mask to receive location server
+       requests. These requests are generated when the service wishes to
+       establish a connection with a location server.
+ The control point must enable this mask to receive notifications
+       related to network initiated Geofences. These events notify the client
+       when a network initiated Geofence is added, deleted or edited.
+ The control point must enable this mask to receive Geofence alerts.
+       These alerts are generated to inform the client of the changes that may
+       affect Geofence. For example if GPS is turned off, or if the network is
+       unavailable.
+ The control point must enable this mask to receive notifications when
+       a Geofence is breached. These events are generated when the UE enters
+       or leaves the perimeter of a Geofence.  */
 }qmiLocGetRegisteredEventsIndMsgT_v02;  /* Message */
 /**
     @}
@@ -4353,7 +4685,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetOperationModeIndMsgT_v02;  /* Message */
 /**
@@ -4384,7 +4716,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -4449,7 +4781,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetSpiStatusIndMsgT_v02;  /* Message */
 /**
@@ -4474,19 +4806,19 @@ typedef struct {
   /**<   Sensor x-axis sample. \n
        - Type: Floating point \n
        - Units Accelerometer: ( (meters)/(seconds^2) ) \n
-       - Units Gyrometer:     ( (rads)/(seconds^2) )  */
+       - Units Gyroscope:     ( (rads)/(seconds^2) )  */
 
   float yAxis;
   /**<   Sensor y-axis sample. \n
        - Type: Floating point \n
        - Units Accelerometer: ( (meters)/(seconds^2) ) \n
-       - Units Gyrometer:     ( (rads)/(seconds^2) )  */
+       - Units Gyroscope:     ( (rads)/(seconds^2) )  */
 
   float zAxis;
   /**<   Sensor z-axis sample. \n
        - Type: Floating point \n
        - Units Accelerometer: ( (meters)/(seconds^2) ) \n
-       - Units Gyrometer:     ( (rads)/(seconds^2) )  */
+       - Units Gyroscope:     ( (rads)/(seconds^2) )  */
 }qmiLoc3AxisSensorSampleStructT_v02;  /* Type */
 /**
     @}
@@ -4543,10 +4875,10 @@ typedef struct {
   /**<   \n Accelerometer sensor samples.  */
 
   /* Optional */
-  /*  3-Axis Gyrometer Data */
+  /*  3-Axis Gyroscope Data */
   uint8_t threeAxisGyroData_valid;  /**< Must be set to true if threeAxisGyroData is being passed */
   qmiLoc3AxisSensorSampleListStructT_v02 threeAxisGyroData;
-  /**<   \n Gyrometer sensor samples.  */
+  /**<   \n Gyroscope sensor samples.  */
 }qmiLocInjectSensorDataReqMsgT_v02;  /* Message */
 /**
     @}
@@ -4571,7 +4903,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -4590,10 +4922,10 @@ typedef struct {
        were accepted.  */
 
   /* Optional */
-  /*  Gyrometer Samples Accepted */
+  /*  Gyroscope Samples Accepted */
   uint8_t threeAxisGyroSamplesAccepted_valid;  /**< Must be set to true if threeAxisGyroSamplesAccepted is being passed */
   uint8_t threeAxisGyroSamplesAccepted;
-  /**<   This field lets the client know how many 3-axis gyrometer samples were
+  /**<   This field lets the client know how many 3-axis gyroscope samples were
        accepted.  */
 }qmiLocInjectSensorDataIndMsgT_v02;  /* Message */
 /**
@@ -4657,7 +4989,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocInjectTimeSyncDataIndMsgT_v02;  /* Message */
 /**
@@ -4704,7 +5036,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -4779,7 +5111,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetCradleMountConfigIndMsgT_v02;  /* Message */
 /**
@@ -4826,7 +5158,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -4886,7 +5218,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetExternalPowerConfigIndMsgT_v02;  /* Message */
 /**
@@ -5018,7 +5350,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 }qmiLocInformLocationServerConnStatusIndMsgT_v02;  /* Message */
 /**
@@ -5117,7 +5449,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -5185,7 +5517,7 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
      */
 
   /* Optional */
@@ -5287,7 +5619,7 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 }qmiLocSetSensorControlConfigIndMsgT_v02;  /* Message */
 /**
@@ -5318,7 +5650,7 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -5343,6 +5675,12 @@ typedef struct {
     @}
   */
 
+typedef uint32_t qmiLocSensorPropertiesMaskT_v02;
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_GYRO_BIAS_VARIANCE_RANDOM_WALK_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000001) /**<  This field denotes the gyro bias variance random walk parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000002) /**<  This field denotes the velocity random walk spectral density parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000004) /**<  This field denotes the acceleration random walk spectral density parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000008) /**<  This field denotes the angle random walk spectral density parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_RATE_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000010) /**<  This field denotes the rate random walk spectral density parameter.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5357,10 +5695,58 @@ typedef struct {
   uint8_t gyroBiasVarianceRandomWalk_valid;  /**< Must be set to true if gyroBiasVarianceRandomWalk is being passed */
   float gyroBiasVarianceRandomWalk;
   /**<   Specifies the gyro bias random walk parameter as a positive
-       floating-point value. This value does not have any internal defaults.
+       floating-point value. This value has internal default value 1.0e-5 radian^2/second^4.
        The gyro bias variance random walk parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radians^2/second^4
+       - Units: radian^2/second^4
+
+   */
+
+  /* Optional */
+  /*  Velocity Random Walk Spectral Density */
+  uint8_t velocityRandomWalkSpectralDensity_valid;  /**< Must be set to true if velocityRandomWalkSpectralDensity is being passed */
+  float velocityRandomWalkSpectralDensity;
+  /**<   Specifies the velocity random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The velocity random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: meter/second^2/hertz^0.5
+
+   */
+
+  /* Optional */
+  /*  Acceleration Random Walk Spectral Density */
+  uint8_t accelerationRandomWalkSpectralDensity_valid;  /**< Must be set to true if accelerationRandomWalkSpectralDensity is being passed */
+  float accelerationRandomWalkSpectralDensity;
+  /**<   Specifies the acceleration random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The acceleration random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: meter/second^3/hertz^0.5
+
+   */
+
+  /* Optional */
+  /*  Angle Random Walk Spectral Density */
+  uint8_t angleRandomWalkSpectralDensity_valid;  /**< Must be set to true if angleRandomWalkSpectralDensity is being passed */
+  float angleRandomWalkSpectralDensity;
+  /**<   Specifies the angle random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The angle random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: radian/second/hertz^0.5
+
+   */
+
+  /* Optional */
+  /*  Rate Random Walk Spectral Density */
+  uint8_t rateRandomWalkSpectralDensity_valid;  /**< Must be set to true if rateRandomWalkSpectralDensity is being passed */
+  float rateRandomWalkSpectralDensity;
+  /**<   Specifies the rate random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The rate random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: radian/second^2/hertz^0.5
 
    */
 }qmiLocSetSensorPropertiesReqMsgT_v02;  /* Message */
@@ -5389,18 +5775,58 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT \n
+          - 0x00000007 -- CONFIG NOT SUPPORTED \n
    */
+
+  /* Optional */
+  /*  Failed Set Sensor Properties */
+  uint8_t failedSensorPropertiesMask_valid;  /**< Must be set to true if failedSensorPropertiesMask is being passed */
+  qmiLocSensorPropertiesMaskT_v02 failedSensorPropertiesMask;
+  /**<   This field will be sent only if the status is not a success.
+       Identifies the parameters that were not set successfully.\n
+        - 0x00000001 -- GYRO_BIAS_VARIANCE_RANDOM_WALK \n
+        - 0x00000002 -- VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY \n
+        - 0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY \n
+        - 0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY \n
+        - 0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
+
+ This field denotes the gyro bias variance random walk parameter.
+ This field denotes the velocity random walk spectral density parameter.
+ This field denotes the acceleration random walk spectral density parameter.
+ This field denotes the angle random walk spectral density parameter.
+ This field denotes the rate random walk spectral density parameter.  */
 }qmiLocSetSensorPropertiesIndMsgT_v02;  /* Message */
 /**
     @}
   */
 
-/*
- * qmiLocGetSensorPropertiesReqMsgT is empty
- * typedef struct {
- * }qmiLocGetSensorPropertiesReqMsgT_v02;
- */
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Request Message; Retrieves the current sensor properties. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Config Parameters */
+  qmiLocSensorPropertiesMaskT_v02 getSensorPropertiesMask;
+  /**<   Mask denoting the sensor properties parameters to be retrieved.
+       Valid bitmasks: \n
+        - 0x00000001 -- GYRO_BIAS_VARIANCE_RANDOM_WALK \n
+        - 0x00000002 -- VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY \n
+        - 0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY \n
+        - 0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY \n
+        - 0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
+
+ This field denotes the gyro bias variance random walk parameter.
+ This field denotes the velocity random walk spectral density parameter.
+ This field denotes the acceleration random walk spectral density parameter.
+ This field denotes the angle random walk spectral density parameter.
+ This field denotes the rate random walk spectral density parameter.  */
+}qmiLocGetSensorPropertiesReqMsgT_v02;  /* Message */
+/**
+    @}
+  */
 
 /** @addtogroup loc_qmi_messages
     @{
@@ -5420,7 +5846,8 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT \n
+          - 0x00000007 -- CONFIG_NOT_SUPPORTED
    */
 
   /* Optional */
@@ -5428,10 +5855,58 @@ typedef struct {
   uint8_t gyroBiasVarianceRandomWalk_valid;  /**< Must be set to true if gyroBiasVarianceRandomWalk is being passed */
   float gyroBiasVarianceRandomWalk;
   /**<   Specifies the gyro bias random walk parameter as a positive
-       floating-point value. This value does not have any internal defaults.
+       floating-point value. This value has internal default value 1.0e-5 radian^2/second^4.
        The gyro bias variance random walk parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radians^2/seconds^4
+       - Units: radian^2/second^4
+
+   */
+
+  /* Optional */
+  /*  Velocity Random Walk Spectral Density */
+  uint8_t velocityRandomWalkSpectralDensity_valid;  /**< Must be set to true if velocityRandomWalkSpectralDensity is being passed */
+  float velocityRandomWalkSpectralDensity;
+  /**<   Specifies the velocity random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The velocity random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: meter/second^2/rtHz
+
+   */
+
+  /* Optional */
+  /*  Acceleration Random Walk Spectral Density */
+  uint8_t accelerationRandomWalkSpectralDensity_valid;  /**< Must be set to true if accelerationRandomWalkSpectralDensity is being passed */
+  float accelerationRandomWalkSpectralDensity;
+  /**<   Specifies the acceleration random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The acceleration random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: meter/second^3/rtHz
+
+   */
+
+  /* Optional */
+  /*  Angle Random Walk Spectral Density */
+  uint8_t angleRandomWalkSpectralDensity_valid;  /**< Must be set to true if angleRandomWalkSpectralDensity is being passed */
+  float angleRandomWalkSpectralDensity;
+  /**<   Specifies the angle random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The angle random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: radian/second/hertz^0.5
+
+   */
+
+  /* Optional */
+  /*  Rate Random Walk Spectral Density */
+  uint8_t rateRandomWalkSpectralDensity_valid;  /**< Must be set to true if rateRandomWalkSpectralDensity is being passed */
+  float rateRandomWalkSpectralDensity;
+  /**<   Specifies the rate random walk spectral density parameter as a positive
+       floating-point value. This value does not have any internal defaults.
+       The rate random walk spectral density parameter is derived from either the
+       sensors data sheet or a sensors conformance test. \n
+       - Units: radian/second^2/hertz^0.5
 
    */
 }qmiLocGetSensorPropertiesIndMsgT_v02;  /* Message */
@@ -5459,6 +5934,9 @@ typedef enum {
     @}
   */
 
+typedef uint32_t qmiLocSensorAlgorithmMaskT_v02;
+#define QMI_LOC_SENSOR_ALGORITHM_MASK_DISABLE_INS_POSITIONING_FILTER_V02 ((qmiLocSensorAlgorithmMaskT_v02)0x00000001) /**<  Inertial sensors are not to be used in Accelerometer-integrated fashion with
+       GNSS. They can still be used for aiding in heading improvements.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5495,7 +5973,7 @@ typedef struct {
    */
 
   /* Optional */
-  /*  Gyrometer Sampling Specification */
+  /*  Gyroscope Sampling Specification */
   uint8_t gyroSamplingSpec_valid;  /**< Must be set to true if gyroSamplingSpec is being passed */
   qmiLocSensorControlConfigSamplingSpecStructT_v02 gyroSamplingSpec;
   /**<   \n Sets the nominal rate at which the GNSS location engine is to request
@@ -5504,6 +5982,17 @@ typedef struct {
        However, the final control of the actual requested rate resides with
        the Sensors Manager Module/GNSS location engine.
    */
+
+  /* Optional */
+  /*  Algorithm Configuration */
+  uint8_t algorithmConfig_valid;  /**< Must be set to true if algorithmConfig is being passed */
+  qmiLocSensorAlgorithmMaskT_v02 algorithmConfig;
+  /**<   Sets which sensor algoritms are to be used when processing sensor data.
+       Valid bitmasks: \n
+       - 0x00000001 -- DISABLE_INS_POSITIONING_FILTER
+
+ Inertial sensors are not to be used in Accelerometer-integrated fashion with
+       GNSS. They can still be used for aiding in heading improvements.  */
 }qmiLocSetSensorPerformanceControlConfigReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5513,6 +6002,7 @@ typedef uint32_t qmiLocSensorPerformanceControlConfigFailureMaskT_v02;
 #define QMI_LOC_SENSOR_PERFORMANCE_CONTROL_CONFIG_PARAM_MASK_PERFORMANCE_MODE_V02 ((qmiLocSensorPerformanceControlConfigFailureMaskT_v02)0x00000001) /**<  Failed to set the performance mode.  */
 #define QMI_LOC_SENSOR_PERFORMANCE_CONTROL_CONFIG_PARAM_MASK_ACCEL_SAMPLING_SPEC_V02 ((qmiLocSensorPerformanceControlConfigFailureMaskT_v02)0x00000002) /**<  Failed to set the accelerometer sampling specification.  */
 #define QMI_LOC_SENSOR_PERFORMANCE_CONTROL_CONFIG_PARAM_MASK_GYRO_SAMPLING_SPEC_V02 ((qmiLocSensorPerformanceControlConfigFailureMaskT_v02)0x00000004) /**<  Failed to set the gyroscope sampling specification.  */
+#define QMI_LOC_SENSOR_PERFORMANCE_CONTROL_CONFIG_PARAM_MASK_ALGORITHM_CONFIG_V02 ((qmiLocSensorPerformanceControlConfigFailureMaskT_v02)0x00000008) /**<  Failed to set the algorithm configuration  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5531,7 +6021,7 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -5541,13 +6031,15 @@ typedef struct {
   /**<   This field is sent only if the status is not a success.
        When sent, this field identifies which configuration failed. \n
        Valid bitmasks: \n
-       - 0x0000000000000001 -- PERFORMANCE_MODE \n
-       - 0x0000000000000002 -- ACCEL_SAMPLING_SPEC \n
-       - 0x0000000000000004 -- GYRO_SAMPLING_SPEC
+       - 0x00000001 -- PERFORMANCE_MODE \n
+       - 0x00000002 -- ACCEL_SAMPLING_SPEC \n
+       - 0x00000004 -- GYRO_SAMPLING_SPEC \n
+       - 0x00000008 -- ALGORITHM_CONFIG
 
  Failed to set the performance mode.
  Failed to set the accelerometer sampling specification.
- Failed to set the gyroscope sampling specification.  */
+ Failed to set the gyroscope sampling specification.
+ Failed to set the algorithm configuration  */
 }qmiLocSetSensorPerformanceControlConfigIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5577,7 +6069,7 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER \n
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
@@ -5609,7 +6101,7 @@ typedef struct {
    */
 
   /* Optional */
-  /*  Gyrometer Sampling Specification */
+  /*  Gyroscope Sampling Specification */
   uint8_t gyroSamplingSpec_valid;  /**< Must be set to true if gyroSamplingSpec is being passed */
   qmiLocSensorControlConfigSamplingSpecStructT_v02 gyroSamplingSpec;
   /**<   \n Sets the nominal rate at which the GNSS location engine is to request
@@ -5618,6 +6110,17 @@ typedef struct {
        However, the final control of the actual requested rate resides with
        the Sensors Manager Module/GNSS location engine.
    */
+
+  /* Optional */
+  /*  Algorithm Configuration */
+  uint8_t algorithmConfig_valid;  /**< Must be set to true if algorithmConfig is being passed */
+  qmiLocSensorAlgorithmMaskT_v02 algorithmConfig;
+  /**<       This TLV informs what sensor algorithms are currently set.
+       Valid bitmasks: \n
+       - 0x00000001 -- DISABLE_INS_POSITIONING_FILTER
+
+ Inertial sensors are not to be used in Accelerometer-integrated fashion with
+       GNSS. They can still be used for aiding in heading improvements.  */
 }qmiLocGetSensorPerformanceControlConfigIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5626,24 +6129,24 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Request Message; Inject a SUPL certificate to be used in AGNSS sessions. */
+/** Request Message; Injects a SUPL certificate to be used in AGNSS sessions. */
 typedef struct {
 
   /* Mandatory */
-  /*  SUPL Certificate Id */
+  /*  SUPL Certificate ID */
   uint8_t suplCertId;
-  /**<   Certificate Id of the Supl Certificate
-       Type: Unsigned Integer
-       Units: Bytes
-       Range: 0-9   */
+  /**<   Certificate ID of the SUPL certificate. \n
+       Type: Unsigned integer \n
+       Units: Bytes \n
+       Range: 0 to 9   */
 
   /* Mandatory */
-  /*  SUPL certificate Data */
+  /*  SUPL Certificate Data */
   uint32_t suplCertData_len;  /**< Must be set to # of elements in suplCertData */
   uint8_t suplCertData[QMI_LOC_MAX_SUPL_CERT_LENGTH_V02];
-  /**<   The supl Certificate contents
-       Type: Array of bytes.
-        - Maximum certificate size : 2000 bytes  */
+  /**<   SUPL certificate contents. \n
+       Type: Array of bytes. \n
+       Maximum certificate size: 2000 bytes  */
 }qmiLocInjectSuplCertificateReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5652,22 +6155,22 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Inject a SUPL certificate to be used in AGNSS sessions. */
+/** Indication Message; Injects a SUPL certificate to be used in AGNSS sessions. */
 typedef struct {
 
   /* Mandatory */
-  /*  Supl Certificate Injection Status */
+  /*  SUPL Certificate Injection Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the inject SUPL certificate request. \n
+  /**<   Status of the Inject SUPL Certificate request. \n
 
-       Valid Values:
+       Valid values:
           - 0x00000000 -- SUCCESS\n
           - 0x00000001 -- GENERAL_FAILURE\n
           - 0x00000002 -- UNSUPPORTED\n
           - 0x00000003 -- INVALID_PARAMETER\n
           - 0x00000004 -- ENGINE_BUSY\n
           - 0x00000005 -- PHONE_OFFLINE\n
-          - 0x00000006 -- LOC_TIMEOUT\n
+          - 0x00000006 -- LOC_TIMEOUT
    */
 }qmiLocInjectSuplCertificateIndMsgT_v02;  /* Message */
 /**
@@ -5677,19 +6180,19 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Request Message; Delete a SUPL certificate.  */
+/** Request Message; Deletes a SUPL certificate.  */
 typedef struct {
 
   /* Optional */
-  /*  SUPL Certificate Id */
+  /*  SUPL Certificate ID */
   uint8_t suplCertId_valid;  /**< Must be set to true if suplCertId is being passed */
   uint8_t suplCertId;
-  /**<   Certificate Id of the Supl Certificate to be deleted
-       Type: Unsigned Integer \n
+  /**<   Certificate ID of the SUPL certificate to be deleted. \n
+       Type: Unsigned integer \n
        Units: Bytes \n
        Range: 0-9 \n
-       If suplCertId is not specified then
-       "all" supl certificates will be deleted.  */
+       If suplCertId is not specified,
+       all SUPL certificates are deleted.  */
 }qmiLocDeleteSuplCertificateReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5698,22 +6201,22 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Delete a SUPL certificate.  */
+/** Indication Message; Deletes a SUPL certificate.  */
 typedef struct {
 
   /* Mandatory */
-  /*  SUPL certifcate Deletion Status */
+  /*  SUPL Certifcate Deletion Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the delete SUPL certificate request. \n
+  /**<   Status of the Delete SUPL Certificate request. \n
 
-       Valid Values:
+       Valid values: \n
           - 0x00000000 -- SUCCESS\n
           - 0x00000001 -- GENERAL_FAILURE\n
           - 0x00000002 -- UNSUPPORTED\n
           - 0x00000003 -- INVALID_PARAMETER\n
           - 0x00000004 -- ENGINE_BUSY\n
           - 0x00000005 -- PHONE_OFFLINE\n
-          - 0x00000006 -- LOC_TIMEOUT\n
+          - 0x00000006 -- LOC_TIMEOUT
    */
 }qmiLocDeleteSuplCertificateIndMsgT_v02;  /* Message */
 /**
@@ -5721,12 +6224,12 @@ typedef struct {
   */
 
 typedef uint32_t qmiLocPositionEngineConfigParamMaskT_v02;
-#define QMI_LOC_POSITION_ENGINE_CONFIG_PARAM_MASK_INJECTED_POSITION_CONTROL_V02 ((qmiLocPositionEngineConfigParamMaskT_v02)0x00000001) /**<  This field denotes if the position engine uses the
-       injected position in direct position calculation.  */
-#define QMI_LOC_POSITION_ENGINE_CONFIG_PARAM_MASK_FILTER_SV_USAGE_V02 ((qmiLocPositionEngineConfigParamMaskT_v02)0x00000002) /**<  This field denotes if the position engine filters the
+#define QMI_LOC_POSITION_ENGINE_CONFIG_PARAM_MASK_INJECTED_POSITION_CONTROL_V02 ((qmiLocPositionEngineConfigParamMaskT_v02)0x00000001) /**<  Denotes whether the position engine uses the
+       injected position in a direct position calculation.  */
+#define QMI_LOC_POSITION_ENGINE_CONFIG_PARAM_MASK_FILTER_SV_USAGE_V02 ((qmiLocPositionEngineConfigParamMaskT_v02)0x00000002) /**<  Denotes whether the position engine filters the
        SV usage in the fix.  */
-#define QMI_LOC_POSITION_ENGINE_CONFIG_PARAM_MASK_STORE_ASSIST_DATA_V02 ((qmiLocPositionEngineConfigParamMaskT_v02)0x00000004) /**<  This field denotes if the position engine stores assistance data
-       in the persistent memory.       */
+#define QMI_LOC_POSITION_ENGINE_CONFIG_PARAM_MASK_STORE_ASSIST_DATA_V02 ((qmiLocPositionEngineConfigParamMaskT_v02)0x00000004) /**<  Denotes whether the position engine stores assistance data
+       in persistent memory.       */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5738,39 +6241,36 @@ typedef struct {
   /*  Injected Position Control */
   uint8_t injectedPositionControl_valid;  /**< Must be set to true if injectedPositionControl is being passed */
   uint8_t injectedPositionControl;
-  /**<   Controls how the injected position will be used in position engine.\n
+  /**<   Controls how the injected position is used in the position engine.\n
        Valid values: \n
-         - 0x01 (TRUE) -- Use the injected position in direct position
+         - 0x01 (TRUE) -- Use the injected position in a direct position
                           calculation. \n
-         - 0x00 (FALSE) -- Do not use the injected position in direct position
+         - 0x00 (FALSE) -- Do not use the injected position in a direct position
                            calculation. \n
-       The default value is TRUE, the injected position is used in direct
-       position calculation by default.
+       The default value is TRUE.
    */
 
   /* Optional */
   /*  Filter SV Usage */
   uint8_t filterSvUsage_valid;  /**< Must be set to true if filterSvUsage is being passed */
   uint8_t filterSvUsage;
-  /**<   Controls if SV usage will be filtered in a position fix.
+  /**<   Controls whether SV usage is filtered in a position fix.    \n
        Valid values:\n
-         - 0x01 (TRUE) -- Filter the usage of SV's in the fix. \n
-         - 0x00 (FALSE) -- Do not filter the usage of SV's in the fix. \n
-       The default value is FALSE, the SV usage is not filtered in the
-       fix by default.
+         - 0x01 (TRUE) -- Filter the usage of SVs in the fix. \n
+         - 0x00 (FALSE) -- Do not filter the usage of SVs in the fix. \n
+       The default value is FALSE.
    */
 
   /* Optional */
   /*  Store Assist Data */
   uint8_t storeAssistData_valid;  /**< Must be set to true if storeAssistData is being passed */
   uint8_t storeAssistData;
-  /**<   Controls whether assistance data should be stored in
-       the persistent memory. \n
+  /**<   Controls whether assistance data is to be stored in
+       persistent memory. \n
        Valid values:\n
          - 0x01 (TRUE) -- Store assistance data in persistent memory. \n
          - 0x00 (FALSE) -- Do not store assistance data in persistent memory. \n
-       The default value is TRUE, the  assistance data  is stored in
-       persistent memory by default.
+       The default value is TRUE.
    */
 }qmiLocSetPositionEngineConfigParametersReqMsgT_v02;  /* Message */
 /**
@@ -5787,7 +6287,7 @@ typedef struct {
   /* Mandatory */
   /*  Set Position Engine Configuration Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Set Configuration Parameters request.
+  /**<   Status of the Set Configuration Parameters request. \n
 
        Valid values: \n
          - 0x00000000 -- SUCCESS \n
@@ -5796,27 +6296,27 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
    */
 
   /* Optional */
   /*  Failed Parameters */
   uint8_t failedPositionEngineConfigParamMask_valid;  /**< Must be set to true if failedPositionEngineConfigParamMask is being passed */
   qmiLocPositionEngineConfigParamMaskT_v02 failedPositionEngineConfigParamMask;
-  /**<   This field will be sent only if the status is not a success.
-       Identifies the parameters that were not set successfully.
+  /**<   Identifies the parameters that were not set successfully.
+       This field is sent only if the status is other than SUCCESS. \n
 
        Valid bitmasks: \n
          - 0x00000001 -- INJECTED_POSITION_CONTROL \n
          - 0x00000002 -- FILTER_SV_USAGE \n
          - 0x00000004 -- STORE_ASSIST_DATA
 
- This field denotes if the position engine uses the
-       injected position in direct position calculation.
- This field denotes if the position engine filters the
+ Denotes whether the position engine uses the
+       injected position in a direct position calculation.
+ Denotes whether the position engine filters the
        SV usage in the fix.
- This field denotes if the position engine stores assistance data
-       in the persistent memory.       */
+ Denotes whether the position engine stores assistance data
+       in persistent memory.       */
 }qmiLocSetPositionEngineConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5832,18 +6332,18 @@ typedef struct {
   /* Mandatory */
   /*  Config Parameters */
   qmiLocPositionEngineConfigParamMaskT_v02 getPositionEngineConfigParamMask;
-  /**<   Mask denoting the configuration parameters to be retrieved.
+  /**<   Mask denoting the configuration parameters to be retrieved. \n
        Valid bitmasks: \n
         - 0x00000001 -- INJECTED_POSITION_CONTROL \n
         - 0x00000002 -- FILTER_SV_USAGE \n
         - 0x00000004 -- STORE_ASSIST_DATA
 
- This field denotes if the position engine uses the
-       injected position in direct position calculation.
- This field denotes if the position engine filters the
+ Denotes whether the position engine uses the
+       injected position in a direct position calculation.
+ Denotes whether the position engine filters the
        SV usage in the fix.
- This field denotes if the position engine stores assistance data
-       in the persistent memory.       */
+ Denotes whether the position engine stores assistance data
+       in persistent memory.       */
 }qmiLocGetPositionEngineConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5859,7 +6359,7 @@ typedef struct {
   /* Mandatory */
   /*  Get Position Engine Configuration Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Get Configuration Parameters request.
+  /**<   Status of the Get Configuration Parameters request. \n
 
        Valid values: \n
          - 0x00000000 -- SUCCESS \n
@@ -5868,48 +6368,529 @@ typedef struct {
          - 0x00000003 -- INVALID_PARAMETER \n
          - 0x00000004 -- ENGINE_BUSY \n
          - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- LOC_TIMEOUT
+         - 0x00000006 -- TIMEOUT
      */
 
   /* Optional */
   /*  Injected Position Control */
   uint8_t injectedPositionControl_valid;  /**< Must be set to true if injectedPositionControl is being passed */
   uint8_t injectedPositionControl;
-  /**<   Specifies if the injected position is used for direct calculation
+  /**<   Specifies whether the injected position is used for a direct calculation
        in the position engine.\n
        Valid values: \n
-         - 0x01 (TRUE) -- The injected position is used in direct position
+         - 0x01 (TRUE) -- The injected position is used in a direct position
                           calculation. \n
-         - 0x00 (FALSE) -- The injected position is not used direct position
+         - 0x00 (FALSE) -- The injected position is not used a direct position
                            calculation. \n
-       The default value is TRUE, the injected position is used in direct
-       position calculation by default.
+       The default value is TRUE.
    */
 
   /* Optional */
   /*  Filter SV Usage */
   uint8_t filterSvUsage_valid;  /**< Must be set to true if filterSvUsage is being passed */
   uint8_t filterSvUsage;
-  /**<   Specifies if SV usage is filtered in a position fix.
+  /**<   Specifies whether SV usage is filtered in a position fix. \n
        Valid values: \n
          - 0x01 (TRUE) -- SV usage is filtered in the fix. \n
          - 0x00 (FALSE) -- SV usage is not filtered in the fix. \n
-       The default value is FALSE, the SV usage is not filtered in the
-       fix by default.
+       The default value is FALSE.
    */
 
   /* Optional */
   /*  Store Assist Data */
   uint8_t storeAssistData_valid;  /**< Must be set to true if storeAssistData is being passed */
   uint8_t storeAssistData;
-  /**<   Specifies if assistance data  is stored in the persistent memory. \n
+  /**<   Specifies whether assistance data is stored in persistent memory. \n
        Valid values: \n
        0x01 (TRUE) -- Assistance data is stored in persistent memory. \n
        0x00 (FALSE) -- Assistance data is not stored in persistent memory. \n
-       The default value is TRUE, the  assistance data  is stored in
-       persistent memory by default.
+       The default value is TRUE.
    */
 }qmiLocGetPositionEngineConfigParametersIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+typedef uint8_t qmiLocGeofenceBreachMaskT_v02;
+#define QMI_LOC_GEOFENCE_BREACH_ENTERING_MASK_V02 ((qmiLocGeofenceBreachMaskT_v02)0x01) /**<  If this mask is set a breach event will be reported
+       when the Geofence is entered.  */
+#define QMI_LOC_GEOFENCE_BREACH_LEAVING_MASK_V02 ((qmiLocGeofenceBreachMaskT_v02)0x02) /**<  If this mask is set a breach event will be reported
+       when the Geofence is exited.  */
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCGEOFENCERESPONSIVENESSENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_GEOFENCE_RESPONSIVENESS_LOW_V02 = 0x01, /**<  The geofence is monitored for a breach at a
+       lower rate. The gap between actual breach and
+       the time it is reported is higher. This
+       setting will result in lower power usage.  */
+  eQMI_LOC_GEOFENCE_RESPONSIVENESS_MED_V02 = 0x02, /**<  The geofence is monitored for a breach at a
+       medium rate. This is the default setting.
+ The geofence is monitored for a breach at a
+       high rate. The gap between actual breach and
+       the time it is reported is low. This will result
+       in higher power usage.  */
+  eQMI_LOC_GEOFENCE_RESPONSIVENESS_HIGH_V02 = 0x03,
+  QMILOCGEOFENCERESPONSIVENESSENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocGeofenceResponsivenessEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCGEOFENCECONFIDENCEENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_GEOFENCE_CONFIDENCE_LOW_V02 = 0x01, /**<  The Geofence engine can indicate a breach with
+       low confidence. This setting will result in lower
+       power usage. This setting can impact the "yield" because
+       incorrect breach events may be sent.  */
+  eQMI_LOC_GEOFENCE_CONFIDENCE_MED_V02 = 0x02, /**<  The Geofence engine can indicate a breach with
+       medium confidence. This is the default setting.
+ The Geofence engine will indicate a breach with
+       high confidence. This setting will result in higher
+       power usage. */
+  eQMI_LOC_GEOFENCE_CONFIDENCE_HIGH_V02 = 0x03,
+  QMILOCGEOFENCECONFIDENCEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocGeofenceConfidenceEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_aggregates
+    @{
+  */
+typedef struct {
+
+  double latitude;
+  /**<   Latitude of the center of the Geofence. */
+
+  double longitude;
+  /**<   Longitude of the center of the Geofence. */
+
+  uint32_t radius;
+  /**<   Radius of the circular geofence in meters. */
+}qmiLocCircularGeofenceArgsStructT_v02;  /* Type */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCGEOFENCEPOSITIONENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_GEOFENCE_POSITION_INSIDE_V02 = 0x01, /**<  Position inside a Geofence.
+ Position outside a Geofence.    */
+  eQMI_LOC_GEOFENCE_POSITION_OUTSIDE_V02 = 0x02,
+  QMILOCGEOFENCEPOSITIONENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocGeofencePositionEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Request Message; Used by the control point to add a circular geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Transaction ID */
+  uint32_t transactionId;
+  /**<   Identifies the transaction, the transaction Id
+       will be returned with the AddCircularGeofence
+       Indication.
+       - Type -- Unsigned Integer.  */
+
+  /* Mandatory */
+  /*  Circular Geofence Arguments */
+  qmiLocCircularGeofenceArgsStructT_v02 circularGeofenceArgs;
+  /**<   The latitude, longitude and the radius which define
+       this Geofence.  */
+
+  /* Mandatory */
+  /*  Breach Event Mask */
+  qmiLocGeofenceBreachMaskT_v02 breachMask;
+  /**<   Specifies the breach events the client is interested in.
+       - Valid values :
+       - 0x01 -- GEOFENCE_BREACH_ENTERING_MASK
+       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK
+ If this mask is set a breach event will be reported
+       when the Geofence is entered.
+ If this mask is set a breach event will be reported
+       when the Geofence is exited.  */
+
+  /* Mandatory */
+  /*  Include Position in Breach Event */
+  uint8_t includePosition;
+  /**<   Specifies if the Geofence engine should include the position
+       in a breach event.
+       Valid values: \n
+       - 0x01 (TRUE)  -- Position will be reported with the breach event.
+       - 0x00 (FALSE) -- Position will not be reported with the breach event.
+   */
+
+  /* Optional */
+  /*  Responsiveness */
+  uint8_t responsiveness_valid;  /**< Must be set to true if responsiveness is being passed */
+  qmiLocGeofenceResponsivenessEnumT_v02 responsiveness;
+  /**<   Specifies the rate of detection for a geofence breach.
+       May impact the time lag between the actual breach event and
+       when it is reported. This parameter has power implications
+       and should be fine tuned to optimize power savings.
+       - Valid values :\n
+       - 0x00000001 -- GEOFENCE_RESPONSIVENESS_LOW
+       - 0x00000002 -- GEOFENCE_RESPONSIVENESS_MED
+       - 0x00000003 -- GEOFENCE_RESPONSIVENESS_HIGH  */
+
+  /* Optional */
+  /*  Confidence */
+  uint8_t confidence_valid;  /**< Must be set to true if confidence is being passed */
+  qmiLocGeofenceConfidenceEnumT_v02 confidence;
+  /**<   Given a breach event the confidence determines the probability
+       that the breach happened at the geofence boundary.
+       This parameter has power implications and
+       should be fine tuned to optimize power savings.
+       - Valid values: \n
+       - 0x00000001 -- GEOFENCE_CONFIDENCE_LOW
+       - 0x00000002 -- GEOFENCE_CONFIDENCE_MED
+       - 0x00000003 -- GEOFENCE_CONFIDENCE_HIGH  */
+}qmiLocAddCircularGeofenceReqMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Used by the control point to add a circular geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Add Circular Geofence Status */
+  qmiLocStatusEnumT_v02 status;
+  /**<   Status of the Add Circular Geofence request.
+
+       Valid values: \n
+         - 0x00000000 -- SUCCESS \n
+         - 0x00000001 -- GENERAL_FAILURE \n
+         - 0x00000002 -- UNSUPPORTED \n
+         - 0x00000003 -- INVALID_PARAMETER \n
+         - 0x00000004 -- ENGINE_BUSY \n
+         - 0x00000005 -- PHONE_OFFLINE \n
+         - 0x00000006 -- TIMEOUT \n
+         - 0x00000008 -- INSUFFICIENT_MEMORY
+     */
+
+  /* Optional */
+  /*  Transaction Id */
+  uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
+  uint32_t transactionId;
+  /**<   Transaction ID which was specified in the Geofence
+       add request. This parameter will always be present
+       if the status field is set to SUCCESS.
+       - Type: Unsigned integer.  */
+
+  /* Optional */
+  /*  Geofence Id */
+  uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
+  uint32_t geofenceId;
+  /**<   Geofence identifier allocated by the engine.
+       The client should include this identifier in all the transactions
+       pertaining to this Geofence.
+       - Type: Unsigned integer.  */
+}qmiLocAddCircularGeofenceIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Request Message; Used by the control point to delete a geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Geofence Id */
+  uint32_t geofenceId;
+  /**<   Identifier for the Geofence that is to be deleted.
+       - Type: Unsigned integer.  */
+
+  /* Mandatory */
+  /*  Transaction ID */
+  uint32_t transactionId;
+  /**<   Identifies the transaction, the transaction Id
+       will be returned with the DeleteGeofence
+       Indication.
+       - Type -- Unsigned Integer.  */
+}qmiLocDeleteGeofenceReqMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Used by the control point to delete a geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Add Circular Geofence Status */
+  qmiLocStatusEnumT_v02 status;
+  /**<   Status of the Delete Geofence request.
+
+       Valid values: \n
+         - 0x00000000 -- SUCCESS \n
+         - 0x00000001 -- GENERAL_FAILURE \n
+         - 0x00000002 -- UNSUPPORTED \n
+         - 0x00000003 -- INVALID_PARAMETER \n
+         - 0x00000004 -- ENGINE_BUSY \n
+         - 0x00000006 -- TIMEOUT  */
+
+  /* Optional */
+  /*  Geofence Id */
+  uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
+  uint32_t geofenceId;
+  /**<   Identifier for the Geofence that was deleted.
+       - Type: Unsigned integer.  */
+
+  /* Optional */
+  /*  Transaction Id */
+  uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
+  uint32_t transactionId;
+  /**<   Transaction ID which was specified in the Geofence
+       delete request. This parameter will always be present
+       if the status field is set to SUCCESS.
+       - Type: Unsigned integer.  */
+}qmiLocDeleteGeofenceIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCGEOFENCEORIGINENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_GEOFENCE_ORIGIN_NETWORK_V02 = 1, /**<  The geofence was initiated by a network initiated client.
+ The geofence was initiated by the device.  */
+  eQMI_LOC_GEOFENCE_ORIGIN_DEVICE_V02 = 2,
+  QMILOCGEOFENCEORIGINENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocGeofenceOriginEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCGEOFENCESTATEENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_GEOFENCE_STATE_ACTIVE_V02 = 1, /**<  The geofence is being actively monitored.
+ The geofence monitoring is suspended.  */
+  eQMI_LOC_GEOFENCE_STATE_SUSPEND_V02 = 2,
+  QMILOCGEOFENCESTATEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocGeofenceStateEnumT_v02;
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Request Message; Used by the control point to query a geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Geofence Id */
+  uint32_t geofenceId;
+  /**<   Identifier for the Geofence that is to be queried.
+       - Type: Unsigned integer.  */
+
+  /* Mandatory */
+  /*  Transaction ID */
+  uint32_t transactionId;
+  /**<   Identifies the transaction, the transaction Id
+       will be returned with the Query Geofence
+       Indication.
+       - Type -- Unsigned Integer.  */
+}qmiLocQueryGeofenceReqMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Used by the control point to query a geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Query Geofence Status */
+  qmiLocStatusEnumT_v02 status;
+  /**<   Status of the Query Geofence request.
+       Valid values: \n
+         - 0x00000000 -- SUCCESS \n
+         - 0x00000001 -- GENERAL_FAILURE \n
+         - 0x00000002 -- UNSUPPORTED \n
+         - 0x00000003 -- INVALID_PARAMETER \n
+         - 0x00000004 -- ENGINE_BUSY \n
+         - 0x00000006 -- TIMEOUT  */
+
+  /* Optional */
+  /*  Geofence Id */
+  uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
+  uint32_t geofenceId;
+  /**<   Identifier for the Geofence that was queried.
+       - Type: Unsigned integer.  */
+
+  /* Optional */
+  /*  Transaction Id */
+  uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
+  uint32_t transactionId;
+  /**<   Transaction ID which was specified in the Geofence
+       query request. This parameter will always be present
+       if the status field is set to SUCCESS.
+       - Type: Unsigned integer.  */
+
+  /* Optional */
+  /*  Geofence Origin */
+  uint8_t geofenceOrigin_valid;  /**< Must be set to true if geofenceOrigin is being passed */
+  qmiLocGeofenceOriginEnumT_v02 geofenceOrigin;
+  /**<   Originator for the geofence.
+       Valid values: \n
+         - 0x00000001 -- GEOFENCE_ORIGIN_NETWORK
+         - 0x00000002 -- GEOFENCE_ORIGIN_DEVICE
+        */
+
+  /* Optional */
+  /*  Position with respect to Geofence */
+  uint8_t posWrtGeofence_valid;  /**< Must be set to true if posWrtGeofence is being passed */
+  qmiLocGeofencePositionEnumT_v02 posWrtGeofence;
+  /**<   Indicates if the client is currently inside outside
+       the Geofence.
+       - Valid values: \n
+       - 0x00000001 -- GEOFENCE_POSITION_INSIDE
+       - 0x00000002 -- GEOFENCE_POSITION_OUTSIDE
+   */
+
+  /* Optional */
+  /*  Circular Geofence Parameters */
+  uint8_t circularGeofenceArgs_valid;  /**< Must be set to true if circularGeofenceArgs is being passed */
+  qmiLocCircularGeofenceArgsStructT_v02 circularGeofenceArgs;
+  /**<   The latitude and longitude of the center and the radius which
+       defines the are of this geofence.  */
+
+  /* Optional */
+  /*  Geofence State */
+  uint8_t geofenceState_valid;  /**< Must be set to true if geofenceState is being passed */
+  qmiLocGeofenceStateEnumT_v02 geofenceState;
+  /**<   Specifies whether the geofence is being monitored actively.
+       Valid values: \n
+       - 0x00000001 -- GEOFENCE_STATE_ACTIVE
+       - 0x00000002 -- GEOFENCE_STATE_SUSPEND  */
+}qmiLocQueryGeofenceIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Request Message; Used by the control point to edit a geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Geofence Id */
+  uint32_t geofenceId;
+  /**<   Identifier for the Geofence to be edited.
+       - Type: Unsigned integer.  */
+
+  /* Mandatory */
+  /*  Transaction ID */
+  uint32_t transactionId;
+  /**<   Identifies the transaction, the transaction Id
+       will be returned with the Edit Geofence Indication.
+        - Type -- Unsigned Integer.  */
+
+  /* Optional */
+  /*  Geofence State */
+  uint8_t geofenceState_valid;  /**< Must be set to true if geofenceState is being passed */
+  qmiLocGeofenceStateEnumT_v02 geofenceState;
+  /**<   Specifies whether the geofence should be actively monitored.
+       Valid values: \n
+       - 0x00000001 -- GEOFENCE_STATE_ACTIVE
+       - 0x00000002 -- GEOFENCE_STATE_SUSPEND  */
+
+  /* Optional */
+  /*  Breach Event Mask */
+  uint8_t breachMask_valid;  /**< Must be set to true if breachMask is being passed */
+  qmiLocGeofenceBreachMaskT_v02 breachMask;
+  /**<   Specifies the breach events the client is interested in.
+       - Valid values :
+       - 0x01 -- GEOFENCE_BREACH_ENTERING_MASK
+       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK
+ If this mask is set a breach event will be reported
+       when the Geofence is entered.
+ If this mask is set a breach event will be reported
+       when the Geofence is exited.  */
+}qmiLocEditGeofenceReqMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+typedef uint32_t qmiLocGeofenceConfigParamMaskT_v02;
+#define QMI_LOC_GEOFENCE_PARAM_MASK_GEOFENCE_STATE_V02 ((qmiLocGeofenceConfigParamMaskT_v02)0x00000001) /**<  Mask for the Geofence state parameter  */
+#define QMI_LOC_GEOFENCE_PARAM_MASK_BREACH_MASK_V02 ((qmiLocGeofenceConfigParamMaskT_v02)0x00000002) /**<  Mask for Geofence breach mask parameter */
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Used by the control point to edit a geofence. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Edit Geofence Status */
+  qmiLocStatusEnumT_v02 status;
+  /**<   Status of the Edit Geofence request.
+       Valid values: \n
+         - 0x00000000 -- SUCCESS \n
+         - 0x00000001 -- GENERAL_FAILURE \n
+         - 0x00000002 -- UNSUPPORTED \n
+         - 0x00000003 -- INVALID_PARAMETER \n
+         - 0x00000004 -- ENGINE_BUSY \n
+         - 0x00000006 -- TIMEOUT  */
+
+  /* Optional */
+  /*  Geofence Id */
+  uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
+  uint32_t geofenceId;
+  /**<   Identifier for the Geofence that was edited.
+       - Type: Unsigned integer.  */
+
+  /* Optional */
+  /*  Transaction Id */
+  uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
+  uint32_t transactionId;
+  /**<   Identifies the transaction, the transaction Id
+       is specified in the Edit Geofence request.
+        - Type -- Unsigned Integer.  */
+
+  /* Optional */
+  /*  Failed Parameters */
+  uint8_t failedParams_valid;  /**< Must be set to true if failedParams is being passed */
+  qmiLocGeofenceConfigParamMaskT_v02 failedParams;
+  /**<   Specified only when the status is not set to SUCCESS. If
+       the mask corresponding to a field is set it indicates that
+       the Geofence parameter could not be edited.
+       Valid values: \n
+       0x00000001 -- GEOFENCE_PARAM_MASK_GEOFENCE_STATE \n
+       0x00000002 -- GEOFENCE_PARAM_MASK_BREACH_MASK \n
+ Mask for the Geofence state parameter
+ Mask for Geofence breach mask parameter */
+}qmiLocEditGeofenceIndMsgT_v02;  /* Message */
 /**
     @}
   */
@@ -6078,6 +7059,21 @@ typedef struct {
 #define QMI_LOC_GET_POSITION_ENGINE_CONFIG_PARAMETERS_REQ_V02 0x005F
 #define QMI_LOC_GET_POSITION_ENGINE_CONFIG_PARAMETERS_RESP_V02 0x005F
 #define QMI_LOC_GET_POSITION_ENGINE_CONFIG_PARAMETERS_IND_V02 0x005F
+#define QMI_LOC_EVENT_NI_GEOFENCE_NOTIFICATION_IND_V02 0x0060
+#define QMI_LOC_EVENT_GEOFENCE_GEN_ALERT_IND_V02 0x0061
+#define QMI_LOC_EVENT_GEOFENCE_BREACH_NOTIFICATION_IND_V02 0x0062
+#define QMI_LOC_ADD_CIRCULAR_GEOFENCE_REQ_V02 0x0063
+#define QMI_LOC_ADD_CIRCULAR_GEOFENCE_RESP_V02 0x0063
+#define QMI_LOC_ADD_CIRCULAR_GEOFENCE_IND_V02 0x0063
+#define QMI_LOC_DELETE_GEOFENCE_REQ_V02 0x0064
+#define QMI_LOC_DELETE_GEOFENCE_RESP_V02 0x0064
+#define QMI_LOC_DELETE_GEOFENCE_IND_V02 0x0064
+#define QMI_LOC_QUERY_GEOFENCE_REQ_V02 0x0065
+#define QMI_LOC_QUERY_GEOFENCE_RESP_V02 0x0065
+#define QMI_LOC_QUERY_GEOFENCE_IND_V02 0x0065
+#define QMI_LOC_EDIT_GEOFENCE_REQ_V02 0x0066
+#define QMI_LOC_EDIT_GEOFENCE_RESP_V02 0x0066
+#define QMI_LOC_EDIT_GEOFENCE_IND_V02 0x0066
 /**
     @}
   */

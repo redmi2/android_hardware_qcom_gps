@@ -26,6 +26,7 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdlib.h>
 #include "qmi_client.h"
 #include "qmi_idl_lib.h"
 #include "qmi_cci_target_ext.h"
@@ -33,22 +34,15 @@
 #if defined( _ANDROID_)
 #include "qmi_cci_target.h"
 #include "qmi_cci_common.h"
-#elif defined(LOC_UTIL_TARGET_OFF_TARGET)
-#include <stdlib.h>
-#include <sys/time.h>
-#include <errno.h>
+#define LOG_NDEBUG 0
+#define LOG_TAG "LocSvc_api_v02"
 #endif //_ANDROID_
 
 #include <string.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include "loc_api_v02_client.h"
-
-#define LOG_NDEBUG 0
-#define LOG_TAG "LocSvc_api_v02"
-
 #include "loc_util_log.h"
 
 #ifdef LOC_UTIL_TARGET_OFF_TARGET
@@ -151,7 +145,22 @@ static locClientEventIndTableStructT locClientEventIndTable[]= {
   //Location Server Connection Request event
   { QMI_LOC_EVENT_LOCATION_SERVER_CONNECTION_REQ_IND_V02,
     sizeof(qmiLocEventLocationServerConnectionReqIndMsgT_v02),
-    QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ_V02 }
+    QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ_V02 },
+
+  // NI Geofence Event
+  { QMI_LOC_EVENT_NI_GEOFENCE_NOTIFICATION_IND_V02,
+    sizeof(qmiLocEventNiGeofenceNotificationIndMsgT_v02),
+    QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION_V02},
+
+  // Geofence General Alert Event
+  { QMI_LOC_EVENT_GEOFENCE_GEN_ALERT_IND_V02,
+    sizeof(qmiLocEventGeofenceGenAlertIndMsgT_v02),
+    QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT_V02},
+
+  //Geofence Breach event
+  { QMI_LOC_EVENT_GEOFENCE_BREACH_NOTIFICATION_IND_V02,
+    sizeof(qmiLocEventGeofenceBreachIndMsgT_v02),
+    QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION_V02}
 };
 
 /* table to relate the respInd Id with its size */
@@ -344,8 +353,23 @@ static locClientRespIndTableStructT locClientRespIndTable[]= {
 
    // Get Position Engine Config
    { QMI_LOC_GET_POSITION_ENGINE_CONFIG_PARAMETERS_IND_V02,
-     sizeof(qmiLocGetPositionEngineConfigParametersIndMsgT_v02)}
+     sizeof(qmiLocGetPositionEngineConfigParametersIndMsgT_v02)},
 
+   //Add a Circular Geofence
+   { QMI_LOC_ADD_CIRCULAR_GEOFENCE_IND_V02,
+     sizeof(qmiLocAddCircularGeofenceIndMsgT_v02)},
+
+   //Delete a Geofence
+   { QMI_LOC_DELETE_GEOFENCE_IND_V02,
+     sizeof(qmiLocDeleteGeofenceIndMsgT_v02)} ,
+
+   //Query a Geofence
+   { QMI_LOC_QUERY_GEOFENCE_IND_V02,
+     sizeof(qmiLocQueryGeofenceIndMsgT_v02)},
+
+   //Edit a Geofence
+   { QMI_LOC_EDIT_GEOFENCE_IND_V02,
+     sizeof(qmiLocEditGeofenceIndMsgT_v02)}
 };
 
 
@@ -475,6 +499,7 @@ static locClientStatusEnumType convertQmiResponseToLocStatus(
     switch(pResponse->resp.error)
     {
       case QMI_ERR_MALFORMED_MSG_V01:
+      case QMI_ERR_INVALID_ARG_V01:
         status = eLOC_CLIENT_FAILURE_INVALID_PARAMETER;
         break;
 
@@ -748,6 +773,27 @@ static bool locClientHandleIndication(
       break;
     }
 
+    case QMI_LOC_EVENT_NI_GEOFENCE_NOTIFICATION_IND_V02:
+    {
+      //locClientHandleNiGeofenceNotificationInd(user_handle, msg_id, ind_buf, ind_buf_len);
+      status = true;
+      break;
+    }
+
+    case QMI_LOC_EVENT_GEOFENCE_GEN_ALERT_IND_V02:
+    {
+      //locClientHandleGeofenceGenAlertInd(user_handle, msg_id, ind_buf, ind_buf_len);
+      status = true;
+      break;
+    }
+
+    case QMI_LOC_EVENT_GEOFENCE_BREACH_NOTIFICATION_IND_V02:
+    {
+      //locClientHandleGeofenceBreachInd(user_handle, msg_id, ind_buf, ind_buf_len);
+      status = true;
+      break;
+    }
+
     //-------------------------------------------------------------------------
 
     // handle the response indications
@@ -853,6 +899,39 @@ static bool locClientHandleIndication(
       status = true;
       break;
     }
+
+    case QMI_LOC_ADD_CIRCULAR_GEOFENCE_IND_V02:
+    {
+      // locClientHandleAddCircularGeofenceInd(
+      //     user_handle, msg_id, ind_buf, ind_buf_len);
+      status = true;
+      break;
+    }
+
+    case QMI_LOC_DELETE_GEOFENCE_IND_V02:
+    {
+      // locClientHandleDeleteGeofenceInd(
+      //     user_handle, msg_id, ind_buf, ind_buf_len);
+      status = true;
+      break;
+    }
+
+    case QMI_LOC_EDIT_GEOFENCE_IND_V02:
+    {
+      // locClientHandleEditGeofenceInd(
+      //     user_handle, msg_id, ind_buf, ind_buf_len);
+      status = true;
+      break;
+    }
+
+    case QMI_LOC_QUERY_GEOFENCE_IND_V02:
+    {
+      // locClientHandleQueryGeofenceInd(
+      //     user_handle, msg_id, ind_buf, ind_buf_len);
+      status = true;
+      break;
+    }
+
     // for indications that only have a "status" field
     case QMI_LOC_NI_USER_RESPONSE_IND_V02:
     case QMI_LOC_INJECT_UTC_TIME_IND_V02:
@@ -977,7 +1056,7 @@ static void locClientIndCb
   // check user handle
   if(memcmp(&pCallbackData->userHandle, &user_handle, sizeof(user_handle)))
   {
-    LOC_LOGE("%s:%d]: invalid user_handle got 0x%x expected 0x%x\n",
+    LOC_LOGE("%s:%d]: invalid user_handle got %p expected %p\n",
         __func__, __LINE__,
         user_handle, pCallbackData->userHandle);
     return;
@@ -1353,6 +1432,26 @@ static bool validateRequest(
       *pOutLen = sizeof(qmiLocGetPositionEngineConfigParametersReqMsgT_v02);
       break;
     }
+    case QMI_LOC_ADD_CIRCULAR_GEOFENCE_REQ_V02:
+    {
+      *pOutLen = sizeof(qmiLocAddCircularGeofenceReqMsgT_v02);
+      break;
+    }
+    case QMI_LOC_DELETE_GEOFENCE_REQ_V02:
+    {
+      *pOutLen = sizeof(qmiLocDeleteGeofenceReqMsgT_v02);
+      break;
+    }
+    case QMI_LOC_QUERY_GEOFENCE_REQ_V02:
+    {
+      *pOutLen = sizeof(qmiLocQueryGeofenceReqMsgT_v02);
+      break;
+    }
+    case QMI_LOC_EDIT_GEOFENCE_REQ_V02:
+    {
+      *pOutLen = sizeof(qmiLocEditGeofenceReqMsgT_v02);
+      break;
+    }
 
     // ALL requests with no payload
     case QMI_LOC_GET_SERVICE_REVISION_REQ_V02:
@@ -1650,7 +1749,7 @@ locClientStatusEnumType locClientOpen (
 
   else
   {
-    LOC_LOGD("%s:%d]: returning handle = 0x%x, user_handle=0x%x, status = %d\n",
+    LOC_LOGD("%s:%d]: returning handle = %p, user_handle=%p, status = %d\n",
                 __func__, __LINE__, *pLocClientHandle,
                 pCallbackData->userHandle, status);
   }
@@ -1699,7 +1798,7 @@ locClientStatusEnumType locClientClose(
     return(eLOC_CLIENT_FAILURE_INVALID_HANDLE);
   }
 
-  LOC_LOGV("locClientClose releasing handle 0x%x, user handle 0x%x\n",
+  LOC_LOGV("locClientClose releasing handle %p, user handle %p\n",
       *pLocClientHandle, pCallbackData->userHandle );
 
   // NEXT call goes out to modem. We log the callflow before it
@@ -1707,6 +1806,7 @@ locClientStatusEnumType locClientClose(
   // back from the modem, to avoid confusing log order. We trust
   // that the QMI framework is robust.
   EXIT_LOG_CALLFLOW(%s, "loc client close");
+
   // release the handle
   rc = qmi_client_release(pCallbackData->userHandle);
   if(QMI_NO_ERR != rc )
@@ -1728,7 +1828,6 @@ locClientStatusEnumType locClientClose(
 
   // set the handle to invalid value
   *pLocClientHandle = LOC_CLIENT_INVALID_HANDLE_VALUE;
-
   return eLOC_CLIENT_SUCCESS;
 }
 
@@ -1794,7 +1893,6 @@ locClientStatusEnumType locClientSendReq(
   // back from the modem, to avoid confusing log order. We trust
   // that the QMI framework is robust.
   EXIT_LOG_CALLFLOW(%s, loc_get_v02_event_name(reqId));
-
   rc = qmi_client_send_msg_sync(
       pCallbackData->userHandle,
       reqId,
@@ -1815,7 +1913,6 @@ locClientStatusEnumType locClientSendReq(
 
   // map the QCCI response to Loc API v02 status
   status = convertQmiResponseToLocStatus(&resp);
-
   return(status);
 }
 
