@@ -1,4 +1,4 @@
-/* Copyright (c) 2009,2011 Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2009-2012 Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -816,15 +816,21 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsCallbacks* callbac
     loc_eng_data.agps_status_cb = callbacks->status_cb;
 
     loc_eng_data.agnss_nif = new AgpsStateMachine(loc_eng_data.agps_status_cb,
-                                                  AGPS_TYPE_SUPL);
+                                                  AGPS_TYPE_SUPL,
+                                                  false);
     loc_eng_data.internet_nif = new AgpsStateMachine(loc_eng_data.agps_status_cb,
-                                                     AGPS_TYPE_WWAN_ANY);
+                                                     AGPS_TYPE_WWAN_ANY,
+                                                     false);
+    loc_eng_data.wifi_nif = new AgpsStateMachine(loc_eng_data.agps_status_cb,
+                                                 AGPS_TYPE_WIFI,
+                                                 true);
 
 #ifdef FEATURE_GNSS_BIT_API
     {
         char baseband[PROPERTY_VALUE_MAX];
         property_get("ro.baseband", baseband, "msm");
-        if ((strcmp(baseband,"svlte2a") == 0))
+        if ((strcmp(baseband,"svlte2a") == 0) ||
+            (strcmp(baseband,"msm") == 0))
         {
             loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb,
                                                    NULL, NULL, &loc_eng_data);
@@ -1471,10 +1477,16 @@ static void loc_eng_deferred_action_thread(void* arg)
 
         case LOC_ENG_MSG_REQUEST_BIT:
         {
+            AgpsStateMachine* stateMachine;
             loc_eng_msg_request_bit* brqMsg = (loc_eng_msg_request_bit*)msg;
-            AgpsStateMachine* stateMachine = (brqMsg->isSupl) ?
-                                             loc_eng_data_p->agnss_nif :
-                                             loc_eng_data_p->internet_nif;
+            if (brqMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_SUPL) {
+                stateMachine = loc_eng_data_p->agnss_nif;
+            } else if (brqMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_ANY) {
+                stateMachine = loc_eng_data_p->internet_nif;
+            } else {
+                LOC_LOGD("%s]%d: unknown I/F request type = 0x%x\n", __func__, __LINE__, brqMsg->ifType);
+                break;
+            }
             BITSubscriber subscriber(stateMachine, brqMsg->ipv4Addr, brqMsg->ipv6Addr);
 
             stateMachine->subscribeRsrc((Subscriber*)&subscriber);
@@ -1483,10 +1495,16 @@ static void loc_eng_deferred_action_thread(void* arg)
 
         case LOC_ENG_MSG_RELEASE_BIT:
         {
+            AgpsStateMachine* stateMachine;
             loc_eng_msg_release_bit* brlMsg = (loc_eng_msg_release_bit*)msg;
-            AgpsStateMachine* stateMachine = (brlMsg->isSupl) ?
-                                             loc_eng_data_p->agnss_nif :
-                                             loc_eng_data_p->internet_nif;
+            if (brlMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_SUPL) {
+                stateMachine = loc_eng_data_p->agnss_nif;
+            } else if (brlMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_ANY) {
+                stateMachine = loc_eng_data_p->internet_nif;
+            } else {
+                LOC_LOGD("%s]%d: unknown I/F request type = 0x%x\n", __func__, __LINE__, brlMsg->ifType);
+                break;
+            }
             BITSubscriber subscriber(stateMachine, brlMsg->ipv4Addr, brlMsg->ipv6Addr);
 
             stateMachine->unsubscribeRsrc((Subscriber*)&subscriber);
@@ -1529,6 +1547,30 @@ static void loc_eng_deferred_action_thread(void* arg)
         }
         break;
 
+        case LOC_ENG_MSG_REQUEST_WIFI:
+        {
+            loc_eng_msg_request_wifi *wrqMsg = (loc_eng_msg_request_wifi *)msg;
+            if (wrqMsg->senderId == LOC_ENG_IF_REQUEST_SENDER_ID_QUIPC ||
+                wrqMsg->senderId == LOC_ENG_IF_REQUEST_SENDER_ID_MSAPM) {
+              AgpsStateMachine* stateMachine = loc_eng_data_p->wifi_nif;
+              WIFISubscriber subscriber(stateMachine, wrqMsg->ssid, wrqMsg->password, wrqMsg->senderId);
+              stateMachine->subscribeRsrc((Subscriber*)&subscriber);
+            } else {
+              LOC_LOGE("%s]%d ERROR: unknown sender ID", __func__, __LINE__);
+              break;
+            }
+        }
+        break;
+
+        case LOC_ENG_MSG_RELEASE_WIFI:
+        {
+            AgpsStateMachine* stateMachine = loc_eng_data_p->wifi_nif;
+            loc_eng_msg_release_wifi* wrlMsg = (loc_eng_msg_release_wifi*)msg;
+            WIFISubscriber subscriber(stateMachine, wrlMsg->ssid, wrlMsg->password, wrlMsg->senderId);
+            stateMachine->unsubscribeRsrc((Subscriber*)&subscriber);
+        }
+        break;
+
         case LOC_ENG_MSG_REQUEST_XTRA_DATA:
             if (loc_eng_data_p->xtra_module_data.download_request_cb != NULL)
             {
@@ -1564,9 +1606,20 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_ATL_OPEN_SUCCESS:
         {
             loc_eng_msg_atl_open_success *aosMsg = (loc_eng_msg_atl_open_success*)msg;
-            AgpsStateMachine* stateMachine = (AGPS_TYPE_SUPL == aosMsg->agpsType) ?
-                                             loc_eng_data_p->agnss_nif :
-                                             loc_eng_data_p->internet_nif;
+            AgpsStateMachine* stateMachine;
+            switch (aosMsg->agpsType) {
+              case AGPS_TYPE_WIFI: {
+                stateMachine = loc_eng_data_p->wifi_nif;
+                break;
+              }
+              case AGPS_TYPE_SUPL: {
+                stateMachine = loc_eng_data_p->agnss_nif;
+                break;
+              }
+              default: {
+                stateMachine  = loc_eng_data_p->internet_nif;
+              }
+            }
 
             stateMachine->setBearer(aosMsg->bearerType);
             stateMachine->setAPN(aosMsg->apn, aosMsg->length);
@@ -1577,9 +1630,20 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_ATL_CLOSED:
         {
             loc_eng_msg_atl_closed *acsMsg = (loc_eng_msg_atl_closed*)msg;
-            AgpsStateMachine* stateMachine = (AGPS_TYPE_SUPL == acsMsg->agpsType) ?
-                                             loc_eng_data_p->agnss_nif :
-                                             loc_eng_data_p->internet_nif;
+            AgpsStateMachine* stateMachine;
+            switch (acsMsg->agpsType) {
+              case AGPS_TYPE_WIFI: {
+                stateMachine = loc_eng_data_p->wifi_nif;
+                break;
+              }
+              case AGPS_TYPE_SUPL: {
+                stateMachine = loc_eng_data_p->agnss_nif;
+                break;
+              }
+              default: {
+                stateMachine  = loc_eng_data_p->internet_nif;
+              }
+            }
 
             stateMachine->onRsrcEvent(RSRC_RELEASED);
         }
@@ -1588,9 +1652,20 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_ATL_OPEN_FAILED:
         {
             loc_eng_msg_atl_open_failed *aofMsg = (loc_eng_msg_atl_open_failed*)msg;
-            AgpsStateMachine* stateMachine = (AGPS_TYPE_SUPL == aofMsg->agpsType) ?
-                                             loc_eng_data_p->agnss_nif :
-                                             loc_eng_data_p->internet_nif;
+            AgpsStateMachine* stateMachine;
+            switch (aofMsg->agpsType) {
+              case AGPS_TYPE_WIFI: {
+                stateMachine = loc_eng_data_p->wifi_nif;
+                break;
+              }
+              case AGPS_TYPE_SUPL: {
+                stateMachine = loc_eng_data_p->agnss_nif;
+                break;
+              }
+              default: {
+                stateMachine  = loc_eng_data_p->internet_nif;
+              }
+            }
 
             stateMachine->onRsrcEvent(RSRC_DENIED);
         }

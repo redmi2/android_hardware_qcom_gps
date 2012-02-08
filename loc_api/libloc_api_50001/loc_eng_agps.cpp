@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011,2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -87,7 +87,7 @@ const int Notification::BROADCAST_INACTIVE = 0x80000002;
 
 
 //======================================================================
-// Subscriber:  BITSubscriber / ATLSubscriber
+// Subscriber:  BITSubscriber / ATLSubscriber / WIFISubscriber
 //======================================================================
 bool Subscriber::forMe(Notification &notification)
 {
@@ -120,14 +120,17 @@ bool BITSubscriber::notifyRsrcStatus(Notification &notification)
         case RSRC_UNSUBSCRIBE:
         case RSRC_RELEASED:
             loc_eng_dmn_conn_loc_api_server_data_conn(
+                LOC_ENG_IF_REQUEST_SENDER_ID_GPSONE_DAEMON,
                 GPSONE_LOC_API_IF_RELEASE_SUCCESS);
             break;
         case RSRC_DENIED:
             loc_eng_dmn_conn_loc_api_server_data_conn(
+                LOC_ENG_IF_REQUEST_SENDER_ID_GPSONE_DAEMON,
                 GPSONE_LOC_API_IF_FAILURE);
             break;
         case RSRC_GRANTED:
             loc_eng_dmn_conn_loc_api_server_data_conn(
+                LOC_ENG_IF_REQUEST_SENDER_ID_GPSONE_DAEMON,
                 GPSONE_LOC_API_IF_REQUEST_SUCCESS);
             break;
         default:
@@ -168,6 +171,38 @@ bool ATLSubscriber::notifyRsrcStatus(Notification &notification)
                                             mStateMachine->getBearer(),
                                             type);
         }
+            break;
+        default:
+            notify = false;
+        }
+    }
+
+    return notify;
+}
+
+bool WIFISubscriber::notifyRsrcStatus(Notification &notification)
+{
+    bool notify = forMe(notification);
+
+    if (notify) {
+        switch(notification.rsrcStatus)
+        {
+        case RSRC_UNSUBSCRIBE:
+            break;
+        case RSRC_RELEASED:
+            loc_eng_dmn_conn_loc_api_server_data_conn(
+                senderId,
+                GPSONE_LOC_API_IF_RELEASE_SUCCESS);
+            break;
+        case RSRC_DENIED:
+            loc_eng_dmn_conn_loc_api_server_data_conn(
+                senderId,
+                GPSONE_LOC_API_IF_FAILURE);
+            break;
+        case RSRC_GRANTED:
+            loc_eng_dmn_conn_loc_api_server_data_conn(
+                senderId,
+                GPSONE_LOC_API_IF_REQUEST_SUCCESS);
             break;
         default:
             notify = false;
@@ -518,11 +553,13 @@ AgpsState* AgpsReleasingState::onRsrcEvent(AgpsRsrcStatus event, void* data)
 //======================================================================
 
 AgpsStateMachine::AgpsStateMachine(void (*servicer)(AGpsStatus* status),
-                                   AGpsType type) :
+                                   AGpsType type,
+                                   bool enforceSingleSubscriber) :
     mServicer(servicer), mType(type),
     mStatePtr(new AgpsReleasedState(this)),
     mAPN(NULL),
-    mAPNLen(0)
+    mAPNLen(0),
+    mEnforceSingleSubscriber(enforceSingleSubscriber)
 {
     linked_list_init(&mSubscribers);
 
@@ -654,8 +691,11 @@ void AgpsStateMachine::sendRsrcRequest(AGpsStatusValue action) const
         if (s == NULL) {
             nifRequest.ipv4_addr = INADDR_NONE;
             nifRequest.ipv6_addr[0] = 0;
+            nifRequest.ssid[0] = '\0';
+            nifRequest.password[0] = '\0';
         } else {
             s->setIPAddresses(nifRequest.ipv4_addr, (char*)nifRequest.ipv6_addr);
+            s->setWifiInfo(nifRequest.ssid, nifRequest.password);
         }
 
         CALLBACK_LOG_CALLFLOW("agps_cb", %s, loc_get_agps_status_name(action));
@@ -665,7 +705,12 @@ void AgpsStateMachine::sendRsrcRequest(AGpsStatusValue action) const
 
 void AgpsStateMachine::subscribeRsrc(Subscriber *subscriber)
 {
-    mStatePtr = mStatePtr->onRsrcEvent(RSRC_SUBSCRIBE, (void*)subscriber);
+  if (mEnforceSingleSubscriber && hasSubscribers()) {
+      Notification notification(Notification::BROADCAST_ALL, RSRC_DENIED, true);
+      notifySubscriber(&notification, subscriber);
+  } else {
+      mStatePtr = mStatePtr->onRsrcEvent(RSRC_SUBSCRIBE, (void*)subscriber);
+  }
 }
 
 bool AgpsStateMachine::unsubscribeRsrc(Subscriber *subscriber)

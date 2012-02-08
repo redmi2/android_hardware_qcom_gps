@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011,2012 Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -37,7 +37,6 @@
 #include "loc.h"
 #include <loc_eng_log.h>
 #include "loc_eng_msg_id.h"
-
 
 #ifdef __cplusplus
 extern "C" {
@@ -90,6 +89,20 @@ struct LocPosMode
                   provider);
     }
 };
+
+typedef enum {
+  LOC_ENG_IF_REQUEST_TYPE_SUPL = 0,
+  LOC_ENG_IF_REQUEST_TYPE_WIFI,
+  LOC_ENG_IF_REQUEST_TYPE_ANY
+} loc_if_req_type_e_type;
+
+typedef enum {
+  LOC_ENG_IF_REQUEST_SENDER_ID_QUIPC = 0,
+  LOC_ENG_IF_REQUEST_SENDER_ID_MSAPM,
+  LOC_ENG_IF_REQUEST_SENDER_ID_GPSONE_DAEMON,
+  LOC_ENG_IF_REQUEST_SENDER_ID_MODEM,
+  LOC_ENG_IF_REQUEST_SENDER_ID_UNKNOWN
+} loc_if_req_sender_id_e_type;
 
 struct loc_eng_msg {
     const void* owner;
@@ -289,20 +302,20 @@ struct loc_eng_msg_report_nmea : public loc_eng_msg {
 };
 
 struct loc_eng_msg_request_bit : public loc_eng_msg {
-    const unsigned int isSupl;
+    const loc_if_req_type_e_type ifType;
     const int ipv4Addr;
     char* const ipv6Addr;
     inline loc_eng_msg_request_bit(void* instance,
-                                   unsigned int is_supl,
+                                   loc_if_req_type_e_type type,
                                    int ipv4,
                                    char* ipv6) :
         loc_eng_msg(instance, LOC_ENG_MSG_REQUEST_BIT),
-        isSupl(is_supl), ipv4Addr(ipv4),
+        ifType(type), ipv4Addr(ipv4),
         ipv6Addr(NULL == ipv6 ? NULL : new char[16])
     {
         if (NULL != ipv6Addr)
             memcpy(ipv6Addr, ipv6, 16);
-        LOC_LOGV("isSupl: %d, ipv4: %d.%d.%d.%d, ipv6: %s", isSupl,
+        LOC_LOGV("ifType: %d, ipv4: %d.%d.%d.%d, ipv6: %s", ifType,
                  (unsigned char)ipv4>>24,
                  (unsigned char)ipv4>>16,
                  (unsigned char)ipv4>>8,
@@ -318,21 +331,58 @@ struct loc_eng_msg_request_bit : public loc_eng_msg {
     }
 };
 
+struct loc_eng_msg_request_wifi : public loc_eng_msg {
+    const loc_if_req_type_e_type ifType;
+    const loc_if_req_sender_id_e_type senderId;
+    char* const ssid;
+    char* const password;
+    inline loc_eng_msg_request_wifi(void* instance,
+                                   loc_if_req_type_e_type type,
+                                   loc_if_req_sender_id_e_type sender_id,
+                                   char* s,
+                                   char* p) :
+        loc_eng_msg(instance, LOC_ENG_MSG_REQUEST_WIFI),
+        ifType(type), senderId(sender_id),
+        ssid(NULL == s ? NULL : new char[SSID_BUF_SIZE]),
+        password(NULL == p ? NULL : new char[SSID_BUF_SIZE])
+    {
+        if (NULL != ssid)
+            strlcpy(ssid, s, SSID_BUF_SIZE);
+        if (NULL != password)
+            strlcpy(password, p, SSID_BUF_SIZE);
+        LOC_LOGV("ifType: %d, senderId: %d, ssid: %s, password: %s",
+                 ifType,
+                 senderId,
+                 NULL != ssid ? ssid : "",
+                 NULL != password ? password : "");
+    }
+
+    inline ~loc_eng_msg_request_wifi()
+    {
+        if (NULL != ssid) {
+            delete[] ssid;
+        }
+        if (NULL != password) {
+            delete[] password;
+        }
+    }
+};
+
 struct loc_eng_msg_release_bit : public loc_eng_msg {
-    const unsigned int isSupl;
+    const loc_if_req_type_e_type ifType;
     const int ipv4Addr;
     char* const ipv6Addr;
     inline loc_eng_msg_release_bit(void* instance,
-                                   unsigned int is_supl,
+                                   loc_if_req_type_e_type type,
                                    int ipv4,
                                    char* ipv6) :
         loc_eng_msg(instance, LOC_ENG_MSG_RELEASE_BIT),
-        isSupl(is_supl), ipv4Addr(ipv4),
+        ifType(type), ipv4Addr(ipv4),
         ipv6Addr(NULL == ipv6 ? NULL : new char[16])
     {
         if (NULL != ipv6Addr)
             memcpy(ipv6Addr, ipv6, 16);
-        LOC_LOGV("isSupl: %d, ipv4: %d.%d.%d.%d, ipv6: %s", isSupl,
+        LOC_LOGV("ifType: %d, ipv4: %d.%d.%d.%d, ipv6: %s", ifType,
                  (unsigned char)ipv4>>24,
                  (unsigned char)ipv4>>16,
                  (unsigned char)ipv4>>8,
@@ -347,6 +397,44 @@ struct loc_eng_msg_release_bit : public loc_eng_msg {
         }
     }
 };
+
+struct loc_eng_msg_release_wifi : public loc_eng_msg {
+    const loc_if_req_type_e_type ifType;
+    const loc_if_req_sender_id_e_type senderId;
+    char* const ssid;
+    char* const password;
+    inline loc_eng_msg_release_wifi(void* instance,
+                                   loc_if_req_type_e_type type,
+                                   loc_if_req_sender_id_e_type sender_id,
+                                   char* s,
+                                   char* p) :
+        loc_eng_msg(instance, LOC_ENG_MSG_RELEASE_WIFI),
+        ifType(type), senderId(sender_id),
+        ssid(NULL == s ? NULL : new char[SSID_BUF_SIZE]),
+        password(NULL == p ? NULL : new char[SSID_BUF_SIZE])
+    {
+        if (NULL != s)
+            strlcpy(ssid, s, SSID_BUF_SIZE);
+        if (NULL != p)
+            strlcpy(password, p, SSID_BUF_SIZE);
+        LOC_LOGV("ifType: %d, senderId: %d, ssid: %s, password: %s",
+                 ifType,
+                 senderId,
+                 NULL != ssid ? ssid : "",
+                 NULL != password ? password : "");
+    }
+
+    inline ~loc_eng_msg_release_wifi()
+    {
+        if (NULL != ssid) {
+            delete[] ssid;
+        }
+        if (NULL != password) {
+            delete[] password;
+        }
+    }
+};
+
 
 struct loc_eng_msg_request_atl : public loc_eng_msg {
     const int handle;

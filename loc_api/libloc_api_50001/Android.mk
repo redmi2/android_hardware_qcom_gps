@@ -3,6 +3,7 @@ ifneq ($(BUILD_TINY_ANDROID),true)
 
 BIT_ENABLED_BOARD_PLATFORM_LIST := msm7630_fusion
 BIT_ENABLED_BOARD_PLATFORM_LIST += msm8660
+BIT_ENABLED_BOARD_PLATFORM_LIST += msm8960
 ifeq ($(call is-board-platform-in-list,$(BIT_ENABLED_BOARD_PLATFORM_LIST)),true)
 FEATURE_GNSS_BIT_API := true
 endif # is-board-platform-in-list

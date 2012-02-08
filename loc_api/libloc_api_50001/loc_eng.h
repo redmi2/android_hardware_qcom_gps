@@ -1,4 +1,4 @@
-/* Copyright (c) 2009,2011 Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2009-2012 Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -116,6 +116,7 @@ typedef struct
     // AGPS state machines
     AgpsStateMachine*              agnss_nif;
     AgpsStateMachine*              internet_nif;
+    AgpsStateMachine*              wifi_nif;
 
     // GPS engine status
     GpsStatusValue                 engine_status;

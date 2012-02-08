@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011,2012 Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -76,6 +76,8 @@ enum loc_eng_msg_ids_t {
     LOC_ENG_MSG_RELEASE_BIT,
     LOC_ENG_MSG_REQUEST_ATL,
     LOC_ENG_MSG_RELEASE_ATL,
+    LOC_ENG_MSG_REQUEST_WIFI,
+    LOC_ENG_MSG_RELEASE_WIFI,
     LOC_ENG_MSG_REQUEST_NI,
     LOC_ENG_MSG_INFORM_NI_RESPONSE,
     LOC_ENG_MSG_REQUEST_XTRA_DATA,

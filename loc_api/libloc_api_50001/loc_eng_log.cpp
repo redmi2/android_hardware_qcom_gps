@@ -1,4 +1,4 @@
-/* Copyright (c) 2011 Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011,2012 Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -87,6 +87,8 @@ static loc_name_val_s_type loc_eng_msgs[] =
     NAME_VAL( LOC_ENG_MSG_RELEASE_ATL ),
     NAME_VAL( LOC_ENG_MSG_REQUEST_BIT ),
     NAME_VAL( LOC_ENG_MSG_RELEASE_BIT ),
+    NAME_VAL( LOC_ENG_MSG_REQUEST_WIFI ),
+    NAME_VAL( LOC_ENG_MSG_RELEASE_WIFI ),
     NAME_VAL( LOC_ENG_MSG_REQUEST_NI ),
     NAME_VAL( LOC_ENG_MSG_INFORM_NI_RESPONSE ),
     NAME_VAL( LOC_ENG_MSG_REQUEST_XTRA_DATA ),
