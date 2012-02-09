@@ -277,9 +277,9 @@ static const char* log_final_interm_string(int is_final)
 static void log_parsed_report(const rpc_loc_parsed_position_s_type *parsed_report)
 {
    rpc_loc_session_status_e_type status = parsed_report->session_status;
-   LOC_LOGD("Session status: %s   Valid mask: 0x%X\n",
+   LOC_LOGD("Session status: %s   Valid mask: 0x%X Tech: 0x%X\n",
          loc_get_sess_status_name(status),
-         (uint) parsed_report->valid_mask);
+         (uint) parsed_report->valid_mask, (uint) parsed_report->technology_mask);
    LOC_LOGD("Latitude:  %.7f (%s)\n", parsed_report->latitude,
          log_final_interm_string(
                (parsed_report->valid_mask & RPC_LOC_POS_VALID_LATITUDE) &&

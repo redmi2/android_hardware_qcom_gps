@@ -1266,9 +1266,32 @@ static void loc_eng_report_position(const rpc_loc_parsed_position_s_type *locati
 
          if (loc_eng_data.location_cb != NULL && !filter_out)
          {
-                CALLBACK_LOG_CALLFLOW("location_cb");
-            loc_eng_data.location_cb(&location);
+
+                // Technology (SV, CellID, WIFI)
+                if ( (location_report_ptr->valid_mask & RPC_LOC_POS_VALID_TECHNOLOGY_MASK) )
+                {
+
+                    if (location_report_ptr->technology_mask & RPC_LOC_POS_TECH_SATELLITE) {
+                        location.position_source = ULP_LOCATION_IS_FROM_GNSS;
+                        LOC_LOGV("reportPosition: fire callback\n");
+                        CALLBACK_LOG_CALLFLOW("location_cb");
+                        loc_eng_data.location_cb(&location);
+                    } else if ((location_report_ptr->technology_mask & RPC_LOC_POS_TECH_CELLID) ||
+                               (location_report_ptr->technology_mask & RPC_LOC_POS_TECH_WIFI)) {
+                        location.position_source = ULP_LOCATION_IS_FROM_HYBRID;
+                        LOC_LOGE("reportPosition: do not report CellID or WIFI %0x\n", location_report_ptr->technology_mask);
+                    } else {
+                        LOC_LOGE("reportPosition: source unknown?\n");
+                    }
+                } else {
+                        LOC_LOGV("reportPosition: no technology mask\n");
+                        location.position_source = 0;
+                        CALLBACK_LOG_CALLFLOW("location_cb");
+                        loc_eng_data.location_cb(&location);
+                }
+
          }
+
       }
       else
       {
