@@ -41,6 +41,9 @@
 #define GPS_CONF_FILE            "/etc/gps.conf"   //??? platform independent
 #endif
 
+#define UTIL_READ_CONF_DEFAULT(filename) \
+    loc_read_conf((filename), NULL, 0);
+
 #define UTIL_READ_CONF(filename, config_table) \
             loc_read_conf((filename), (config_table), sizeof(config_table) / sizeof(config_table[0]))
 
