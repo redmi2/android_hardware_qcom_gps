@@ -167,6 +167,9 @@ static const AGpsRilInterface sLocEngAGpsRilInterface =
 // Global data structure for location engine
 loc_eng_data_s_type loc_eng_data;
 int loc_eng_inited = 0; /* not initialized */
+// save report in a separate place, as we do not want it
+// to be flushed out by other reports.
+static rpc_loc_parsed_position_s_type loc_location_report;
 
 // Address buffers, for addressing setting before init
 int    supl_host_set = 0;
@@ -1032,8 +1035,29 @@ static int32 loc_event_cb
 
    loc_eng_callback_log(loc_event, loc_event_payload);
    pthread_mutex_lock(&loc_eng_data.deferred_action_mutex);
-   loc_eng_data.loc_event = loc_event;
-   memcpy(&loc_eng_data.loc_event_payload, loc_event_payload, sizeof(*loc_event_payload));
+   // essentially we only OR if the current bit is position bit
+   // else we assign the bit event. When events come very quickly
+   // one after another, event assignment overwrites any unprocessed
+   // events in loc_eng_data.loc_event.  We could OR the incoming
+   // bits, but we can not easily handle the associated payload data.
+   // So we tolerate losing events, except for position events / reports.
+   // This is why we OR if current unprocessed event is a position
+   // event; and also dedicate another global data buffer for position
+   // report payload.  Position event / report CAN be lost however, if
+   // the incoming event is also position event.  But it is very very
+   // unlikely, because it would mean that we have held off the
+   // current processed position report for 1 second or longer and
+   // did not pass it up.  In this case, this 1 second old position
+   // is no longer current, and we are getting a new position.  So
+   // losing this position is not much of a problem.
+   loc_eng_data.loc_event = (loc_eng_data.loc_event &
+                             RPC_LOC_EVENT_PARSED_POSITION_REPORT) | loc_event;
+   if (loc_event == RPC_LOC_EVENT_PARSED_POSITION_REPORT) {
+       loc_location_report = loc_event_payload->rpc_loc_event_payload_u_type_u.
+           parsed_location_report;
+   } else {
+       memcpy(&loc_eng_data.loc_event_payload, loc_event_payload, sizeof(*loc_event_payload));
+   }
    /* hold a wake lock while events are pending for deferred_action_thread */
    loc_eng_data.acquire_wakelock_cb();
    loc_eng_data.deferred_action_flags |= DEFERRED_ACTION_EVENT;
@@ -1525,8 +1549,7 @@ static void loc_eng_process_loc_event (rpc_loc_event_mask_type loc_event,
    if ( (loc_event & RPC_LOC_EVENT_PARSED_POSITION_REPORT) &&
          loc_eng_data.mute_session_state != LOC_MUTE_SESS_IN_SESSION)
    {
-      loc_eng_report_position(&loc_event_payload->rpc_loc_event_payload_u_type_u.
-            parsed_location_report);
+      loc_eng_report_position(&loc_location_report);
    }
 
    // Satellite report
