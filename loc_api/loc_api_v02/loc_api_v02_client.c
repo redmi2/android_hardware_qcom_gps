@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -1543,14 +1543,15 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
 
   QMI_CCI_OS_SIGNAL_WAIT(&os_params, LOC_CLIENT_SERVICE_TIMEOUT);
 
-  /* release the notifier handle */
-  qmi_client_release(notifier);
 
   if(QMI_CCI_OS_SIGNAL_TIMED_OUT(&os_params))
   {
     // timed out, return with error
     LOC_LOGE("%s:%d]: timed out waiting for service\n",
                     __func__, __LINE__);
+
+    /* release the notifier handle */
+    qmi_client_release(notifier);
 
     return(eLOC_CLIENT_FAILURE_TIMEOUT);
   }
@@ -1568,6 +1569,9 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
       LOC_LOGE("%s:%d]: qmi_client_get_service_list failed even though"
                     "service is up !!!\n", __func__, __LINE__);
 
+      /* release the notifier handle */
+      qmi_client_release(notifier);
+
       return(eLOC_CLIENT_FAILURE_INTERNAL);
     }
 
@@ -1576,6 +1580,7 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
   //get service info to be used in qmi_client_init
   rc = qmi_client_get_service_list( locClientServiceObject, serviceInfo,
                                     &num_entries, &num_services);
+
 
   LOC_LOGV("%s:%d]: qmi_client_get_service_list()"
                 " returned %d num_entries = %d num_services = %d\n",
@@ -1586,6 +1591,9 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
   {
     LOC_LOGE("%s:%d]: qmi_client_get_service_list Error %d \n",
                   __func__, __LINE__, rc);
+
+    /* release the notifier handle */
+    qmi_client_release(notifier);
 
     return(eLOC_CLIENT_FAILURE_INTERNAL);
   }
@@ -1601,6 +1609,10 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
   {
     LOC_LOGE("%s:%d]: qmi_client_init error %d\n",
                   __func__, __LINE__, rc);
+
+    /* release the notifier handle */
+    qmi_client_release(notifier);
+
     return(eLOC_CLIENT_FAILURE_INTERNAL);
   }
 
@@ -1616,11 +1628,18 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
   {
     LOC_LOGE("%s:%d]: could not register QCCI error callback error:%d\n",
                   __func__, __LINE__, rc);
+
+    /* release the notifier handle */
+    qmi_client_release(notifier);
+
     return (eLOC_CLIENT_FAILURE_INTERNAL);
   }
 
   // copy the clnt handle returned in qmi_client_init
   memcpy(&(pLocClientCbData->userHandle), &clnt, sizeof(qmi_client_type));
+
+  /* release the notifier handle */
+  qmi_client_release(notifier);
 
   return(eLOC_CLIENT_SUCCESS);
 
