@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -82,7 +82,7 @@ extern "C" {
 /** Major Version Number of the IDL used to generate this file */
 #define LOC_V02_IDL_MAJOR_VERS 0x02
 /** Revision Number of the IDL used to generate this file */
-#define LOC_V02_IDL_MINOR_VERS 0x08
+#define LOC_V02_IDL_MINOR_VERS 0x09
 /** Major Version Number of the qmi_idl_compiler used to generate this file */
 #define LOC_V02_IDL_TOOL_VERS 0x04
 /** Maximum Defined Message ID */
@@ -104,6 +104,10 @@ extern "C" {
 
 /**  Maximum string length for the Version field in the application ID.  */
 #define QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 8
+
+/**  Maximum length of the list containing the SV's that were used to generate
+     a position report.  */
+#define QMI_LOC_MAX_SV_USED_LIST_LENGTH_V02 80
 
 /**  Maximum number of satellites in the satellite report.  */
 #define QMI_LOC_SV_INFO_LIST_MAX_SIZE_V02 80
@@ -940,6 +944,12 @@ typedef struct {
   uint32_t fixId;
   /**<   Fix count for the session. Starts with 0 and increments by one
        for each successive position report for a particular session.  */
+
+  /* Optional */
+  /*  SV's Used to Calculate the Fix */
+  uint8_t gnssSvUsedList_valid;  /**< Must be set to true if gnssSvUsedList is being passed */
+  uint32_t gnssSvUsedList_len;  /**< Must be set to # of elements in gnssSvUsedList */
+  uint16_t gnssSvUsedList[QMI_LOC_MAX_SV_USED_LIST_LENGTH_V02];
 }qmiLocEventPositionReportIndMsgT_v02;  /* Message */
 /**
     @}
@@ -1025,9 +1035,10 @@ typedef struct {
 
          - Type: Unsigned integer \n
          - Range: \n
-             -- For GPS:     1 to 32 \n
+             -- For GPS:      1 to 32 \n
              -- For SBAS:    33 to 64    \n
-             -- For GLONASS: 65 to 96   */
+             -- For GLONASS: 65 to 96 \n
+             -- For QZSS:    193 to 197  */
 
   uint8_t healthStatus;
   /**<   Health status. \n
@@ -5385,6 +5396,9 @@ typedef enum {
     @}
   */
 
+typedef uint32_t qmiLocLppConfigMaskT_v02;
+#define QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000001) /**<  Enable User plane configuration for LTE positioning profile (LPP)  */
+#define QMI_LOC_LPP_CONFIG_ENABLE_CONTROL_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000002) /**<  Enable Control plane configuration for LPP.      */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5421,15 +5435,29 @@ typedef struct {
          - 0x00000001 -- SUPL_VERSION_1_0 \n
          - 0x00000002 -- SUPL_VERSION_2_0
    */
+
+  /* Optional */
+  /*  LPP Configuration */
+  uint8_t lppConfig_valid;  /**< Must be set to true if lppConfig is being passed */
+  qmiLocLppConfigMaskT_v02 lppConfig;
+  /**<   LTE Positioning Profile (LPP) configuration.
+
+      Valid bitmasks: \n
+         - 0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE \n
+         - 0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
+
+ Enable User plane configuration for LTE positioning profile (LPP)
+ Enable Control plane configuration for LPP.      */
 }qmiLocSetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
   */
 
 typedef uint64_t qmiLocProtocolConfigParamMaskT_v02;
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_SECURITY_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x00000001) /**<  Mask for the SUPL security configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_VX_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x00000002) /**<  Mask for the VX version configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x00000004) /**<  Mask for the SUPL version configuration parameter.       */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_SECURITY_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000001) /**<  Mask for the SUPL security configuration parameter.  */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_VX_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000002) /**<  Mask for the VX version configuration parameter.  */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000004) /**<  Mask for the SUPL version configuration parameter.       */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_LPP_CONFIG_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000008) /**<  Mask for the LPP configuration parameter.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5463,11 +5491,13 @@ typedef struct {
        Valid bitmasks: \n
          - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
          - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
-         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
+         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION \n
+         - 0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
 
  Mask for the SUPL security configuration parameter.
  Mask for the VX version configuration parameter.
- Mask for the SUPL version configuration parameter.       */
+ Mask for the SUPL version configuration parameter.
+ Mask for the LPP configuration parameter.  */
 }qmiLocSetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5488,11 +5518,13 @@ typedef struct {
        Valid bitmasks: \n
          - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
          - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
-         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
+         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION \n
+         - 0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
 
  Mask for the SUPL security configuration parameter.
  Mask for the VX version configuration parameter.
- Mask for the SUPL version configuration parameter.       */
+ Mask for the SUPL version configuration parameter.
+ Mask for the LPP configuration parameter.  */
 }qmiLocGetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5549,6 +5581,19 @@ typedef struct {
          - 0x00000001 -- SUPL_VERSION_1_0 \n
          - 0x00000002 -- SUPL_VERSION_2_0
    */
+
+  /* Optional */
+  /*  LPP Configuration */
+  uint8_t lppConfig_valid;  /**< Must be set to true if lppConfig is being passed */
+  qmiLocLppConfigMaskT_v02 lppConfig;
+  /**<   LTE Positioning Profile (LPP) configuration.
+
+      Valid bitmasks: \n
+         - 0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE \n
+         - 0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
+
+ Enable User plane configuration for LTE positioning profile (LPP)
+ Enable Control plane configuration for LPP.      */
 }qmiLocGetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
