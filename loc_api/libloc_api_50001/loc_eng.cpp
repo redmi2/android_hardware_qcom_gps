@@ -1437,7 +1437,7 @@ static void loc_eng_deferred_action_thread(void* arg)
                     }
                 }
                 // we are done navigating if this is singleshot
-                loc_eng_data_p->navigating = loc_eng_data_p->client_handle->
+                loc_eng_data_p->navigating &= loc_eng_data_p->client_handle->
                         getPositionMode().recurrence != GPS_POSITION_RECURRENCE_SINGLE;
             }
 
