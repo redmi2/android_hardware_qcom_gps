@@ -1506,143 +1506,168 @@ static bool validateRequest(
 static locClientStatusEnumType locClientQmiCtrlPointInit(
     locClientCallbackDataType *pLocClientCbData)
 {
-  uint32_t num_services, num_entries = 10;
   qmi_client_type clnt, notifier;
-  qmi_client_os_params os_params;
+  bool notifierInitFlag = false;
+  locClientStatusEnumType status = eLOC_CLIENT_SUCCESS;
+  // instances of this service
+  qmi_service_info *pServiceInfo = NULL;
 
-  // num instances of this service
-  qmi_service_info serviceInfo[5];
-
-  qmi_client_error_type rc = QMI_NO_ERR;
-
-  // Get the service object for the qmiLoc Service
-  qmi_idl_service_object_type locClientServiceObject =
-    loc_get_service_object_v02();
-
-  // Verify that qmiLoc_get_service_object did not return NULL
-  if (NULL == locClientServiceObject)
+  do
   {
-      LOC_LOGE("%s:%d]: qmiLoc_get_service_object_v02 failed\n" ,
-                  __func__, __LINE__ );
-    return(eLOC_CLIENT_FAILURE_INTERNAL);
-  }
+    uint32_t num_services = 0, num_entries = 0;
+    qmi_client_os_params os_params;
+    qmi_client_error_type rc = QMI_NO_ERR;
+
+    // Get the service object for the qmiLoc Service
+    qmi_idl_service_object_type locClientServiceObject =
+      loc_get_service_object_v02();
+
+    // Verify that qmiLoc_get_service_object did not return NULL
+    if (NULL == locClientServiceObject)
+    {
+        LOC_LOGE("%s:%d]: qmiLoc_get_service_object_v02 failed\n" ,
+                    __func__, __LINE__ );
+       status = eLOC_CLIENT_FAILURE_INTERNAL;
+       break;
+    }
 
 
-  // register for service notification
-  rc = qmi_client_notifier_init(locClientServiceObject, &os_params, &notifier);
+    // register for service notification
+    rc = qmi_client_notifier_init(locClientServiceObject, &os_params, &notifier);
 
-  if(rc != QMI_NO_ERR)
-  {
-    LOC_LOGE("%s:%d]: qmi_client_notifier_init failed\n",
-                  __func__, __LINE__ );
-    return(eLOC_CLIENT_FAILURE_INTERNAL);
-  }
+    if(rc != QMI_NO_ERR)
+    {
+      LOC_LOGE("%s:%d]: qmi_client_notifier_init failed %d\n",
+                    __func__, __LINE__, rc );
+      status = eLOC_CLIENT_FAILURE_INTERNAL;
+      break;
+    }
 
-  /* If service is not up wait on a signal until the service is up
-   * or a timeout occurs. */
+    notifierInitFlag = true;
 
-  QMI_CCI_OS_SIGNAL_WAIT(&os_params, LOC_CLIENT_SERVICE_TIMEOUT);
+    /* If service is not up wait on a signal until the service is up
+     * or a timeout occurs. */
+
+    QMI_CCI_OS_SIGNAL_WAIT(&os_params, LOC_CLIENT_SERVICE_TIMEOUT);
 
 
-  if(QMI_CCI_OS_SIGNAL_TIMED_OUT(&os_params))
-  {
-    // timed out, return with error
-    LOC_LOGE("%s:%d]: timed out waiting for service\n",
-                    __func__, __LINE__);
+    if(QMI_CCI_OS_SIGNAL_TIMED_OUT(&os_params))
+    {
+      // timed out, return with error
+      LOC_LOGE("%s:%d]: timed out waiting for service\n",
+                      __func__, __LINE__);
 
-    /* release the notifier handle */
-    qmi_client_release(notifier);
+      status = eLOC_CLIENT_FAILURE_TIMEOUT;
+      break;
+    }
 
-    return(eLOC_CLIENT_FAILURE_TIMEOUT);
-  }
-  else
-  {
     // get the service addressing information
     rc = qmi_client_get_service_list( locClientServiceObject, NULL, NULL,
                                       &num_services);
     LOC_LOGV("%s:%d]: qmi_client_get_service_list() returned %d "
-                  "num_services = %d\n", __func__, __LINE__, rc,
-                  num_services);
+             "num_services = %d\n", __func__, __LINE__, rc,
+             num_services);
 
     if(rc != QMI_NO_ERR)
     {
       LOC_LOGE("%s:%d]: qmi_client_get_service_list failed even though"
-                    "service is up !!!\n", __func__, __LINE__);
+               "service is up !!!\n", __func__, __LINE__);
 
-      /* release the notifier handle */
-      qmi_client_release(notifier);
+       status = eLOC_CLIENT_FAILURE_INTERNAL;
+       break;
+     }
 
-      return(eLOC_CLIENT_FAILURE_INTERNAL);
+    pServiceInfo =
+      (qmi_service_info *)malloc(num_services * sizeof(qmi_service_info));
+
+    if(NULL == pServiceInfo)
+    {
+      LOC_LOGE("%s:%d]: could not allocate memory for serviceInfo !!\n",
+               __func__, __LINE__);
+
+      status = eLOC_CLIENT_FAILURE_INTERNAL;
+      break;
     }
 
-  }
+    //set the number of entries to get equal to the total number of
+    //services.
+    num_entries = num_services;
+    //populate the serviceInfo
+    rc = qmi_client_get_service_list( locClientServiceObject, pServiceInfo,
+                                      &num_entries, &num_services);
 
-  //get service info to be used in qmi_client_init
-  rc = qmi_client_get_service_list( locClientServiceObject, serviceInfo,
-                                    &num_entries, &num_services);
 
+    LOC_LOGV("%s:%d]: qmi_client_get_service_list()"
+                  " returned %d num_entries = %d num_services = %d\n",
+                  __func__, __LINE__,
+                   rc, num_entries, num_services);
 
-  LOC_LOGV("%s:%d]: qmi_client_get_service_list()"
-                " returned %d num_entries = %d num_services = %d\n",
-                __func__, __LINE__,
-                 rc, num_entries, num_services);
+    if(rc != QMI_NO_ERR)
+    {
+      LOC_LOGE("%s:%d]: qmi_client_get_service_list Error %d \n",
+                    __func__, __LINE__, rc);
 
-  if(rc != QMI_NO_ERR)
-  {
-    LOC_LOGE("%s:%d]: qmi_client_get_service_list Error %d \n",
-                  __func__, __LINE__, rc);
+      status = eLOC_CLIENT_FAILURE_INTERNAL;
+      break;
+    }
 
-    /* release the notifier handle */
-    qmi_client_release(notifier);
+    LOC_LOGV("%s:%d]: passing the pointer %p to qmi_client_init \n",
+                      __func__, __LINE__, pLocClientCbData);
 
-    return(eLOC_CLIENT_FAILURE_INTERNAL);
-  }
+    // initialize the client
+    //sent the address of the first service found
+    // if IPC router is present, this will go to the service instance
+    // enumerated over IPC router, else it will go over the next transport where
+    // the service was enumerated.
+    rc = qmi_client_init(&pServiceInfo[0], locClientServiceObject,
+                         locClientIndCb, (void *) pLocClientCbData,
+                         NULL, &clnt);
 
-  LOC_LOGV("%s:%d]: passing the pointer %p to qmi_client_init \n",
-                    __func__, __LINE__, pLocClientCbData);
-  // initialize the client
-  rc = qmi_client_init(&serviceInfo[0], locClientServiceObject,
-                       locClientIndCb, (void *) pLocClientCbData,
-                       NULL, &clnt);
+    if(rc != QMI_NO_ERR)
+    {
+      LOC_LOGE("%s:%d]: qmi_client_init error %d\n",
+                    __func__, __LINE__, rc);
 
-  if(rc != QMI_NO_ERR)
-  {
-    LOC_LOGE("%s:%d]: qmi_client_init error %d\n",
-                  __func__, __LINE__, rc);
+      status = eLOC_CLIENT_FAILURE_INTERNAL;
+      break;
+    }
 
-    /* release the notifier handle */
-    qmi_client_release(notifier);
+    LOC_LOGV("%s:%d]: passing the pointer %p to"
+                  "qmi_client_register_error_cb \n",
+                   __func__, __LINE__, pLocClientCbData);
 
-    return(eLOC_CLIENT_FAILURE_INTERNAL);
-  }
+    // register error callback
+    rc  = qmi_client_register_error_cb(clnt,
+        locClientErrorCb, (void *) pLocClientCbData);
 
-  LOC_LOGV("%s:%d]: passing the pointer %p to"
-                "qmi_client_register_error_cb \n",
-                 __func__, __LINE__, pLocClientCbData);
+    if( QMI_NO_ERR != rc)
+    {
+      LOC_LOGE("%s:%d]: could not register QCCI error callback error:%d\n",
+                    __func__, __LINE__, rc);
 
-  // register error callback
-  rc  = qmi_client_register_error_cb(clnt,
-      locClientErrorCb, (void *) pLocClientCbData);
+      status = eLOC_CLIENT_FAILURE_INTERNAL;
+      break;
+    }
 
-  if( QMI_NO_ERR != rc)
-  {
-    LOC_LOGE("%s:%d]: could not register QCCI error callback error:%d\n",
-                  __func__, __LINE__, rc);
+    // copy the clnt handle returned in qmi_client_init
+    memcpy(&(pLocClientCbData->userHandle), &clnt, sizeof(qmi_client_type));
 
-    /* release the notifier handle */
-    qmi_client_release(notifier);
+    status = eLOC_CLIENT_SUCCESS;
 
-    return (eLOC_CLIENT_FAILURE_INTERNAL);
-  }
-
-  // copy the clnt handle returned in qmi_client_init
-  memcpy(&(pLocClientCbData->userHandle), &clnt, sizeof(qmi_client_type));
+  } while(0);
 
   /* release the notifier handle */
-  qmi_client_release(notifier);
+  if(true == notifierInitFlag)
+  {
+    qmi_client_release(notifier);
+  }
 
-  return(eLOC_CLIENT_SUCCESS);
+  if(NULL != pServiceInfo)
+  {
+    free((void *)pServiceInfo);
+  }
 
+  return status;
 }
 //----------------------- END INTERNAL FUNCTIONS ----------------------------------------
 
@@ -1932,6 +1957,18 @@ locClientStatusEnumType locClientSendReq(
 
   // map the QCCI response to Loc API v02 status
   status = convertQmiResponseToLocStatus(&resp);
+
+  // if the request is to change registered events, update the
+  // loc api copy of that
+  if(eLOC_CLIENT_SUCCESS == status &&
+      QMI_LOC_REG_EVENTS_REQ_V02 == reqId)
+  {
+    if(NULL != reqPayload.pRegEventsReq )
+    {
+      pCallbackData->eventRegMask =
+        (locClientEventMaskType)(reqPayload.pRegEventsReq->eventRegMask);
+    }
+  }
   return(status);
 }
 
