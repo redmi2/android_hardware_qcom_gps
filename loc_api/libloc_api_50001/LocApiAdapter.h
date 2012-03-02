@@ -188,6 +188,10 @@ public:
         setSUPLVersion(uint32_t version)
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
     inline virtual enum loc_api_adapter_err
+        setLPPConfig(uint32_t profile)
+    {LOC_LOGW("%s: default implementation invoked", __func__);
+     return LOC_API_ADAPTER_ERR_SUCCESS; }
+    inline virtual enum loc_api_adapter_err
         setSensorControlConfig(int sensorUsage)
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
     inline virtual enum loc_api_adapter_err

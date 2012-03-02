@@ -93,6 +93,7 @@ static loc_param_s_type loc_parameter_table[] =
   {"SENSOR_CONTROL_MODE",            &gps_conf.SENSOR_CONTROL_MODE,            NULL, 'n'},
   {"SENSOR_USAGE",                   &gps_conf.SENSOR_USAGE,                   NULL, 'n'},
   {"QUIPC_ENABLED",                  &gps_conf.QUIPC_ENABLED,                  NULL, 'n'},
+  {"LPP_PROFILE",                    &gps_conf.LPP_PROFILE,                    NULL, 'n'},
 };
 
 static void loc_default_parameters(void)
@@ -115,6 +116,8 @@ static void loc_default_parameters(void)
    /* Value MUST be set by OEMs in configuration for sensor-assisted
       navigation to work. There is NO default value */
    gps_conf.GYRO_BIAS_RANDOM_WALK_VALID = 0;
+   /* LTE Positioning Profile configuration is disable by default*/
+   gps_conf.LPP_PROFILE = 0;
 }
 
 LocEngContext::LocEngContext(gps_create_thread threadCreator) :
@@ -315,6 +318,11 @@ static int loc_eng_reinit(loc_eng_data_s_type &loc_eng_data)
                                                                           gps_conf.SUPL_VER));
         msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
                   supl_msg, loc_eng_free_msg);
+
+        loc_eng_msg_lpp_config *lpp_msg(new loc_eng_msg_lpp_config(&loc_eng_data,
+                                                                          gps_conf.LPP_PROFILE));
+        msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
+                  lpp_msg, loc_eng_free_msg);
 
         loc_eng_msg_sensor_control_config *sensor_control_config_msg(
             new loc_eng_msg_sensor_control_config(&loc_eng_data, gps_conf.SENSOR_USAGE));
@@ -1363,6 +1371,13 @@ static void loc_eng_deferred_action_thread(void* arg)
         {
             loc_eng_msg_suple_version *svMsg = (loc_eng_msg_suple_version*)msg;
             loc_eng_data_p->client_handle->setSUPLVersion(svMsg->supl_version);
+        }
+        break;
+
+        case LOC_ENG_MSG_LPP_CONFIG:
+        {
+            loc_eng_msg_lpp_config *svMsg = (loc_eng_msg_lpp_config*)msg;
+            loc_eng_data_p->client_handle->setLPPConfig(svMsg->lpp_config);
         }
         break;
 

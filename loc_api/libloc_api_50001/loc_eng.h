@@ -159,6 +159,7 @@ typedef struct loc_gps_cfg_s
   unsigned long  SENSOR_CONTROL_MODE;
   unsigned long  SENSOR_USAGE;
   unsigned long  QUIPC_ENABLED;
+  unsigned long  LPP_PROFILE;
 } loc_gps_cfg_s_type;
 
 extern loc_gps_cfg_s_type gps_conf;
