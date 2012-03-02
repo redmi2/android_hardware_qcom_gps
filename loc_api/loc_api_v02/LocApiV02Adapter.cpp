@@ -1171,6 +1171,67 @@ enum loc_api_adapter_err LocApiV02Adapter :: setSUPLVersion(uint32_t version)
   return LOC_API_ADAPTER_ERR_SUCCESS;
 }
 
+/* set the configuration for LTE positioning profile (LPP) */
+enum loc_api_adapter_err LocApiV02Adapter :: setLPPConfig(uint32_t profile)
+{
+  locClientStatusEnumType result = eLOC_CLIENT_SUCCESS;
+  locClientReqUnionType req_union;
+  qmiLocSetProtocolConfigParametersReqMsgT_v02 lpp_config_req;
+  qmiLocSetProtocolConfigParametersIndMsgT_v02 lpp_config_ind;
+
+  LOC_LOGD("%s:%d]: lpp profile = %d\n",  __func__, __LINE__, profile);
+
+  memset(&lpp_config_req, 0, sizeof(lpp_config_req));
+  memset(&lpp_config_ind, 0, sizeof(lpp_config_ind));
+
+  lpp_config_req.lppConfig_valid = 1;
+  //  Default RRLP or User or Control plane configuration
+  switch(profile)
+  {
+    /* RRLP */
+    case 0:
+      lpp_config_req.lppConfig = profile;
+      break;
+
+    /* User plane */
+    case 1:
+      lpp_config_req.lppConfig = QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE_V02;
+      break;
+
+    case 2:
+      lpp_config_req.lppConfig = QMI_LOC_LPP_CONFIG_ENABLE_CONTROL_PLANE_V02;
+      break;
+
+    default:
+      LOC_LOGE("%s:%d]: Invalid LPP Profile Config Setting Provided in gps.conf = %d!",
+                    __FUNCTION__,
+                    __LINE__,
+                    profile);
+      return LOC_API_ADAPTER_ERR_INVALID_PARAMETER;
+      break;
+  }
+
+  req_union.pSetProtocolConfigParametersReq = &lpp_config_req;
+
+  result = loc_sync_send_req(clientHandle,
+                             QMI_LOC_SET_PROTOCOL_CONFIG_PARAMETERS_REQ_V02,
+                             req_union, LOC_ENGINE_SYNC_REQUEST_TIMEOUT,
+                             QMI_LOC_SET_PROTOCOL_CONFIG_PARAMETERS_IND_V02,
+                             &lpp_config_ind);
+
+  if(result != eLOC_CLIENT_SUCCESS ||
+     eQMI_LOC_SUCCESS_V02 != lpp_config_ind.status)
+  {
+    LOC_LOGE ("%s:%d]: Error status = %s, ind..status = %s ",
+              __func__, __LINE__,
+              loc_get_v02_client_status_name(result),
+              loc_get_v02_qmi_status_name(lpp_config_ind.status));
+
+    return LOC_API_ADAPTER_ERR_GENERAL_FAILURE;
+  }
+  return LOC_API_ADAPTER_ERR_SUCCESS;
+}
+
 /* set the Sensor Configuration */
 enum loc_api_adapter_err LocApiV02Adapter :: setSensorControlConfig(int sensorsDisabled)
 {

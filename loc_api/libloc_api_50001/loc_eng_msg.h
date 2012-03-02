@@ -138,6 +138,16 @@ struct loc_eng_msg_suple_version : public loc_eng_msg {
         }
 };
 
+struct loc_eng_msg_lpp_config : public loc_eng_msg {
+    const int lpp_config;
+    inline loc_eng_msg_lpp_config(void *instance, int profile) :
+        loc_eng_msg(instance, LOC_ENG_MSG_LPP_CONFIG),
+        lpp_config(profile)
+        {
+            LOC_LOGV("lpp profile: %d", profile);
+        }
+};
+
 struct loc_eng_msg_ext_power_config : public loc_eng_msg {
     const int isBatteryCharging;
     inline loc_eng_msg_ext_power_config(void* instance, int isBattCharging) :
