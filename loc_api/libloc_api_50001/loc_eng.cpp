@@ -1697,14 +1697,7 @@ const ulpInterface * loc_eng_get_ulp_inf(void)
     }
     dlerror();    /* Clear any existing error */
 
-    if (gps_conf.QUIPC_ENABLED == 0)
-    {
-    handle = dlopen ("libulp.so", RTLD_NOW);
-    }
-    else
-    {
-        handle = dlopen ("libulp2.so", RTLD_NOW);
-    }
+    handle = dlopen ("libulp2.so", RTLD_NOW);
 
     if (!handle)
     {
