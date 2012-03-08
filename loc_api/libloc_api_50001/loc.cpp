@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011 - 2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -34,6 +34,11 @@
 #include <loc_eng.h>
 #include <loc_log.h>
 #include <msg_q.h>
+
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <errno.h>
 
 static gps_location_callback gps_loc_cb = NULL;
 static gps_sv_status_callback gps_sv_cb = NULL;
@@ -154,6 +159,55 @@ static const UlpPhoneContextInterface sLocEngUlpPhoneContextInterface =
     loc_ulp_phone_context_settings_update
 };
 static loc_eng_data_s_type loc_afw_data;
+static int gss_fd = 0;
+
+#define TARGET_NAME_OTHER              0
+#define TARGET_NAME_APQ8064_STANDALONE 1
+#define TARGET_NAME_APQ8064_FUSION3    2
+
+static int read_a_line(const char * file_path, char * line, int line_size)
+{
+    FILE *fp;
+    int result = 0;
+
+    * line = '\0';
+    fp = fopen(file_path, "r" );
+    if( fp == NULL ) {
+        LOC_LOGE("open failed: %s: %s\n", file_path, strerror(errno));
+        result = -1;
+    } else {
+        fgets(line, line_size, fp);
+        LOC_LOGD("cat %s: %s\n", file_path, line);
+        fclose(fp);
+    }
+    return result;
+}
+
+#define LINE_LEN 100
+static int get_target_name(void)
+{
+    int target_name = TARGET_NAME_OTHER;
+
+    char hw_platform[]      = "/sys/devices/system/soc/soc0/hw_platform"; // "Liquid"
+    char id[]               = "/sys/devices/system/soc/soc0/id"; //109
+    char mdm[]              = "/dev/mdm"; // No such file or directory
+
+    char line[LINE_LEN];
+
+    read_a_line( hw_platform, line, LINE_LEN);
+    if(!memcmp(line, "Liquid", sizeof("Liquid"))) {
+        if (!read_a_line( mdm, line, LINE_LEN)) {
+            target_name = TARGET_NAME_APQ8064_FUSION3;
+        } else {
+            read_a_line( id, line, LINE_LEN);
+            if(!strncmp(line, "109", strlen("109"))) {
+                target_name = TARGET_NAME_APQ8064_STANDALONE;
+            }
+        }
+    }
+
+    return target_name;
+}
 
 /*===========================================================================
 FUNCTION    gps_get_hardware_interface
@@ -252,6 +306,17 @@ static int loc_init(GpsCallbacks* callbacks)
                                     NULL  /* sv_ext_parser */};
     gps_loc_cb = callbacks->location_cb;
     gps_sv_cb = callbacks->sv_status_cb;
+
+    if (get_target_name() == TARGET_NAME_APQ8064_STANDALONE)
+    {
+        gss_fd = open("/dev/gss", O_RDONLY);
+        if (gss_fd < 0) {
+            LOC_LOGE("GSS open failed: %s\n", strerror(errno));
+            return NULL;
+        }
+        LOC_LOGE("GSS open success!\n");
+    }
+
     const ulpInterface * loc_eng_ulp_inf = NULL;
     int retVal = loc_eng_init(loc_afw_data, &clientCallbacks, event,
                               loc_ulp_msg_sender, &loc_eng_ulp_inf );
@@ -283,6 +348,15 @@ static void loc_cleanup()
     loc_eng_cleanup(loc_afw_data);
     gps_loc_cb = NULL;
     gps_sv_cb = NULL;
+
+    /*
+     * if (get_target_name() == TARGET_NAME_APQ8064_STANDALONE)
+     * {
+     *     close(gss_fd);
+     *     LOC_LOGD("GSS shutdown.\n");
+     * }
+     */
+
     EXIT_LOG(%s, VOID_RET);
 }
 
