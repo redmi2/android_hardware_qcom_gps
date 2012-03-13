@@ -772,7 +772,7 @@ static void loc_eng_agps_reinit(loc_eng_data_s_type &loc_eng_data)
                            loc_eng_data.c2k_host_buf,
                            loc_eng_data.c2k_port_buf);
     }
-    EXIT_LOG(%p, VOID_RET);
+    EXIT_LOG(%s, VOID_RET);
 }
 /*===========================================================================
 FUNCTION    loc_eng_agps_init
@@ -817,7 +817,7 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsCallbacks* callbac
 #endif /* FEATURE_GNSS_BIT_API */
 
     loc_eng_agps_reinit(loc_eng_data);
-    EXIT_LOG(%p, VOID_RET);
+    EXIT_LOG(%s, VOID_RET);
 }
 
 /*===========================================================================
