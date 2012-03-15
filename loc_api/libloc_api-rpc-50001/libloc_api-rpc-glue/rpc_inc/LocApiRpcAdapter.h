@@ -38,6 +38,8 @@ class LocApiRpcAdapter : public LocApiAdapter {
     // RPC communication establishment
     rpc_loc_client_handle_type client_handle;
     rpc_loc_event_mask_type eMask;
+    int dataEnableLastSet;
+    char apnLastSet[MAX_APN_LEN];
 
     static const rpc_loc_event_mask_type locBits[];
     static rpc_loc_event_mask_type convertMask(LOC_API_ADAPTER_EVENT_MASK_T mask);
