@@ -1,4 +1,4 @@
-/* Copyright (c) 2009,2011 Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2009,2011-2012 Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -43,7 +43,6 @@
 #include <sys/time.h>
 #include <netdb.h>
 #include <time.h>
-#include <dlfcn.h>
 
 #include "LocApiAdapter.h"
 
@@ -67,7 +66,6 @@
 #define SUCCESS TRUE
 #define FAILURE FALSE
 
-
 static void loc_eng_deferred_action_thread(void* context);
 static void* loc_eng_create_msg_q();
 static void loc_eng_free_msg(void* msg);
@@ -75,6 +73,7 @@ static void loc_eng_free_msg(void* msg);
 pthread_mutex_t LocEngContext::lock = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t LocEngContext::cond = PTHREAD_COND_INITIALIZER;
 LocEngContext* LocEngContext::me = NULL;
+boolean gpsConfigAlreadyRead = false;
 
 loc_gps_cfg_s_type gps_conf;
 
@@ -135,14 +134,6 @@ LocEngContext* LocEngContext::get(gps_create_thread threadCreator)
     pthread_mutex_lock(&lock);
     // gonna need mutex protection here...
     if (NULL == me) {
-        // Initialize our defaults before reading of configuration file overwrites them.
-        loc_default_parameters();
-
-        // gps.conf is not part of the context class. But we only want to parse the conf
-        // file once. This is the only good place to ensure that.
-        // In fact one day the conf file should go into context as well.
-        UTIL_READ_CONF(GPS_CONF_FILE, loc_parameter_table);
-
         me = new LocEngContext(threadCreator);
     }
     me->counter++;
@@ -181,7 +172,6 @@ void LocEngContext::drop()
 static int loc_eng_reinit(loc_eng_data_s_type &loc_eng_data);
 static void loc_eng_agps_reinit(loc_eng_data_s_type &loc_eng_data);
 
-static const ulpInterface * loc_eng_get_ulp_inf(void);
 static int loc_eng_set_server(loc_eng_data_s_type &loc_eng_data,
                               LocServerType type, const char *hostname, int port);
 // Internal functions
@@ -249,8 +239,8 @@ SIDE EFFECTS
 ===========================================================================*/
 int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
                  LOC_API_ADAPTER_EVENT_MASK_T event,
-                  void (*loc_external_msg_sender) (void*, void*),
-                  const ulpInterface ** loc_eng_ulp_inf)
+                  void (*loc_external_msg_sender) (void*, void*))
+
 {
     ENTRY_LOG_CALLFLOW();
     if (NULL == callbacks || 0 == event) {
@@ -285,12 +275,6 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
     // loc_eng_data.engine_status -- GPS_STATUS_NONE;
     // loc_eng_data.fix_session_status -- GPS_STATUS_NONE;
     // loc_eng_data.mute_session_state -- LOC_MUTE_SESS_NONE;
-
-    if (loc_external_msg_sender) {
-       *loc_eng_ulp_inf = loc_eng_get_ulp_inf();
-       if (*loc_eng_ulp_inf == NULL)
-            loc_external_msg_sender = NULL;
-    }
 
     LocEng locEngHandle(&loc_eng_data, event, loc_eng_data.acquire_wakelock_cb,
                         loc_eng_data.release_wakelock_cb, loc_eng_msg_sender, loc_external_msg_sender,
@@ -1664,70 +1648,6 @@ static void loc_eng_deferred_action_thread(void* arg)
     EXIT_LOG(%s, VOID_RET);
 }
 
-
-/*===========================================================================
-FUNCTION loc_eng_get_ulp_inf
-
-DESCRIPTION
-   This function checks if ULP is enabled, and loads the libulp.so and
-   returns its interface
-
-DEPENDENCIES
-   None
-
-RETURN VALUE
-   interface pointer to libulp: no error
-   NULL: errors
-
-SIDE EFFECTS
-   N/A
-
-===========================================================================*/
-const ulpInterface * loc_eng_get_ulp_inf(void)
-{
-    ENTRY_LOG();
-    void *handle;
-    const char *error;
-    get_ulp_interface* get_ulp_inf;
-    const ulpInterface* loc_eng_ulpInf = NULL;
-
-    if (!(gps_conf.CAPABILITIES & ULP_CAPABILITY)) {
-       LOC_LOGD ("%s, ULP is not configured to be On in gps.conf\n", __func__);
-       goto exit;
-    }
-    dlerror();    /* Clear any existing error */
-
-    if (gps_conf.QUIPC_ENABLED == 0)
-    {
-    handle = dlopen ("libulp.so", RTLD_NOW);
-    }
-    else
-    {
-        handle = dlopen ("libulp2.so", RTLD_NOW);
-    }
-
-    if (!handle)
-    {
-        if ((error = dlerror()) != NULL)  {
-            LOC_LOGE ("%s, dlopen for libulp.so failed, error = %s\n", __func__, error);
-           }
-        goto exit;
-    }
-    dlerror();    /* Clear any existing error */
-    get_ulp_inf = (get_ulp_interface*) dlsym(handle, "ulp_get_interface");
-    if ((error = dlerror()) != NULL)  {
-        LOC_LOGE ("%s, dlsym for ulpInterface failed, error = %s\n", __func__, error);
-        goto exit;
-     }
-
-    // Initialize the ULP interface
-    loc_eng_ulpInf = get_ulp_inf();
-
-exit:
-    EXIT_LOG(%d, loc_eng_ulpInf == NULL);
-    return loc_eng_ulpInf;
-}
-
 /*===========================================================================
 FUNCTION loc_eng_ulp_init
 
@@ -1966,3 +1886,38 @@ int loc_eng_ulp_send_network_position(loc_eng_data_s_type &loc_eng_data,
     EXIT_LOG(%d, ret_val);
     return ret_val;
 }
+/*===========================================================================
+FUNCTION    loc_eng_read_config
+
+DESCRIPTION
+   Initiates the reading of the gps config file stored in /etc dir
+
+DEPENDENCIES
+   None
+
+RETURN VALUE
+   0: success
+
+SIDE EFFECTS
+   N/A
+
+===========================================================================*/
+int loc_eng_read_config(void)
+{
+    ENTRY_LOG_CALLFLOW();
+    if(gpsConfigAlreadyRead == false)
+    {
+      // Initialize our defaults before reading of configuration file overwrites them.
+      loc_default_parameters();
+      // Ee only want to parse the conf file once. This is a good place to ensure that.
+      // In fact one day the conf file should go into context.
+      UTIL_READ_CONF(GPS_CONF_FILE, loc_parameter_table);
+      gpsConfigAlreadyRead = true;
+    } else {
+      LOC_LOGV("GPS Config file has already been read\n");
+    }
+
+    EXIT_LOG(%d, 0);
+    return 0;
+}
+
