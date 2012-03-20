@@ -68,10 +68,6 @@ typedef unsigned char boolean;
 #define FAILURE                 FALSE
 #define INVALID_ATL_CONNECTION_HANDLE -1
 
-#define MAX_APN_LEN 100
-#define MAX_URL_LEN 256
-#define smaller_of(a, b) (((a) > (b)) ? (b) : (a))
-
 enum loc_mute_session_e_type {
    LOC_MUTE_SESS_NONE = 0,
    LOC_MUTE_SESS_WAIT,
