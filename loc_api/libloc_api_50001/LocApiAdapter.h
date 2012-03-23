@@ -107,6 +107,7 @@ class LocApiAdapter {
 protected:
     const LocEng locEngHandle;
     LocPosMode fixCriteria;
+    bool navigating;
 
     LocApiAdapter(LocEng &locEng);
 
@@ -201,6 +202,9 @@ public:
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
 
     inline const LocPosMode& getPositionMode() const {return fixCriteria;}
+
+    inline bool isInSession() { return navigating; }
+    inline virtual void setInSession(bool inSession) { navigating = inSession; }
 };
 
 LocApiAdapter* getLocApiAdapter(LocEng &locEng);

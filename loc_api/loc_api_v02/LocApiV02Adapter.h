@@ -47,9 +47,6 @@ class LocApiV02Adapter : public LocApiAdapter {
   /* events the client is registered for */
   locClientEventMaskType eventMask;
 
-  /* current session state */
-  bool navigating;
-
   /* Convert event mask from loc eng to loc_api_v02 format */
   locClientEventMaskType convertMask(LOC_API_ADAPTER_EVENT_MASK_T mask);
 

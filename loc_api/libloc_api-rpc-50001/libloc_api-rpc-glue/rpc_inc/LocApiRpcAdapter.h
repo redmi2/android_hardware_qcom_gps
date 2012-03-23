@@ -74,8 +74,10 @@ public:
         stopFix();
     virtual enum loc_api_adapter_err
         setPositionMode(const LocPosMode *mode);
+    inline virtual enum loc_api_adapter_err
+        enableData(int enable) { return enableData(enable, false); }
     virtual enum loc_api_adapter_err
-        enableData(int enable);
+        enableData(int enable, boolean force);
     virtual enum loc_api_adapter_err
         setTime(GpsUtcTime time, int64_t timeReference, int uncertainty);
     virtual enum loc_api_adapter_err
@@ -84,8 +86,10 @@ public:
         deleteAidingData(GpsAidingData f);
     virtual enum loc_api_adapter_err
         informNiResponse(GpsUserResponseType userResponse, const void* passThroughData);
+    inline virtual enum loc_api_adapter_err
+        setAPN(char* apn, int len) { return setAPN(apn, len, false); }
     virtual enum loc_api_adapter_err
-        setAPN(char* apn, int len);
+        setAPN(char* apn, int len, boolean force);
     virtual enum loc_api_adapter_err
         setServer(const char* url, int len);
     virtual enum loc_api_adapter_err
@@ -98,6 +102,8 @@ public:
         atlCloseStatus(int handle, int is_succ);
     virtual enum loc_api_adapter_err
         setSUPLVersion(uint32_t version);
+
+    virtual void setInSession(bool inSession);
 };
 
 #endif //LOC_API_RPC_ADAPTER_H

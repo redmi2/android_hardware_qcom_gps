@@ -380,7 +380,7 @@ void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data)
         loc_eng_data.internet_nif = NULL;
     }
 #endif
-    if (loc_eng_data.navigating)
+    if (loc_eng_data.client_handle->isInSession())
     {
         LOC_LOGD("loc_eng_cleanup: fix not stopped. stop it now.");
         loc_eng_stop(loc_eng_data);
@@ -465,13 +465,13 @@ static int loc_eng_start_handler(loc_eng_data_s_type &loc_eng_data)
    ENTRY_LOG();
    int ret_val = LOC_API_ADAPTER_ERR_SUCCESS;
 
-   if (!loc_eng_data.navigating) {
+   if (!loc_eng_data.client_handle->isInSession()) {
        ret_val = loc_eng_data.client_handle->startFix();
 
        if (ret_val == LOC_API_ADAPTER_ERR_SUCCESS ||
            ret_val == LOC_API_ADAPTER_ERR_ENGINE_DOWN)
        {
-           loc_eng_data.navigating = TRUE;
+           loc_eng_data.client_handle->setInSession(TRUE);
        }
    }
 
@@ -522,7 +522,7 @@ static int loc_eng_stop_handler(loc_eng_data_s_type &loc_eng_data)
    ENTRY_LOG();
    int ret_val = LOC_API_ADAPTER_ERR_SUCCESS;
 
-   if (loc_eng_data.navigating) {
+   if (loc_eng_data.client_handle->isInSession()) {
 
        ret_val = loc_eng_data.client_handle->stopFix();
        if (ret_val == LOC_API_ADAPTER_ERR_SUCCESS &&
@@ -531,7 +531,7 @@ static int loc_eng_stop_handler(loc_eng_data_s_type &loc_eng_data)
            loc_inform_gps_status(loc_eng_data, GPS_STATUS_SESSION_END);
        }
 
-       loc_eng_data.navigating = FALSE;
+       loc_eng_data.client_handle->setInSession(FALSE);
    }
 
     EXIT_LOG(%d, ret_val);
@@ -1158,9 +1158,10 @@ static void loc_eng_report_status (loc_eng_data_s_type &loc_eng_data, GpsStatusV
     }
 
     // Session End is not reported during Android navigating state
+    boolean navigating = loc_eng_data.client_handle->isInSession();
     if (status != GPS_STATUS_NONE &&
-        !(status == GPS_STATUS_SESSION_END && loc_eng_data.navigating) &&
-        !(status == GPS_STATUS_SESSION_BEGIN && !loc_eng_data.navigating))
+        !(status == GPS_STATUS_SESSION_END && navigating) &&
+        !(status == GPS_STATUS_SESSION_BEGIN && !navigating))
     {
         if (loc_eng_data.mute_session_state != LOC_MUTE_SESS_IN_SESSION)
         {
@@ -1228,10 +1229,10 @@ void loc_eng_handle_engine_up(loc_eng_data_s_type &loc_eng_data)
     loc_eng_report_status(loc_eng_data, GPS_STATUS_ENGINE_ON);
 
     // modem is back up.  If we crashed in the middle of navigating, we restart.
-    if (loc_eng_data.navigating) {
+    if (loc_eng_data.client_handle->isInSession()) {
         // This sets the copy in adapter to modem
         loc_eng_data.client_handle->setPositionMode(NULL);
-        loc_eng_data.navigating = false;
+        loc_eng_data.client_handle->setInSession(false);
         loc_eng_start_handler(loc_eng_data);
     }
     EXIT_LOG(%s, VOID_RET);
@@ -1427,8 +1428,10 @@ static void loc_eng_deferred_action_thread(void* arg)
                     }
                 }
                 // we are done navigating if this is singleshot
-                loc_eng_data_p->navigating &= loc_eng_data_p->client_handle->
-                        getPositionMode().recurrence != GPS_POSITION_RECURRENCE_SINGLE;
+                boolean navigating = loc_eng_data_p->client_handle->isInSession();
+                navigating &= loc_eng_data_p->client_handle->
+                    getPositionMode().recurrence != GPS_POSITION_RECURRENCE_SINGLE;
+                loc_eng_data_p->client_handle->setInSession(navigating);
             }
 
             break;

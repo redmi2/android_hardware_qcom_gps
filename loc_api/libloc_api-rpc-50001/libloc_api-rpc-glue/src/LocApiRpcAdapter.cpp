@@ -480,30 +480,42 @@ LocApiRpcAdapter::informNiResponse(GpsUserResponseType userResponse,
 }
 
 enum loc_api_adapter_err
-    LocApiRpcAdapter::setAPN(char* apn, int len)
+LocApiRpcAdapter::setAPN(char* apn, int len, boolean force)
 {
     enum loc_api_adapter_err rtv = LOC_API_ADAPTER_ERR_SUCCESS;
     int size = sizeof(apnLastSet);
-    if (memcmp(apnLastSet, apn, size)) {
+    if (force || memcmp(apnLastSet, apn, size)) {
         if (len < size) {
             // size will be not larger than its original value
             size = len + 1;
         }
         memcpy(apnLastSet, apn, size);
-        rpc_loc_ioctl_data_u_type ioctl_data = {RPC_LOC_IOCTL_SET_LBS_APN_PROFILE, {0}};
-        ioctl_data.rpc_loc_ioctl_data_u_type_u.apn_profiles[0].srv_system_type = LOC_APN_PROFILE_SRV_SYS_MAX;
-        ioctl_data.rpc_loc_ioctl_data_u_type_u.apn_profiles[0].pdp_type = LOC_APN_PROFILE_PDN_TYPE_IPV4;
-        memcpy(&(ioctl_data.rpc_loc_ioctl_data_u_type_u.apn_profiles[0].apn_name), apn, size);
 
-        rtv = convertErr(
-            loc_eng_ioctl (client_handle,
-                           RPC_LOC_IOCTL_SET_LBS_APN_PROFILE,
-                           &ioctl_data,
-                           LOC_IOCTL_DEFAULT_TIMEOUT,
-                           NULL)
-            );
+        if (false == navigating) {
+            rpc_loc_ioctl_data_u_type ioctl_data = {RPC_LOC_IOCTL_SET_LBS_APN_PROFILE, {0}};
+            ioctl_data.rpc_loc_ioctl_data_u_type_u.apn_profiles[0].srv_system_type = LOC_APN_PROFILE_SRV_SYS_MAX;
+            ioctl_data.rpc_loc_ioctl_data_u_type_u.apn_profiles[0].pdp_type = LOC_APN_PROFILE_PDN_TYPE_IPV4;
+            memcpy(&(ioctl_data.rpc_loc_ioctl_data_u_type_u.apn_profiles[0].apn_name), apn, size);
+
+            rtv = convertErr(
+                loc_eng_ioctl (client_handle,
+                               RPC_LOC_IOCTL_SET_LBS_APN_PROFILE,
+                               &ioctl_data,
+                               LOC_IOCTL_DEFAULT_TIMEOUT,
+                               NULL)
+                );
+        }
     }
     return rtv;
+}
+
+void LocApiRpcAdapter::setInSession(bool inSession)
+{
+    LocApiAdapter::setInSession(inSession);
+    if (false == navigating) {
+        enableData(dataEnableLastSet, true);
+        setAPN(apnLastSet, sizeof(apnLastSet)-1, true);
+    }
 }
 
 enum loc_api_adapter_err
@@ -573,21 +585,24 @@ LocApiRpcAdapter::setServer(unsigned int ip, int port, LocServerType type)
 }
 
 enum loc_api_adapter_err
-LocApiRpcAdapter::enableData(int enable)
+LocApiRpcAdapter::enableData(int enable, boolean force)
 {
     enum loc_api_adapter_err rtv = LOC_API_ADAPTER_ERR_SUCCESS;
-    if (dataEnableLastSet != enable) {
+    if (force || dataEnableLastSet != enable) {
         dataEnableLastSet = enable;
-        rpc_loc_ioctl_data_u_type ioctl_data = {RPC_LOC_IOCTL_SET_DATA_ENABLE, {0}};
 
-        ioctl_data.rpc_loc_ioctl_data_u_type_u.data_enable = enable;
-        rtv =  convertErr(
-            loc_eng_ioctl (client_handle,
-                           RPC_LOC_IOCTL_SET_DATA_ENABLE,
-                           &ioctl_data,
-                           LOC_IOCTL_DEFAULT_TIMEOUT,
-                           NULL)
-            );
+        if (false == navigating) {
+            rpc_loc_ioctl_data_u_type ioctl_data = {RPC_LOC_IOCTL_SET_DATA_ENABLE, {0}};
+
+            ioctl_data.rpc_loc_ioctl_data_u_type_u.data_enable = enable;
+            rtv =  convertErr(
+                loc_eng_ioctl (client_handle,
+                               RPC_LOC_IOCTL_SET_DATA_ENABLE,
+                               &ioctl_data,
+                               LOC_IOCTL_DEFAULT_TIMEOUT,
+                               NULL)
+                );
+        }
     }
     return rtv;
 }
