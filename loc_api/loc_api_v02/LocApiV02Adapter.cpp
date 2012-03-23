@@ -161,7 +161,7 @@ locClientCallbacksType globalCallbacks =
 /* Constructor for LocApiV02Adapter */
 LocApiV02Adapter :: LocApiV02Adapter(LocEng &locEng):
   LocApiAdapter(locEng), clientHandle( LOC_CLIENT_INVALID_HANDLE_VALUE),
-  eventMask(convertMask(locEng.eventMask)), navigating(false)
+  eventMask(convertMask(locEng.eventMask))
 {
   // initialize loc_sync_req interface
   loc_sync_req_init();
@@ -337,12 +337,8 @@ enum loc_api_adapter_err LocApiV02Adapter :: startFix()
 
   if( eLOC_CLIENT_SUCCESS == status)
   {
-    navigating = true;
     return LOC_API_ADAPTER_ERR_SUCCESS;
   }
-
-  // start_fix failed so MO fix is not in progress
-  navigating = false;
 
   return LOC_API_ADAPTER_ERR_GENERAL_FAILURE;
 }
@@ -370,7 +366,6 @@ enum loc_api_adapter_err LocApiV02Adapter :: stopFix()
 
   if( eLOC_CLIENT_SUCCESS == status)
   {
-    navigating = false;
     return LOC_API_ADAPTER_ERR_SUCCESS;
   }
 
