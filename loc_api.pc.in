@@ -6,3 +6,5 @@ includedir=@includedir@
 Name: loc_api
 Description: Qualcomm GPS Location API
 Version: @VERSION@
+libs: -L${libdir} -lgps_utils_so -lloc_adapter_so -lloc_api
+Cflags: -I${includedir}/hardware/qcom/gps
