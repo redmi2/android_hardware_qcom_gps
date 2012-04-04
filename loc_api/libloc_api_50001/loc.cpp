@@ -34,12 +34,16 @@
 #include <loc_eng.h>
 #include <loc_log.h>
 #include <msg_q.h>
+#include <dlfcn.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 
+//Globals defns
+static const ulpInterface * loc_eng_ulp_inf = NULL;
+static const ulpInterface * loc_eng_get_ulp_inf(void);
 static gps_location_callback gps_loc_cb = NULL;
 static gps_sv_status_callback gps_sv_cb = NULL;
 
@@ -250,6 +254,11 @@ const GpsInterface* gps_get_hardware_interface ()
 // for gps.c
 extern "C" const GpsInterface* get_gps_interface()
 {
+    loc_eng_read_config();
+    //We load up libulp module at this point itself if ULP configured to be On
+    if(gps_conf.CAPABILITIES & ULP_CAPABILITY) {
+       loc_eng_ulp_inf = loc_eng_get_ulp_inf();
+    }
     return &sLocEngInterface;
 }
 
@@ -317,9 +326,13 @@ static int loc_init(GpsCallbacks* callbacks)
         LOC_LOGE("GSS open success!\n");
     }
 
-    const ulpInterface * loc_eng_ulp_inf = NULL;
-    int retVal = loc_eng_init(loc_afw_data, &clientCallbacks, event,
-                              loc_ulp_msg_sender, &loc_eng_ulp_inf );
+    int retVal = -1;
+    if (loc_eng_ulp_inf == NULL)
+        retVal = loc_eng_init(loc_afw_data, &clientCallbacks, event,
+                              NULL);
+    else
+        retVal = loc_eng_init(loc_afw_data, &clientCallbacks, event,
+                              loc_ulp_msg_sender);
     int ret_val1 = loc_eng_ulp_init(loc_afw_data, loc_eng_ulp_inf);
     LOC_LOGD("loc_eng_ulp_init returned %d\n",ret_val1);
     EXIT_LOG(%d, retVal);
@@ -609,13 +622,15 @@ static const void* loc_get_extension(const char* name)
    }
    else if(strcmp(name, ULP_NETWORK_INTERFACE) == 0)
    {
-      ret_val = &sUlpNetworkInterface;
+     //Return a valid value for ULP Network Interface only if ULP
+     //turned on in gps.conf
+     if(gps_conf.CAPABILITIES & ULP_CAPABILITY)
+         ret_val = &sUlpNetworkInterface;
    }
    else
    {
       LOC_LOGE ("get_extension: Invalid interface passed in\n");
    }
-
     EXIT_LOG(%p, ret_val);
     return ret_val;
 }
@@ -930,6 +945,62 @@ static void sv_cb(GpsSvStatus* sv_status, void* svExt)
     }
     EXIT_LOG(%s, VOID_RET);
 }
+/*===========================================================================
+FUNCTION loc_eng_get_ulp_inf
+
+DESCRIPTION
+   This function checks if ULP is enabled, and loads the libulp2.so and
+   returns its interface
+
+DEPENDENCIES
+   None
+
+RETURN VALUE
+   interface pointer to libulp: no error
+   NULL: errors
+
+SIDE EFFECTS
+   N/A
+
+===========================================================================*/
+const ulpInterface * loc_eng_get_ulp_inf(void)
+{
+    ENTRY_LOG();
+    void *handle;
+    const char *error;
+    get_ulp_interface* get_ulp_inf;
+    const ulpInterface* loc_eng_ulpInf = NULL;
+
+    if (!(gps_conf.CAPABILITIES & ULP_CAPABILITY)) {
+       LOC_LOGD ("%s, ULP is not configured to be On in gps.conf\n", __func__);
+       goto exit;
+    }
+    dlerror();    /* Clear any existing error */
+
+    handle = dlopen ("libulp2.so", RTLD_NOW);
+
+    if (!handle)
+    {
+        if ((error = dlerror()) != NULL)  {
+            LOC_LOGE ("%s, dlopen for libulp.so failed, error = %s\n", __func__, error);
+           }
+        goto exit;
+    }
+    dlerror();    /* Clear any existing error */
+    get_ulp_inf = (get_ulp_interface*) dlsym(handle, "ulp_get_interface");
+    if ((error = dlerror()) != NULL)  {
+        LOC_LOGE ("%s, dlsym for ulpInterface failed, error = %s\n", __func__, error);
+        goto exit;
+     }
+
+    // Initialize the ULP interface
+    loc_eng_ulpInf = get_ulp_inf();
+
+exit:
+    EXIT_LOG(%d, loc_eng_ulpInf == NULL);
+    return loc_eng_ulpInf;
+}
+
 /*===========================================================================
 FUNCTION    loc_ulp_network_init
 

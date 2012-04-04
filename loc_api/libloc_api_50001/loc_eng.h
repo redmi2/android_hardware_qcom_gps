@@ -169,8 +169,7 @@ extern loc_gps_cfg_s_type gps_conf;
 int  loc_eng_init(loc_eng_data_s_type &loc_eng_data,
                   LocCallbacks* callbacks,
                   LOC_API_ADAPTER_EVENT_MASK_T event,
-                  void (*loc_external_msg_sender) (void*, void*),
-                   const ulpInterface ** loc_eng_ulp_inf );
+                  void (*loc_external_msg_sender) (void*, void*));
 int loc_eng_ulp_init(loc_eng_data_s_type &loc_eng_data, const ulpInterface * loc_eng_ulpInf);
 int  loc_eng_start(loc_eng_data_s_type &loc_eng_data);
 int  loc_eng_stop(loc_eng_data_s_type &loc_eng_data);
@@ -233,6 +232,7 @@ int loc_eng_ulp_phone_context_init(loc_eng_data_s_type &loc_eng_data,
                                    UlpPhoneContextCallbacks *callback);
 int loc_eng_ulp_send_network_position(loc_eng_data_s_type &loc_eng_data,
                                              UlpNetworkPositionReport *position_report);
+int loc_eng_read_config(void);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
