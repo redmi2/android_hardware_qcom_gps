@@ -192,14 +192,15 @@ static int get_target_name(void)
 {
     int target_name = TARGET_NAME_OTHER;
 
-    char hw_platform[]      = "/sys/devices/system/soc/soc0/hw_platform"; // "Liquid"
+    char hw_platform[]      = "/sys/devices/system/soc/soc0/hw_platform"; // "Liquid" or "Surf"
     char id[]               = "/sys/devices/system/soc/soc0/id"; //109
     char mdm[]              = "/dev/mdm"; // No such file or directory
 
     char line[LINE_LEN];
 
     read_a_line( hw_platform, line, LINE_LEN);
-    if(!memcmp(line, "Liquid", sizeof("Liquid"))) {
+    if(!memcmp(line, "Liquid", sizeof("Liquid")) ||
+       !memcmp(line, "Surf",   sizeof("Surf")) ) {
         if (!read_a_line( mdm, line, LINE_LEN)) {
             target_name = TARGET_NAME_APQ8064_FUSION3;
         } else {
