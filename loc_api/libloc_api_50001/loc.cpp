@@ -180,8 +180,12 @@ static int read_a_line(const char * file_path, char * line, int line_size)
         LOC_LOGE("open failed: %s: %s\n", file_path, strerror(errno));
         result = -1;
     } else {
+        int len;
         fgets(line, line_size, fp);
-        LOC_LOGD("cat %s: %s\n", file_path, line);
+        len = strlen(line);
+        len = len < line_size - 1? len : line_size - 1;
+        line[len] = '\0';
+        LOC_LOGD("cat %s: %s", file_path, line);
         fclose(fp);
     }
     return result;
@@ -210,7 +214,6 @@ static int get_target_name(void)
             }
         }
     }
-
     return target_name;
 }
 
@@ -319,12 +322,13 @@ static int loc_init(GpsCallbacks* callbacks)
 
     if (get_target_name() == TARGET_NAME_APQ8064_STANDALONE)
     {
+        gps_conf.CAPABILITIES &= ~(GPS_CAPABILITY_MSA | GPS_CAPABILITY_MSB);
         gss_fd = open("/dev/gss", O_RDONLY);
         if (gss_fd < 0) {
             LOC_LOGE("GSS open failed: %s\n", strerror(errno));
             return NULL;
         }
-        LOC_LOGE("GSS open success!\n");
+        LOC_LOGD("GSS open success! CAPABILITIES %0x\n", gps_conf.CAPABILITIES);
     }
 
     int retVal = -1;
