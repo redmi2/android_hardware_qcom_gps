@@ -369,7 +369,11 @@ static locClientRespIndTableStructT locClientRespIndTable[]= {
 
    //Edit a Geofence
    { QMI_LOC_EDIT_GEOFENCE_IND_V02,
-     sizeof(qmiLocEditGeofenceIndMsgT_v02)}
+     sizeof(qmiLocEditGeofenceIndMsgT_v02)},
+
+   //Get best available position
+   { QMI_LOC_GET_BEST_AVAILABLE_POSITION_IND_V02,
+     sizeof(qmiLocGetBestAvailablePositionIndMsgT_v02)}
 };
 
 
@@ -932,6 +936,12 @@ static bool locClientHandleIndication(
       break;
     }
 
+    case QMI_LOC_GET_BEST_AVAILABLE_POSITION_IND_V02:
+    {
+      status = true;
+      break;
+    }
+
     // for indications that only have a "status" field
     case QMI_LOC_NI_USER_RESPONSE_IND_V02:
     case QMI_LOC_INJECT_UTC_TIME_IND_V02:
@@ -1450,6 +1460,11 @@ static bool validateRequest(
     case QMI_LOC_EDIT_GEOFENCE_REQ_V02:
     {
       *pOutLen = sizeof(qmiLocEditGeofenceReqMsgT_v02);
+      break;
+    }
+    case QMI_LOC_GET_BEST_AVAILABLE_POSITION_REQ_V02:
+    {
+      *pOutLen = sizeof(qmiLocGetBestAvailablePositionReqMsgT_v02);
       break;
     }
 
