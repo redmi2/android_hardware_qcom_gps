@@ -1398,11 +1398,13 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_REPORT_POSITION:
             if (loc_eng_data_p->mute_session_state != LOC_MUTE_SESS_IN_SESSION)
             {
+                bool reported = false;
                 loc_eng_msg_report_position *rpMsg = (loc_eng_msg_report_position*)msg;
                 if (loc_eng_data_p->location_cb != NULL) {
                     if (LOC_SESS_FAILURE == rpMsg->status) {
                         // in case we want to handle the failure case
                         loc_eng_data_p->location_cb(NULL, NULL);
+                        reported = true;
                     }
                     // what's in the else if is... (line by line)
                     // 1. this is a good fix; or
@@ -1419,13 +1421,23 @@ static void loc_eng_deferred_action_thread(void* arg)
                                 (rpMsg->location.accuracy > gps_conf.ACCURACY_THRES)))) {
                         loc_eng_data_p->location_cb((GpsLocation*)&(rpMsg->location),
                                                     (void*)rpMsg->locationExt);
+                        reported = true;
                     }
                 }
-                // we are done navigating if this is singleshot
-                boolean navigating = loc_eng_data_p->client_handle->isInSession();
-                navigating &= loc_eng_data_p->client_handle->
-                    getPositionMode().recurrence != GPS_POSITION_RECURRENCE_SINGLE;
-                loc_eng_data_p->client_handle->setInSession(navigating);
+
+                // if we have reported this fix
+                if (reported &&
+                    // and if this is a singleshot
+                    GPS_POSITION_RECURRENCE_SINGLE ==
+                    loc_eng_data_p->client_handle->getPositionMode().recurrence) {
+                    if (LOC_SESS_INTERMEDIATE == rpMsg->status) {
+                        // modem could be still working for a final fix,
+                        // although we no longer need it.  So stopFix().
+                        loc_eng_data_p->client_handle->stopFix();
+                    }
+                    // turn off the session flag.
+                    loc_eng_data_p->client_handle->setInSession(false);
+                }
             }
 
             break;
