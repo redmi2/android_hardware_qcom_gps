@@ -192,6 +192,12 @@ static int read_a_line(const char * file_path, char * line, int line_size)
 }
 
 #define LINE_LEN 100
+#define STR_LIQUID    "Liquid"
+#define STR_SURF      "Surf"
+#define STRLEN_LIQUID (sizeof(STR_LIQUID) - 1)
+#define STRLEN_SURF   (sizeof(STR_SURF) - 1)
+#define IS_STR_END(c) ((c) == '\0' || (c) == '\n' || (c) == '\r')
+
 static int get_target_name(void)
 {
     int target_name = TARGET_NAME_OTHER;
@@ -203,8 +209,9 @@ static int get_target_name(void)
     char line[LINE_LEN];
 
     read_a_line( hw_platform, line, LINE_LEN);
-    if(!memcmp(line, "Liquid", sizeof("Liquid")) ||
-       !memcmp(line, "Surf",   sizeof("Surf")) ) {
+    if(( !memcmp(line, STR_LIQUID, STRLEN_LIQUID) && IS_STR_END(line[STRLEN_LIQUID]) ) ||
+       ( !memcmp(line, STR_SURF,   STRLEN_SURF)   && IS_STR_END(line[STRLEN_SURF])   )
+      ) {
         if (!read_a_line( mdm, line, LINE_LEN)) {
             target_name = TARGET_NAME_APQ8064_FUSION3;
         } else {
