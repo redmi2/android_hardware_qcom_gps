@@ -75,7 +75,15 @@ struct LocPosMode
     }
 
     inline bool equals(const LocPosMode &anotherMode) const
-    { return 0 == memcmp(this, &anotherMode, sizeof(*this)); }
+    {
+        return anotherMode.mode == mode &&
+            anotherMode.recurrence == recurrence &&
+            anotherMode.min_interval == min_interval &&
+            anotherMode.preferred_accuracy == preferred_accuracy &&
+            anotherMode.preferred_time == preferred_time &&
+            !strncmp(anotherMode.credentials, credentials, sizeof(credentials)-1) &&
+            !strncmp(anotherMode.provider, provider, sizeof(provider)-1);
+    }
 
     inline void logv() const
     {
