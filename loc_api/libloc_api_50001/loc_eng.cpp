@@ -1712,7 +1712,7 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_REQUEST_PHONE_CONTEXT:
         {
             loc_eng_msg_request_phone_context *contextReqMsg = (loc_eng_msg_request_phone_context*)msg;
-            LOC_LOGD("Received phone context request from ULP.context_type %x,request_type %d  ",
+            LOC_LOGD("Received phone context request from ULP.context_type 0x%x,request_type 0x%x  ",
                      contextReqMsg->contextRequest.context_type,contextReqMsg->contextRequest.request_type)
             if(loc_eng_data_p->ulp_phone_context_req_cb != NULL)
             {
@@ -1882,9 +1882,11 @@ int loc_eng_ulp_phone_context_settings_update(loc_eng_data_s_type &loc_eng_data,
 
     LOC_LOGD("loc_eng_ulp_phone_context_settings: context_type - 0x%x is_agps_enabled - %d "
              "is_battery_charging %d ,is_gps_enabled %d, is_network_position_available %d,"
-             "is_wifi_setting_enabled %d\n",
+             "is_wifi_setting_enabled %d, is_agps_setting_enabled %d, is_enh_location_services_enabled %d\n",
              settings->context_type ,settings->is_agps_enabled,settings->is_battery_charging,
-             settings->is_gps_enabled, settings->is_network_position_available, settings->is_wifi_setting_enabled );
+             settings->is_gps_enabled, settings->is_network_position_available,
+             settings->is_wifi_setting_enabled, settings->is_agps_enabled,
+             settings->is_enh_location_services_enabled );
 
     if((loc_eng_data.ulp_initialized == true) && (gps_conf.CAPABILITIES & ULP_CAPABILITY))
     {
