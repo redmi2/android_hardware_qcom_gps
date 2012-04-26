@@ -557,6 +557,19 @@ typedef union
 
         @newpage */
 
+    const qmiLocGetBestAvailablePositionReqMsgT_v02*
+      pGetBestAvailablePositionReq;
+    /**< Get the best available position from location engine
+
+        If the request is accepted by the service, the client receives the
+        following indication containing a response:
+        QMI_LOC_GET_BEST_AVAILABLE_POSITION_IND_V02
+
+        To send this request, set the reqId field in locClientSendReq() to
+        QMI_LOC_GET_BEST_AVAILABLE_POSITION_REQ_V02
+
+        @newpage */
+
 }locClientReqUnionType;
 
 
@@ -1054,6 +1067,14 @@ typedef union
         QMI_LOC_EDIT_GEOFENCE_REQ_V02
         The respIndId field in the response indication callback is set to
         QMI_LOC_EDIT_GEOFENCE_IND_V02
+        @newpage */
+
+    const qmiLocGetBestAvailablePositionIndMsgT_v02*
+      pGetBestAvailablePositionInd;
+    /**< Response to the request,
+        QMI_LOC_GET_BEST_AVAILABLE_POSITION_REQ_V02
+        The respIndId field in the response indication callback is set to
+        QMI_LOC_GET_BEST_AVAILABLE_POSITION_IND_V02
         @newpage */
 
 }locClientRespIndUnionType;
