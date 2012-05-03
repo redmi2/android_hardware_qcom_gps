@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -82,11 +82,11 @@ extern "C" {
 /** Major Version Number of the IDL used to generate this file */
 #define LOC_V02_IDL_MAJOR_VERS 0x02
 /** Revision Number of the IDL used to generate this file */
-#define LOC_V02_IDL_MINOR_VERS 0x08
+#define LOC_V02_IDL_MINOR_VERS 0x0A
 /** Major Version Number of the qmi_idl_compiler used to generate this file */
-#define LOC_V02_IDL_TOOL_VERS 0x04
+#define LOC_V02_IDL_TOOL_VERS 0x05
 /** Maximum Defined Message ID */
-#define LOC_V02_MAX_MESSAGE_ID 0x0066;
+#define LOC_V02_MAX_MESSAGE_ID 0x0067;
 /**
     @}
   */
@@ -104,6 +104,10 @@ extern "C" {
 
 /**  Maximum string length for the Version field in the application ID.  */
 #define QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 8
+
+/**  Maximum length of the list containing the SV's that were used to generate
+     a position report.  */
+#define QMI_LOC_MAX_SV_USED_LIST_LENGTH_V02 80
 
 /**  Maximum number of satellites in the satellite report.  */
 #define QMI_LOC_SV_INFO_LIST_MAX_SIZE_V02 80
@@ -214,45 +218,45 @@ typedef struct {
   */
 
 typedef uint64_t qmiLocEventRegMaskT_v02;
-#define QMI_LOC_EVENT_MASK_POSITION_REPORT_V02 ((qmiLocEventRegMaskT_v02)0x00000001) /**<  The control point must enable this mask to receive position report
+#define QMI_LOC_EVENT_MASK_POSITION_REPORT_V02 ((qmiLocEventRegMaskT_v02)0x00000001ull) /**<  The control point must enable this mask to receive position report
        event indications.  */
-#define QMI_LOC_EVENT_MASK_GNSS_SV_INFO_V02 ((qmiLocEventRegMaskT_v02)0x00000002) /**<  The control point must enable this mask to receive satellite report
+#define QMI_LOC_EVENT_MASK_GNSS_SV_INFO_V02 ((qmiLocEventRegMaskT_v02)0x00000002ull) /**<  The control point must enable this mask to receive satellite report
        event indications. These reports are sent at a 1 Hz rate.  */
-#define QMI_LOC_EVENT_MASK_NMEA_V02 ((qmiLocEventRegMaskT_v02)0x00000004) /**<  The control point must enable this mask to receive NMEA reports for
+#define QMI_LOC_EVENT_MASK_NMEA_V02 ((qmiLocEventRegMaskT_v02)0x00000004ull) /**<  The control point must enable this mask to receive NMEA reports for
        position and satellites in view. The report is at a 1 Hz rate.  */
-#define QMI_LOC_EVENT_MASK_NI_NOTIFY_VERIFY_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000008) /**<  The control point must enable this mask to receive NI notify verify request
+#define QMI_LOC_EVENT_MASK_NI_NOTIFY_VERIFY_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000008ull) /**<  The control point must enable this mask to receive NI notify verify request
        event indications.  */
-#define QMI_LOC_EVENT_MASK_INJECT_TIME_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000010) /**<  The control point must enable this mask to receive time injection request
+#define QMI_LOC_EVENT_MASK_INJECT_TIME_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000010ull) /**<  The control point must enable this mask to receive time injection request
        event indications.  */
-#define QMI_LOC_EVENT_MASK_INJECT_PREDICTED_ORBITS_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000020) /**<  The control point must enable this mask to receive predicted orbits request
+#define QMI_LOC_EVENT_MASK_INJECT_PREDICTED_ORBITS_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000020ull) /**<  The control point must enable this mask to receive predicted orbits request
        event indications.  */
-#define QMI_LOC_EVENT_MASK_INJECT_POSITION_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000040) /**<  The control point must enable this mask to receive position injection request
+#define QMI_LOC_EVENT_MASK_INJECT_POSITION_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000040ull) /**<  The control point must enable this mask to receive position injection request
        event indications.  */
-#define QMI_LOC_EVENT_MASK_ENGINE_STATE_V02 ((qmiLocEventRegMaskT_v02)0x00000080) /**<  The control point must enable this mask to receive engine state report
+#define QMI_LOC_EVENT_MASK_ENGINE_STATE_V02 ((qmiLocEventRegMaskT_v02)0x00000080ull) /**<  The control point must enable this mask to receive engine state report
        event indications.  */
-#define QMI_LOC_EVENT_MASK_FIX_SESSION_STATE_V02 ((qmiLocEventRegMaskT_v02)0x00000100) /**<  The control point must enable this mask to receive fix session status report
+#define QMI_LOC_EVENT_MASK_FIX_SESSION_STATE_V02 ((qmiLocEventRegMaskT_v02)0x00000100ull) /**<  The control point must enable this mask to receive fix session status report
        event indications.  */
-#define QMI_LOC_EVENT_MASK_WIFI_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000200) /**<  The control point must enable this mask to receive WiFi position request
+#define QMI_LOC_EVENT_MASK_WIFI_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000200ull) /**<  The control point must enable this mask to receive WiFi position request
        event indications.  */
-#define QMI_LOC_EVENT_MASK_SENSOR_STREAMING_READY_STATUS_V02 ((qmiLocEventRegMaskT_v02)0x00000400) /**<  The control point must enable this mask to receive notifications from the
+#define QMI_LOC_EVENT_MASK_SENSOR_STREAMING_READY_STATUS_V02 ((qmiLocEventRegMaskT_v02)0x00000400ull) /**<  The control point must enable this mask to receive notifications from the
        GPS engine indicating its readiness to accept data from the
        sensors (accelerometer, gyroscope, etc.).  */
-#define QMI_LOC_EVENT_MASK_TIME_SYNC_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000800) /**<  The control point must enable this mask to receive time-sync requests
+#define QMI_LOC_EVENT_MASK_TIME_SYNC_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00000800ull) /**<  The control point must enable this mask to receive time-sync requests
        from the GPS engine. Time sync enables the GPS engine to synchronize
        its clock with the sensor processor's clock.  */
-#define QMI_LOC_EVENT_MASK_SET_SPI_STREAMING_REPORT_V02 ((qmiLocEventRegMaskT_v02)0x00001000) /**<  The control point must enable this mask to receive Stationary Position
+#define QMI_LOC_EVENT_MASK_SET_SPI_STREAMING_REPORT_V02 ((qmiLocEventRegMaskT_v02)0x00001000ull) /**<  The control point must enable this mask to receive Stationary Position
        Indicator (SPI) streaming report indications.  */
-#define QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00002000) /**<  The control point must enable this mask to receive location server
+#define QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ_V02 ((qmiLocEventRegMaskT_v02)0x00002000ull) /**<  The control point must enable this mask to receive location server
        requests. These requests are generated when the service wishes to
        establish a connection with a location server. */
-#define QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00004000) /**<  The control point must enable this mask to receive notifications
+#define QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00004000ull) /**<  The control point must enable this mask to receive notifications
        related to network initiated Geofences. These events notify the client
        when a network initiated Geofence is added, deleted or edited.  */
-#define QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT_V02 ((qmiLocEventRegMaskT_v02)0x00008000) /**<  The control point must enable this mask to receive Geofence alerts.
+#define QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT_V02 ((qmiLocEventRegMaskT_v02)0x00008000ull) /**<  The control point must enable this mask to receive Geofence alerts.
        These alerts are generated to inform the client of the changes that may
        affect Geofence. For example if GPS is turned off, or if the network is
        unavailable.  */
-#define QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00010000) /**<  The control point must enable this mask to receive notifications when
+#define QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00010000ull) /**<  The control point must enable this mask to receive notifications when
        a Geofence is breached. These events are generated when the UE enters
        or leaves the perimeter of a Geofence.  */
 /** @addtogroup loc_qmi_messages
@@ -287,48 +291,7 @@ typedef struct {
        - 0x00010000 -- GEOFENCE_BREACH_NOTIFICATION \n
        Multiple events can be registered by ORing the individual masks and
        sending them in this TLV. All unused bits in this mask must be set to 0.
-
- The control point must enable this mask to receive position report
-       event indications.
- The control point must enable this mask to receive satellite report
-       event indications. These reports are sent at a 1 Hz rate.
- The control point must enable this mask to receive NMEA reports for
-       position and satellites in view. The report is at a 1 Hz rate.
- The control point must enable this mask to receive NI notify verify request
-       event indications.
- The control point must enable this mask to receive time injection request
-       event indications.
- The control point must enable this mask to receive predicted orbits request
-       event indications.
- The control point must enable this mask to receive position injection request
-       event indications.
- The control point must enable this mask to receive engine state report
-       event indications.
- The control point must enable this mask to receive fix session status report
-       event indications.
- The control point must enable this mask to receive WiFi position request
-       event indications.
- The control point must enable this mask to receive notifications from the
-       GPS engine indicating its readiness to accept data from the
-       sensors (accelerometer, gyroscope, etc.).
- The control point must enable this mask to receive time-sync requests
-       from the GPS engine. Time sync enables the GPS engine to synchronize
-       its clock with the sensor processor's clock.
- The control point must enable this mask to receive Stationary Position
-       Indicator (SPI) streaming report indications.
- The control point must enable this mask to receive location server
-       requests. These requests are generated when the service wishes to
-       establish a connection with a location server.
- The control point must enable this mask to receive notifications
-       related to network initiated Geofences. These events notify the client
-       when a network initiated Geofence is added, deleted or edited.
- The control point must enable this mask to receive Geofence alerts.
-       These alerts are generated to inform the client of the changes that may
-       affect Geofence. For example if GPS is turned off, or if the network is
-       unavailable.
- The control point must enable this mask to receive notifications when
-       a Geofence is breached. These events are generated when the UE enters
-       or leaves the perimeter of a Geofence.  */
+   */
 }qmiLocRegEventsReqMsgT_v02;  /* Message */
 /**
     @}
@@ -865,11 +828,8 @@ typedef struct {
 
        Valid bitmasks: \n
          - 0x00000001 -- SATELLITE \n
-         - 0x00000002 -- CELLID    \n
-         - 0x00000004 -- WIFI
- Satellites were used to generate the fix.
- Cell towers were used to generate the fix.
- WiFi access points were used to generate the fix.  */
+         - 0x00000002 -- CELLID \n
+         - 0x00000004 -- WIFI  */
 
   /* Optional */
   /*  Dilution of Precision */
@@ -940,6 +900,12 @@ typedef struct {
   uint32_t fixId;
   /**<   Fix count for the session. Starts with 0 and increments by one
        for each successive position report for a particular session.  */
+
+  /* Optional */
+  /*  SV's Used to Calculate the Fix */
+  uint8_t gnssSvUsedList_valid;  /**< Must be set to true if gnssSvUsedList is being passed */
+  uint32_t gnssSvUsedList_len;  /**< Must be set to # of elements in gnssSvUsedList */
+  uint16_t gnssSvUsedList[QMI_LOC_MAX_SV_USED_LIST_LENGTH_V02];
 }qmiLocEventPositionReportIndMsgT_v02;  /* Message */
 /**
     @}
@@ -1025,9 +991,10 @@ typedef struct {
 
          - Type: Unsigned integer \n
          - Range: \n
-             -- For GPS:     1 to 32 \n
-             -- For SBAS:    33 to 64    \n
-             -- For GLONASS: 65 to 96   */
+             -- For GPS:      1 to 32 \n
+             -- For GLONASS: 1 to 32 \n
+             -- For SBAS:    120 to 151 \n
+        The GPS and GLONASS SVs can be disambiguated using the system field.  */
 
   uint8_t healthStatus;
   /**<   Health status. \n
@@ -1801,6 +1768,98 @@ typedef struct {
     @}
   */
 
+typedef uint16_t qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02;
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_WLAN_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0001) /**<  Denotes that WLAN measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_GSM_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0002) /**<  Denotes that GSM measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_WCDMA_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0004) /**<  Denotes that WCDMA measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_CDMA_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0008) /**<  Denotes that CDMA measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_HRDP_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0010) /**<  Denotes that HRDP measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_UMB_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0020) /**<  Denotes that UMB measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.           */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_LTE_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0040) /**<  Denotes that LTE measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.   */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_WIMAX_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0080) /**<  Denotes that WIMAX measurements are allowed as part of location ID
+       and multiple location ID in the SUPL_POS_INIT message.   */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_HISTORIC_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0100) /**<  Denotes that historical information is allowed as part of
+       multiple location ID in the SUPL_POS_INIT message.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_NONSVRV_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0200) /**<  Denotes that information of non-serving cells is allowed
+       as part of multiple location ID in the SUPL_POS_INIT message.    */
+/** @addtogroup loc_qmi_enums
+    @{
+  */
+typedef enum {
+  QMILOCNISUPLVER2EXTTRIGGERTYPEENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
+  eQMI_LOC_SUPL_VER_2_EXT_TRIGGER_TYPE_SINGLE_SHOT_V02 = -1, /**<  The SUPL INIT message indicates a request for a single shot
+       triggered session.  */
+  eQMI_LOC_SUPL_VER_2_EXT_TRIGGER_TYPE_PERIODIC_V02 = 0, /**<  The SUPL INIT message indicates a request for a periodic
+       triggered session.
+ The SUPL INIT message indicates a request for an area event
+       triggered session.  */
+  eQMI_LOC_SUPL_VER_2_EXT_TRIGGER_TYPE_AREA_EVENT_V02 = 1,
+  QMILOCNISUPLVER2EXTTRIGGERTYPEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
+}qmiLocNiSuplVer2ExtTriggerTypeEnumT_v02;
+/**
+    @}
+  */
+
+typedef uint16_t qmiLocNiSuplVer2ExtGnssTypeMaskT_v02;
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GPS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0001) /**<  GPS is allowed to be used as the positioning technology   */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GLONASS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0002) /**<  GLONASS is allowed to be used as the positioning technology  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GALILEO_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0004) /**<  Galileo is allowed to be used as the positioning technology  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_SBAS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0008) /**<  SBAS is allowed to be used as the positioning technology  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_QZSS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0010) /**<  QZSS is allowed to be used as the positioning technology  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_MODERN_GPS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0020) /**<  Modern GPS is allowed to be used as the positioning technology    */
+/** @addtogroup loc_qmi_aggregates
+    @{
+  */
+typedef struct {
+
+  qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02 supportedNetworksMask;
+  /**<   Specifies which type of network measurements are allowed to be sent as
+       part of the location ID or mutiple location IDs parameter in the SUPL_POS_INIT
+       message.
+       Valid bitmasks: \n
+        - 0x0001 -- SUPPORTED_NETWORK_WLAN
+        - 0x0002 -- SUPPORTED_NETWORK_GSM
+        - 0x0004 -- SUPPORTED_NETWORK_WCDMA
+        - 0x0008 -- SUPPORTED_NETWORK_CDMA
+        - 0x0010 -- SUPPORTED_NETWORK_HRDP
+        - 0x0020 -- SUPPORTED_NETWORK_UMB
+        - 0x0040 -- SUPPORTED_NETWORK_LTE
+        - 0x0080 -- SUPPORTED_NETWORK_WIMAX
+        - 0x0100 -- SUPPORTED_NETWORK_HISTORIC
+        - 0x0200 -- SUPPORTED_NETWORK_NONSVRV
+    */
+
+  qmiLocNiSuplVer2ExtTriggerTypeEnumT_v02 triggerType;
+  /**<   Specifies the type of session trigger requested in the
+       SUPL INIT message.
+       Valid values: \n
+        - 0xFFFFFFFF  -- TRIGGER_TYPE_SINGLE_SHOT \n
+        - 0x00000000  -- TRIGGER_TYPE_PERIODIC \n
+        - 0x00000001  -- TRIGGER_TYPE_AREA_EVENT    */
+
+  qmiLocNiSuplVer2ExtGnssTypeMaskT_v02 gnssType;
+  /**<   Specifies which GNSS technologies are allowed as positioning
+       technologies.
+       Valid bitmasks: \n
+        - 0x0001 -- GNSS_GPS
+        - 0x0002 -- GNSS_GLONASS
+        - 0x0004 -- GNSS_GALILEO
+        - 0x0008 -- GNSS_SBAS
+        - 0x0010 -- GNSS_QZSS
+        - 0x0020 -- GNSS_MODERN_GPS
+   */
+}qmiLocNiSuplVer2ExtStructT_v02;  /* Type */
+/**
+    @}
+  */
+
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -1843,6 +1902,14 @@ typedef struct {
   uint8_t NiVxServiceInteractionInd_valid;  /**< Must be set to true if NiVxServiceInteractionInd is being passed */
   qmiLocNiVxServiceInteractionStructT_v02 NiVxServiceInteractionInd;
   /**<   \n Optional NI service interaction payload.  */
+
+  /* Optional */
+  /*  Network Initiated SUPL Version 2 Extension */
+  uint8_t NiSuplVer2ExtInd_valid;  /**< Must be set to true if NiSuplVer2ExtInd is being passed */
+  qmiLocNiSuplVer2ExtStructT_v02 NiSuplVer2ExtInd;
+  /**<   \n Optional NI SUPL Version 2 Extension payload. When present
+          this payload should be used in conjunction with the SUPL
+          indication payload.  */
 }qmiLocEventNiNotifyVerifyReqIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2556,8 +2623,9 @@ typedef struct {
   qmiLocGeofencePositionStructT_v02 geofencePosition;
   /**<   Position of the client when it breached the Geofence.
        This field is included if the client configures the
-       Geofence to report position.
-         */
+       Geofence to report position. The position is reported
+       at the same confidence level which was specified in add
+       geofence request.   */
 }qmiLocEventGeofenceBreachIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2746,7 +2814,7 @@ typedef enum {
     @{
   */
 /** Request Message; Sends the NI user response back to the engine; success or
-                      failure is reported in a separate indication. */
+                    failure is reported in a separate indication. */
 typedef struct {
 
   /* Mandatory */
@@ -2795,7 +2863,13 @@ typedef struct {
   /*  Network Initiated Service Interaction Request */
   uint8_t NiVxServiceInteractionPayload_valid;  /**< Must be set to true if NiVxServiceInteractionPayload is being passed */
   qmiLocNiVxServiceInteractionStructT_v02 NiVxServiceInteractionPayload;
-  /**<   \n Optional NI service interaction payload.          */
+  /**<   \n Optional NI service interaction payload.   */
+
+  /* Optional */
+  /*  Network Initiated SUPL Version 2 Extension */
+  uint8_t NiSuplVer2ExtPayload_valid;  /**< Must be set to true if NiSuplVer2ExtPayload is being passed */
+  qmiLocNiSuplVer2ExtStructT_v02 NiSuplVer2ExtPayload;
+  /**<   \n Optional SUPL Version 2 Extension payload.         */
 }qmiLocNiUserRespReqMsgT_v02;  /* Message */
 /**
     @}
@@ -2805,7 +2879,7 @@ typedef struct {
     @{
   */
 /** Indication Message; Sends the NI user response back to the engine; success or
-                      failure is reported in a separate indication. */
+                    failure is reported in a separate indication. */
 typedef struct {
 
   /* Mandatory */
@@ -3601,14 +3675,7 @@ typedef struct {
          - 0x00000010 -- NMEA_MASK_VTG \n
          - 0x00000020 -- NMEA_MASK_PQXFI \n
          - 0x00000040 -- NMEA_MASK_PSTIS
-
- Enable GGA type.
- Enable RMC type.
- Enable GSV type.
- Enable GSA type.
- Enable VTG type.
- Enable PQXFI type.
- Enable PSTIS type.  */
+          */
 }qmiLocSetNmeaTypesReqMsgT_v02;  /* Message */
 /**
     @}
@@ -3681,14 +3748,7 @@ typedef struct {
          - 0x00000010 -- NMEA_MASK_VTG \n
          - 0x00000020 -- NMEA_MASK_PQXFI \n
          - 0x00000040 -- NMEA_MASK_PSTIS
-
- Enable GGA type.
- Enable RMC type.
- Enable GSV type.
- Enable GSA type.
- Enable VTG type.
- Enable PQXFI type.
- Enable PSTIS type.  */
+          */
 }qmiLocGetNmeaTypesIndMsgT_v02;  /* Message */
 /**
     @}
@@ -3889,10 +3949,7 @@ typedef struct {
          - 0x01 -- IPV4 \n
          - 0x02 -- IPV6 \n
          - 0x04 -- URL
-
- IPV4 server address type.
- IPV6 server address type.
- URL server address type.  */
+   */
 }qmiLocGetServerReqMsgT_v02;  /* Message */
 /**
     @}
@@ -3957,25 +4014,25 @@ typedef struct {
   */
 
 typedef uint64_t qmiLocDeleteGnssDataMaskT_v02;
-#define QMI_LOC_MASK_DELETE_GPS_SVDIR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000001) /**<  Mask to delete GPS SVDIR.   */
-#define QMI_LOC_MASK_DELETE_GPS_SVSTEER_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000002) /**<  Mask to delete GPS SVSTEER.   */
-#define QMI_LOC_MASK_DELETE_GPS_TIME_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000004) /**<  Mask to delete GPS time.  */
-#define QMI_LOC_MASK_DELETE_GPS_ALM_CORR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000008) /**<  Mask to delete almanac correlation.  */
-#define QMI_LOC_MASK_DELETE_GLO_SVDIR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000010) /**<  Mask to delete GLONASS SVDIR.   */
-#define QMI_LOC_MASK_DELETE_GLO_SVSTEER_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000020) /**<  Mask to delete GLONASS SVSTEER.   */
-#define QMI_LOC_MASK_DELETE_GLO_TIME_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000040) /**<  Mask to delete GLONASS time.  */
-#define QMI_LOC_MASK_DELETE_GLO_ALM_CORR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000080) /**<  Mask to delete GLONASS almanac correlation */
-#define QMI_LOC_MASK_DELETE_SBAS_SVDIR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000100) /**<  Mask to delete SBAS SVDIR  */
-#define QMI_LOC_MASK_DELETE_SBAS_SVSTEER_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000200) /**<  Mask to delete SBAS SVSTEER  */
-#define QMI_LOC_MASK_DELETE_POSITION_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000400) /**<  Mask to delete position estimate  */
-#define QMI_LOC_MASK_DELETE_TIME_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000800) /**<  Mask to delete time estimate  */
-#define QMI_LOC_MASK_DELETE_IONO_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00001000) /**<  Mask to delete IONO  */
-#define QMI_LOC_MASK_DELETE_UTC_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00002000) /**<  Mask to delete UTC estimate  */
-#define QMI_LOC_MASK_DELETE_HEALTH_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00004000) /**<  Mask to delete SV health record  */
-#define QMI_LOC_MASK_DELETE_SADATA_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00008000) /**<  Mask to delete SADATA  */
-#define QMI_LOC_MASK_DELETE_RTI_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00010000) /**<  Mask to delete RTI  */
-#define QMI_LOC_MASK_DELETE_SV_NO_EXIST_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00020000) /**<  Mask to delete SV_NO_EXIST  */
-#define QMI_LOC_MASK_DELETE_FREQ_BIAS_EST_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00040000) /**<  Mask to delete frequency bias estimate  */
+#define QMI_LOC_MASK_DELETE_GPS_SVDIR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000001ull) /**<  Mask to delete GPS SVDIR.   */
+#define QMI_LOC_MASK_DELETE_GPS_SVSTEER_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000002ull) /**<  Mask to delete GPS SVSTEER.   */
+#define QMI_LOC_MASK_DELETE_GPS_TIME_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000004ull) /**<  Mask to delete GPS time.  */
+#define QMI_LOC_MASK_DELETE_GPS_ALM_CORR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000008ull) /**<  Mask to delete almanac correlation.  */
+#define QMI_LOC_MASK_DELETE_GLO_SVDIR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000010ull) /**<  Mask to delete GLONASS SVDIR.   */
+#define QMI_LOC_MASK_DELETE_GLO_SVSTEER_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000020ull) /**<  Mask to delete GLONASS SVSTEER.   */
+#define QMI_LOC_MASK_DELETE_GLO_TIME_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000040ull) /**<  Mask to delete GLONASS time.  */
+#define QMI_LOC_MASK_DELETE_GLO_ALM_CORR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000080ull) /**<  Mask to delete GLONASS almanac correlation */
+#define QMI_LOC_MASK_DELETE_SBAS_SVDIR_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000100ull) /**<  Mask to delete SBAS SVDIR  */
+#define QMI_LOC_MASK_DELETE_SBAS_SVSTEER_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000200ull) /**<  Mask to delete SBAS SVSTEER  */
+#define QMI_LOC_MASK_DELETE_POSITION_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000400ull) /**<  Mask to delete position estimate  */
+#define QMI_LOC_MASK_DELETE_TIME_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00000800ull) /**<  Mask to delete time estimate  */
+#define QMI_LOC_MASK_DELETE_IONO_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00001000ull) /**<  Mask to delete IONO  */
+#define QMI_LOC_MASK_DELETE_UTC_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00002000ull) /**<  Mask to delete UTC estimate  */
+#define QMI_LOC_MASK_DELETE_HEALTH_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00004000ull) /**<  Mask to delete SV health record  */
+#define QMI_LOC_MASK_DELETE_SADATA_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00008000ull) /**<  Mask to delete SADATA  */
+#define QMI_LOC_MASK_DELETE_RTI_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00010000ull) /**<  Mask to delete RTI  */
+#define QMI_LOC_MASK_DELETE_SV_NO_EXIST_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00020000ull) /**<  Mask to delete SV_NO_EXIST  */
+#define QMI_LOC_MASK_DELETE_FREQ_BIAS_EST_V02 ((qmiLocDeleteGnssDataMaskT_v02)0x00040000ull) /**<  Mask to delete frequency bias estimate  */
 typedef uint32_t qmiLocDeleteCelldbDataMaskT_v02;
 #define QMI_LOC_MASK_DELETE_CELLDB_POS_V02 ((qmiLocDeleteCelldbDataMaskT_v02)0x00000001) /**<  Mask to delete cell database position  */
 #define QMI_LOC_MASK_DELETE_CELLDB_LATEST_GPS_POS_V02 ((qmiLocDeleteCelldbDataMaskT_v02)0x00000002) /**<  Mask to delete cell database latest GPS position  */
@@ -4061,7 +4118,7 @@ typedef struct {
   uint8_t deleteSvInfoList_valid;  /**< Must be set to true if deleteSvInfoList is being passed */
   uint32_t deleteSvInfoList_len;  /**< Must be set to # of elements in deleteSvInfoList */
   qmiLocDeleteSvInfoStructT_v02 deleteSvInfoList[QMI_LOC_DELETE_MAX_SV_INFO_LENGTH_V02];
-  /**<   \n List of satellites for which the assitance data is to be deleted.
+  /**<   \n List of satellites for which the assistance data is to be deleted.
     */
 
   /* Optional */
@@ -4089,26 +4146,7 @@ typedef struct {
        - 0x00010000 -- DELETE_RTI \n
        - 0x00020000 -- DELETE_SV_NO_EXIST \n
        - 0x00040000 -- DELETE_FREQ_BIAS_EST
-
- Mask to delete GPS SVDIR.
- Mask to delete GPS SVSTEER.
- Mask to delete GPS time.
- Mask to delete almanac correlation.
- Mask to delete GLONASS SVDIR.
- Mask to delete GLONASS SVSTEER.
- Mask to delete GLONASS time.
- Mask to delete GLONASS almanac correlation
- Mask to delete SBAS SVDIR
- Mask to delete SBAS SVSTEER
- Mask to delete position estimate
- Mask to delete time estimate
- Mask to delete IONO
- Mask to delete UTC estimate
- Mask to delete SV health record
- Mask to delete SADATA
- Mask to delete RTI
- Mask to delete SV_NO_EXIST
- Mask to delete frequency bias estimate  */
+   */
 
   /* Optional */
   /*  Delete Cell Database */
@@ -4126,17 +4164,7 @@ typedef struct {
        - 0x00000080 -- DELETE_CELLDB_LAST_SRV_CELL \n
        - 0x00000100 -- DELETE_CELLDB_CUR_SRV_CELL \n
        - 0x00000200 -- DELETE_CELLDB_NEIGHBOR_INFO
-
- Mask to delete cell database position
- Mask to delete cell database latest GPS position
- Mask to delete cell database OTA position
- Mask to delete cell database external reference position
- Mask to delete cell database time tag
- Mask to delete cell database cell ID
- Mask to delete cell database cached cell ID
- Mask to delete cell database last service cell
- Mask to delete cell database current service cell
- Mask to delete cell database neighbor information  */
+   */
 
   /* Optional */
   /*  Delete Clock Info */
@@ -4155,18 +4183,7 @@ typedef struct {
        - 0x00000100 -- DELETE_CLOCK_INFO_GLO4YEAR_NUMBER \n
        - 0x00000200 -- DELETE_CLOCK_INFO_GLO_RF_GRP_DELAY \n
        - 0x00000400 -- DELETE_CLOCK_INFO_DISABLE_TT
-
- Mask to delete time estimate from clock information
- Mask to delete frequency estimate from clock information
- Mask to delete week number from clock information
- Mask to delete RTC time from clock information
- Mask to delete time transfer from clock information
- Mask to delete GPS time estimate from clock information
- Mask to delete GLONASS time estimate from clock information
- Mask to delete GLONASS day number from clock information
- Mask to delete GLONASS four year number from clock information
- Mask to delete GLONASS RF GRP delay from clock information
- Mask to delete disable TT from clock information   */
+   */
 }qmiLocDeleteAssistDataReqMsgT_v02;  /* Message */
 /**
     @}
@@ -4575,48 +4592,7 @@ typedef struct {
          - 0x00000800 -- TIME_SYNC_REQ \n
          - 0x00001000 -- SET_SPI_STREAMING_REPORT \n
          - 0x00002000 -- LOCATION_SERVER__CONNECTION_REQ
-
- The control point must enable this mask to receive position report
-       event indications.
- The control point must enable this mask to receive satellite report
-       event indications. These reports are sent at a 1 Hz rate.
- The control point must enable this mask to receive NMEA reports for
-       position and satellites in view. The report is at a 1 Hz rate.
- The control point must enable this mask to receive NI notify verify request
-       event indications.
- The control point must enable this mask to receive time injection request
-       event indications.
- The control point must enable this mask to receive predicted orbits request
-       event indications.
- The control point must enable this mask to receive position injection request
-       event indications.
- The control point must enable this mask to receive engine state report
-       event indications.
- The control point must enable this mask to receive fix session status report
-       event indications.
- The control point must enable this mask to receive WiFi position request
-       event indications.
- The control point must enable this mask to receive notifications from the
-       GPS engine indicating its readiness to accept data from the
-       sensors (accelerometer, gyroscope, etc.).
- The control point must enable this mask to receive time-sync requests
-       from the GPS engine. Time sync enables the GPS engine to synchronize
-       its clock with the sensor processor's clock.
- The control point must enable this mask to receive Stationary Position
-       Indicator (SPI) streaming report indications.
- The control point must enable this mask to receive location server
-       requests. These requests are generated when the service wishes to
-       establish a connection with a location server.
- The control point must enable this mask to receive notifications
-       related to network initiated Geofences. These events notify the client
-       when a network initiated Geofence is added, deleted or edited.
- The control point must enable this mask to receive Geofence alerts.
-       These alerts are generated to inform the client of the changes that may
-       affect Geofence. For example if GPS is turned off, or if the network is
-       unavailable.
- The control point must enable this mask to receive notifications when
-       a Geofence is breached. These events are generated when the UE enters
-       or leaves the perimeter of a Geofence.  */
+             */
 }qmiLocGetRegisteredEventsIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5385,6 +5361,9 @@ typedef enum {
     @}
   */
 
+typedef uint32_t qmiLocLppConfigMaskT_v02;
+#define QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000001) /**<  Enable User plane configuration for LTE positioning profile (LPP)  */
+#define QMI_LOC_LPP_CONFIG_ENABLE_CONTROL_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000002) /**<  Enable Control plane configuration for LPP.      */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5421,15 +5400,27 @@ typedef struct {
          - 0x00000001 -- SUPL_VERSION_1_0 \n
          - 0x00000002 -- SUPL_VERSION_2_0
    */
+
+  /* Optional */
+  /*  LPP Configuration */
+  uint8_t lppConfig_valid;  /**< Must be set to true if lppConfig is being passed */
+  qmiLocLppConfigMaskT_v02 lppConfig;
+  /**<   LTE Positioning Profile (LPP) configuration.
+
+      Valid bitmasks: \n
+         - 0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE \n
+         - 0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
+   */
 }qmiLocSetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
   */
 
 typedef uint64_t qmiLocProtocolConfigParamMaskT_v02;
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_SECURITY_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x00000001) /**<  Mask for the SUPL security configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_VX_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x00000002) /**<  Mask for the VX version configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x00000004) /**<  Mask for the SUPL version configuration parameter.       */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_SECURITY_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000001ull) /**<  Mask for the SUPL security configuration parameter.  */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_VX_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000002ull) /**<  Mask for the VX version configuration parameter.  */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000004ull) /**<  Mask for the SUPL version configuration parameter.       */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_LPP_CONFIG_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000008ull) /**<  Mask for the LPP configuration parameter.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5463,11 +5454,9 @@ typedef struct {
        Valid bitmasks: \n
          - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
          - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
-         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
-
- Mask for the SUPL security configuration parameter.
- Mask for the VX version configuration parameter.
- Mask for the SUPL version configuration parameter.       */
+         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION \n
+         - 0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+   */
 }qmiLocSetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5488,11 +5477,9 @@ typedef struct {
        Valid bitmasks: \n
          - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
          - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
-         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
-
- Mask for the SUPL security configuration parameter.
- Mask for the VX version configuration parameter.
- Mask for the SUPL version configuration parameter.       */
+         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION \n
+         - 0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+   */
 }qmiLocGetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5548,6 +5535,17 @@ typedef struct {
         Valid values: \n
          - 0x00000001 -- SUPL_VERSION_1_0 \n
          - 0x00000002 -- SUPL_VERSION_2_0
+   */
+
+  /* Optional */
+  /*  LPP Configuration */
+  uint8_t lppConfig_valid;  /**< Must be set to true if lppConfig is being passed */
+  qmiLocLppConfigMaskT_v02 lppConfig;
+  /**<   LTE Positioning Profile (LPP) configuration.
+
+      Valid bitmasks: \n
+         - 0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE \n
+         - 0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
    */
 }qmiLocGetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
@@ -5691,14 +5689,14 @@ typedef uint32_t qmiLocSensorPropertiesMaskT_v02;
 typedef struct {
 
   /* Optional */
-  /*  Gyro Bias Variance */
+  /*  Gyro Bias Random Walk Variance */
   uint8_t gyroBiasVarianceRandomWalk_valid;  /**< Must be set to true if gyroBiasVarianceRandomWalk is being passed */
   float gyroBiasVarianceRandomWalk;
-  /**<   Specifies the gyro bias random walk parameter as a positive
+  /**<   Specifies the gyro bias random walk variance parameter as a positive
        floating-point value. This value has internal default value 1.0e-5 radian^2/second^4.
        The gyro bias variance random walk parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radian^2/second^4
+       - Units: Radians^2/seconds^4
 
    */
 
@@ -5710,7 +5708,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The velocity random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: meter/second^2/hertz^0.5
+       - Units: Meters/seconds^2/Hertz^0.5
 
    */
 
@@ -5722,7 +5720,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The acceleration random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: meter/second^3/hertz^0.5
+       - Units: Meters/seconds^3/Hertz^0.5
 
    */
 
@@ -5734,7 +5732,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The angle random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radian/second/hertz^0.5
+       - Units: Radians/seconds/Hertz^0.5
 
    */
 
@@ -5746,7 +5744,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The rate random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radian/second^2/hertz^0.5
+       - Units: Radians/seconds^2/Hertz^0.5
 
    */
 }qmiLocSetSensorPropertiesReqMsgT_v02;  /* Message */
@@ -5776,7 +5774,7 @@ typedef struct {
           - 0x00000004 -- ENGINE_BUSY \n
           - 0x00000005 -- PHONE_OFFLINE \n
           - 0x00000006 -- TIMEOUT \n
-          - 0x00000007 -- CONFIG NOT SUPPORTED \n
+          - 0x00000007 -- CONFIG_NOT_SUPPORTED
    */
 
   /* Optional */
@@ -5790,12 +5788,7 @@ typedef struct {
         - 0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY \n
         - 0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY \n
         - 0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
-
- This field denotes the gyro bias variance random walk parameter.
- This field denotes the velocity random walk spectral density parameter.
- This field denotes the acceleration random walk spectral density parameter.
- This field denotes the angle random walk spectral density parameter.
- This field denotes the rate random walk spectral density parameter.  */
+   */
 }qmiLocSetSensorPropertiesIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5808,7 +5801,7 @@ typedef struct {
 typedef struct {
 
   /* Mandatory */
-  /*  Config Parameters */
+  /*  Sensor Properties Config Parameters */
   qmiLocSensorPropertiesMaskT_v02 getSensorPropertiesMask;
   /**<   Mask denoting the sensor properties parameters to be retrieved.
        Valid bitmasks: \n
@@ -5817,12 +5810,7 @@ typedef struct {
         - 0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY \n
         - 0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY \n
         - 0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
-
- This field denotes the gyro bias variance random walk parameter.
- This field denotes the velocity random walk spectral density parameter.
- This field denotes the acceleration random walk spectral density parameter.
- This field denotes the angle random walk spectral density parameter.
- This field denotes the rate random walk spectral density parameter.  */
+   */
 }qmiLocGetSensorPropertiesReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5851,14 +5839,14 @@ typedef struct {
    */
 
   /* Optional */
-  /*  Gyro Bias Variance */
+  /*  Gyro Bias Random Walk Variance */
   uint8_t gyroBiasVarianceRandomWalk_valid;  /**< Must be set to true if gyroBiasVarianceRandomWalk is being passed */
   float gyroBiasVarianceRandomWalk;
-  /**<   Specifies the gyro bias random walk parameter as a positive
+  /**<   Specifies the gyro bias random walk variance parameter as a positive
        floating-point value. This value has internal default value 1.0e-5 radian^2/second^4.
        The gyro bias variance random walk parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radian^2/second^4
+       - Units: Radians^2/seconds^4
 
    */
 
@@ -5870,7 +5858,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The velocity random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: meter/second^2/rtHz
+       - Units: Meters/seconds^2/Hertz^0.5
 
    */
 
@@ -5882,7 +5870,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The acceleration random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: meter/second^3/rtHz
+       - Units: Meters/seconds^3/Hertz^0.5
 
    */
 
@@ -5894,7 +5882,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The angle random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radian/second/hertz^0.5
+       - Units: Radians/seconds/Hertz^0.5
 
    */
 
@@ -5906,7 +5894,7 @@ typedef struct {
        floating-point value. This value does not have any internal defaults.
        The rate random walk spectral density parameter is derived from either the
        sensors data sheet or a sensors conformance test. \n
-       - Units: radian/second^2/hertz^0.5
+       - Units: Radians/seconds^2/Hertz^0.5
 
    */
 }qmiLocGetSensorPropertiesIndMsgT_v02;  /* Message */
@@ -5987,12 +5975,10 @@ typedef struct {
   /*  Algorithm Configuration */
   uint8_t algorithmConfig_valid;  /**< Must be set to true if algorithmConfig is being passed */
   qmiLocSensorAlgorithmMaskT_v02 algorithmConfig;
-  /**<   Sets which sensor algoritms are to be used when processing sensor data.
+  /**<   Sets which sensor algorithms are to be used when processing sensor data.
        Valid bitmasks: \n
        - 0x00000001 -- DISABLE_INS_POSITIONING_FILTER
-
- Inertial sensors are not to be used in Accelerometer-integrated fashion with
-       GNSS. They can still be used for aiding in heading improvements.  */
+   */
 }qmiLocSetSensorPerformanceControlConfigReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6035,11 +6021,7 @@ typedef struct {
        - 0x00000002 -- ACCEL_SAMPLING_SPEC \n
        - 0x00000004 -- GYRO_SAMPLING_SPEC \n
        - 0x00000008 -- ALGORITHM_CONFIG
-
- Failed to set the performance mode.
- Failed to set the accelerometer sampling specification.
- Failed to set the gyroscope sampling specification.
- Failed to set the algorithm configuration  */
+   */
 }qmiLocSetSensorPerformanceControlConfigIndMsgT_v02;  /* Message */
 /**
     @}
@@ -6115,12 +6097,10 @@ typedef struct {
   /*  Algorithm Configuration */
   uint8_t algorithmConfig_valid;  /**< Must be set to true if algorithmConfig is being passed */
   qmiLocSensorAlgorithmMaskT_v02 algorithmConfig;
-  /**<       This TLV informs what sensor algorithms are currently set.
+  /**<   Informs which sensor algorithms are currently set.
        Valid bitmasks: \n
        - 0x00000001 -- DISABLE_INS_POSITIONING_FILTER
-
- Inertial sensors are not to be used in Accelerometer-integrated fashion with
-       GNSS. They can still be used for aiding in heading improvements.  */
+   */
 }qmiLocGetSensorPerformanceControlConfigIndMsgT_v02;  /* Message */
 /**
     @}
@@ -6136,17 +6116,17 @@ typedef struct {
   /*  SUPL Certificate ID */
   uint8_t suplCertId;
   /**<   Certificate ID of the SUPL certificate. \n
-       Type: Unsigned integer \n
-       Units: Bytes \n
-       Range: 0 to 9   */
+       - Type: Unsigned integer \n
+       - Units: Bytes \n
+       - Range: 0 to 9   */
 
   /* Mandatory */
   /*  SUPL Certificate Data */
   uint32_t suplCertData_len;  /**< Must be set to # of elements in suplCertData */
   uint8_t suplCertData[QMI_LOC_MAX_SUPL_CERT_LENGTH_V02];
   /**<   SUPL certificate contents. \n
-       Type: Array of bytes. \n
-       Maximum certificate size: 2000 bytes  */
+       - Type: Array of bytes. \n
+       - Maximum certificate size: 2000 bytes  */
 }qmiLocInjectSuplCertificateReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6162,15 +6142,14 @@ typedef struct {
   /*  SUPL Certificate Injection Status */
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Inject SUPL Certificate request. \n
-
-       Valid values:
+       Valid Values: \n
           - 0x00000000 -- SUCCESS\n
           - 0x00000001 -- GENERAL_FAILURE\n
           - 0x00000002 -- UNSUPPORTED\n
           - 0x00000003 -- INVALID_PARAMETER\n
           - 0x00000004 -- ENGINE_BUSY\n
           - 0x00000005 -- PHONE_OFFLINE\n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 }qmiLocInjectSuplCertificateIndMsgT_v02;  /* Message */
 /**
@@ -6188,9 +6167,9 @@ typedef struct {
   uint8_t suplCertId_valid;  /**< Must be set to true if suplCertId is being passed */
   uint8_t suplCertId;
   /**<   Certificate ID of the SUPL certificate to be deleted. \n
-       Type: Unsigned integer \n
-       Units: Bytes \n
-       Range: 0-9 \n
+       - Type: Unsigned integer \n
+       - Units: Bytes \n
+       - Range: 0 to 9 \n
        If suplCertId is not specified,
        all SUPL certificates are deleted.  */
 }qmiLocDeleteSuplCertificateReqMsgT_v02;  /* Message */
@@ -6205,10 +6184,9 @@ typedef struct {
 typedef struct {
 
   /* Mandatory */
-  /*  SUPL Certifcate Deletion Status */
+  /*  SUPL Certificate Deletion Status */
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Delete SUPL Certificate request. \n
-
        Valid values: \n
           - 0x00000000 -- SUCCESS\n
           - 0x00000001 -- GENERAL_FAILURE\n
@@ -6216,7 +6194,7 @@ typedef struct {
           - 0x00000003 -- INVALID_PARAMETER\n
           - 0x00000004 -- ENGINE_BUSY\n
           - 0x00000005 -- PHONE_OFFLINE\n
-          - 0x00000006 -- LOC_TIMEOUT
+          - 0x00000006 -- TIMEOUT
    */
 }qmiLocDeleteSuplCertificateIndMsgT_v02;  /* Message */
 /**
@@ -6254,7 +6232,7 @@ typedef struct {
   /*  Filter SV Usage */
   uint8_t filterSvUsage_valid;  /**< Must be set to true if filterSvUsage is being passed */
   uint8_t filterSvUsage;
-  /**<   Controls whether SV usage is filtered in a position fix.    \n
+  /**<   Controls whether SV usage is filtered in a position fix. \n
        Valid values:\n
          - 0x01 (TRUE) -- Filter the usage of SVs in the fix. \n
          - 0x00 (FALSE) -- Do not filter the usage of SVs in the fix. \n
@@ -6310,13 +6288,7 @@ typedef struct {
          - 0x00000001 -- INJECTED_POSITION_CONTROL \n
          - 0x00000002 -- FILTER_SV_USAGE \n
          - 0x00000004 -- STORE_ASSIST_DATA
-
- Denotes whether the position engine uses the
-       injected position in a direct position calculation.
- Denotes whether the position engine filters the
-       SV usage in the fix.
- Denotes whether the position engine stores assistance data
-       in persistent memory.       */
+   */
 }qmiLocSetPositionEngineConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -6337,13 +6309,7 @@ typedef struct {
         - 0x00000001 -- INJECTED_POSITION_CONTROL \n
         - 0x00000002 -- FILTER_SV_USAGE \n
         - 0x00000004 -- STORE_ASSIST_DATA
-
- Denotes whether the position engine uses the
-       injected position in a direct position calculation.
- Denotes whether the position engine filters the
-       SV usage in the fix.
- Denotes whether the position engine stores assistance data
-       in persistent memory.       */
+   */
 }qmiLocGetPositionEngineConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6402,8 +6368,8 @@ typedef struct {
   uint8_t storeAssistData;
   /**<   Specifies whether assistance data is stored in persistent memory. \n
        Valid values: \n
-       0x01 (TRUE) -- Assistance data is stored in persistent memory. \n
-       0x00 (FALSE) -- Assistance data is not stored in persistent memory. \n
+         - 0x01 (TRUE) -- Assistance data is stored in persistent memory. \n
+         - 0x00 (FALSE) -- Assistance data is not stored in persistent memory. \n
        The default value is TRUE.
    */
 }qmiLocGetPositionEngineConfigParametersIndMsgT_v02;  /* Message */
@@ -6501,7 +6467,7 @@ typedef struct {
   /*  Transaction ID */
   uint32_t transactionId;
   /**<   Identifies the transaction, the transaction Id
-       will be returned with the AddCircularGeofence
+       will be returned with the Add Circular Geofence
        Indication.
        - Type -- Unsigned Integer.  */
 
@@ -6517,11 +6483,7 @@ typedef struct {
   /**<   Specifies the breach events the client is interested in.
        - Valid values :
        - 0x01 -- GEOFENCE_BREACH_ENTERING_MASK
-       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK
- If this mask is set a breach event will be reported
-       when the Geofence is entered.
- If this mask is set a breach event will be reported
-       when the Geofence is exited.  */
+       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK   */
 
   /* Mandatory */
   /*  Include Position in Breach Event */
@@ -6623,7 +6585,7 @@ typedef struct {
   /*  Transaction ID */
   uint32_t transactionId;
   /**<   Identifies the transaction, the transaction Id
-       will be returned with the DeleteGeofence
+       will be returned with the Delete Geofence
        Indication.
        - Type -- Unsigned Integer.  */
 }qmiLocDeleteGeofenceReqMsgT_v02;  /* Message */
@@ -6832,11 +6794,7 @@ typedef struct {
   /**<   Specifies the breach events the client is interested in.
        - Valid values :
        - 0x01 -- GEOFENCE_BREACH_ENTERING_MASK
-       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK
- If this mask is set a breach event will be reported
-       when the Geofence is entered.
- If this mask is set a breach event will be reported
-       when the Geofence is exited.  */
+       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK   */
 }qmiLocEditGeofenceReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6887,10 +6845,119 @@ typedef struct {
        the Geofence parameter could not be edited.
        Valid values: \n
        0x00000001 -- GEOFENCE_PARAM_MASK_GEOFENCE_STATE \n
-       0x00000002 -- GEOFENCE_PARAM_MASK_BREACH_MASK \n
- Mask for the Geofence state parameter
- Mask for Geofence breach mask parameter */
+       0x00000002 -- GEOFENCE_PARAM_MASK_BREACH_MASK \n  */
 }qmiLocEditGeofenceIndMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Request Message; Used by the control point to get the best available
+                    position estimate from the location engine. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Transaction Id */
+  uint32_t transactionId;
+  /**<   Identifies the transaction, the same transaction Id
+       will be returned in the Get Best Available Position indication.
+        - Type -- Unsigned Integer.  */
+}qmiLocGetBestAvailablePositionReqMsgT_v02;  /* Message */
+/**
+    @}
+  */
+
+/** @addtogroup loc_qmi_messages
+    @{
+  */
+/** Indication Message; Used by the control point to get the best available
+                    position estimate from the location engine. */
+typedef struct {
+
+  /* Mandatory */
+  /*  Get Best Available Position status */
+  qmiLocStatusEnumT_v02 status;
+  /**<   Status of the Get Instantaneous Position request.
+       Valid values: \n
+         - 0x00000000 -- SUCCESS \n
+         - 0x00000001 -- GENERAL_FAILURE \n
+         - 0x00000002 -- UNSUPPORTED \n
+         - 0x00000004 -- ENGINE_BUSY \n
+         - 0x00000006 -- TIMEOUT  */
+
+  /* Optional */
+  /*  Transaction Id */
+  uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
+  uint32_t transactionId;
+  /**<   Transaction Id which was specified in the Get Best
+       Available Position request.
+        - Type -- Unsigned Integer.  */
+
+  /* Optional */
+  /*  Latitude */
+  uint8_t latitude_valid;  /**< Must be set to true if latitude is being passed */
+  double latitude;
+  /**<   Latitude (specified in WGS84 datum). \n
+       - Type: Floating point \n
+       - Units: Degrees \n
+       - Range: -90.0 to 90.0 \n
+       - Positive values indicate northern latitude \n
+       - Negative values indicate southern latitude  */
+
+  /* Optional */
+  /*   Longitude */
+  uint8_t longitude_valid;  /**< Must be set to true if longitude is being passed */
+  double longitude;
+  /**<   Longitude (specified in WGS84 datum).\n
+       - Type: Floating point \n
+       - Units: Degrees \n
+       - Range: -180.0 to 180.0 \n
+       - Positive values indicate eastern longitude \n
+       - Negative values indicate western longitude  */
+
+  /* Optional */
+  /*   Circular Horizontal Position Uncertainty */
+  uint8_t horUncCircular_valid;  /**< Must be set to true if horUncCircular is being passed */
+  float horUncCircular;
+  /**<   Horizontal position uncertainty (circular).\n
+       - Type: Floating point \n
+       - Units: Meters  */
+
+  /* Optional */
+  /*  Altitude With Respect to Ellipsoid */
+  uint8_t altitudeWrtEllipsoid_valid;  /**< Must be set to true if altitudeWrtEllipsoid is being passed */
+  float altitudeWrtEllipsoid;
+  /**<   Altitude with respect to the WGS84 ellipsoid.\n
+       - Type: Floating point \n
+       - Units: Meters \n
+       - Range: -500 to 15883  */
+
+  /* Optional */
+  /*  Vertical Uncertainty */
+  uint8_t vertUnc_valid;  /**< Must be set to true if vertUnc is being passed */
+  float vertUnc;
+  /**<   Vertical uncertainty.\n
+       - Type: Floating point \n
+       - Units: Meters  */
+
+  /* Optional */
+  /*  UTC Timestamp */
+  uint8_t timestampUtc_valid;  /**< Must be set to true if timestampUtc is being passed */
+  uint64_t timestampUtc;
+  /**<   UTC timestamp. \n
+       - Type: Unsigned integer \n
+       - Units: Milliseconds since Jan. 1, 1970  */
+
+  /* Optional */
+  /*  Time Uncertainty */
+  uint8_t timeUnc_valid;  /**< Must be set to true if timeUnc is being passed */
+  float timeUnc;
+  /**<   Time uncertainty. \n
+       - Type: Floating point \n
+       - Units: Milliseconds   */
+}qmiLocGetBestAvailablePositionIndMsgT_v02;  /* Message */
 /**
     @}
   */
@@ -7074,6 +7141,9 @@ typedef struct {
 #define QMI_LOC_EDIT_GEOFENCE_REQ_V02 0x0066
 #define QMI_LOC_EDIT_GEOFENCE_RESP_V02 0x0066
 #define QMI_LOC_EDIT_GEOFENCE_IND_V02 0x0066
+#define QMI_LOC_GET_BEST_AVAILABLE_POSITION_REQ_V02 0x0067
+#define QMI_LOC_GET_BEST_AVAILABLE_POSITION_RESP_V02 0x0067
+#define QMI_LOC_GET_BEST_AVAILABLE_POSITION_IND_V02 0x0067
 /**
     @}
   */

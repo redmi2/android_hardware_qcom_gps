@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, Code Aurora Forum. All rights reserved.
+/* Copyright (c) 2011-2012, Code Aurora Forum. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -206,6 +206,9 @@ static loc_name_val_s_type loc_v02_event_name[] =
     NAME_VAL(QMI_LOC_EDIT_GEOFENCE_REQ_V02),
     NAME_VAL(QMI_LOC_EDIT_GEOFENCE_RESP_V02),
     NAME_VAL(QMI_LOC_EDIT_GEOFENCE_IND_V02),
+    NAME_VAL(QMI_LOC_GET_BEST_AVAILABLE_POSITION_REQ_V02),
+    NAME_VAL(QMI_LOC_GET_BEST_AVAILABLE_POSITION_RESP_V02),
+    NAME_VAL(QMI_LOC_GET_BEST_AVAILABLE_POSITION_IND_V02),
 };
 static int loc_v02_event_num = sizeof(loc_v02_event_name) / sizeof(loc_name_val_s_type);
 
