@@ -86,6 +86,10 @@ static loc_param_s_type loc_parameter_table[] =
   {"SUPL_VER",                       &gps_conf.SUPL_VER,                       NULL, 'n'},
   {"CAPABILITIES",                   &gps_conf.CAPABILITIES,                   NULL, 'n'},
   {"GYRO_BIAS_RANDOM_WALK",          &gps_conf.GYRO_BIAS_RANDOM_WALK,          &gps_conf.GYRO_BIAS_RANDOM_WALK_VALID, 'f'},
+  {"ACCEL_RANDOM_WALK_SPECTRAL_DENSITY",     &gps_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY,    &gps_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID, 'f'},
+  {"ANGLE_RANDOM_WALK_SPECTRAL_DENSITY",     &gps_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY,    &gps_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID, 'f'},
+  {"RATE_RANDOM_WALK_SPECTRAL_DENSITY",      &gps_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY,     &gps_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID, 'f'},
+  {"VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY",  &gps_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY, &gps_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID, 'f'},
   {"SENSOR_ACCEL_BATCHES_PER_SEC",   &gps_conf.SENSOR_ACCEL_BATCHES_PER_SEC,   NULL, 'n'},
   {"SENSOR_ACCEL_SAMPLES_PER_BATCH", &gps_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH, NULL, 'n'},
   {"SENSOR_GYRO_BATCHES_PER_SEC",    &gps_conf.SENSOR_GYRO_BATCHES_PER_SEC,    NULL, 'n'},
@@ -112,11 +116,22 @@ static void loc_default_parameters(void)
    gps_conf.SENSOR_GYRO_SAMPLES_PER_BATCH = 5;
    gps_conf.SENSOR_CONTROL_MODE = 0; /* AUTO */
    gps_conf.SENSOR_USAGE = 0; /* Enabled */
+   gps_conf.SENSOR_ALGORITHM_CONFIG_MASK = 0; /* INS Disabled = FALSE*/
 
-   /* Value MUST be set by OEMs in configuration for sensor-assisted
-      navigation to work. There is NO default value */
+   /* Values MUST be set by OEMs in configuration for sensor-assisted
+      navigation to work. There are NO default values */
+   gps_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY = 0;
+   gps_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY = 0;
+   gps_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY = 0;
+   gps_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY = 0;
+
    gps_conf.GYRO_BIAS_RANDOM_WALK_VALID = 0;
-   /* LTE Positioning Profile configuration is disable by default*/
+   gps_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
+   gps_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
+   gps_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
+   gps_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID = 0;
+
+      /* LTE Positioning Profile configuration is disable by default*/
    gps_conf.LPP_PROFILE = 0;
 }
 
@@ -329,11 +344,25 @@ static int loc_eng_reinit(loc_eng_data_s_type &loc_eng_data)
         msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
                   sensor_control_config_msg, loc_eng_free_msg);
 
-        /* Make sure this is specified by the user in the gps.conf file */
-        if(gps_conf.GYRO_BIAS_RANDOM_WALK_VALID)
+        /* Make sure at least one of the sensor property is specified by the user in the gps.conf file. */
+        if( gps_conf.GYRO_BIAS_RANDOM_WALK_VALID ||
+            gps_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
+            gps_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
+            gps_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID ||
+            gps_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID )
         {
             loc_eng_msg_sensor_properties *sensor_properties_msg(
-                new loc_eng_msg_sensor_properties(&loc_eng_data, gps_conf.GYRO_BIAS_RANDOM_WALK));
+                new loc_eng_msg_sensor_properties(&loc_eng_data,
+                                                   gps_conf.GYRO_BIAS_RANDOM_WALK_VALID,
+                                                   gps_conf.GYRO_BIAS_RANDOM_WALK,
+                                                   gps_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                   gps_conf.ACCEL_RANDOM_WALK_SPECTRAL_DENSITY,
+                                                   gps_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                   gps_conf.ANGLE_RANDOM_WALK_SPECTRAL_DENSITY,
+                                                   gps_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                   gps_conf.RATE_RANDOM_WALK_SPECTRAL_DENSITY,
+                                                   gps_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID,
+                                                   gps_conf.VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY));
             msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
                       sensor_properties_msg, loc_eng_free_msg);
         }
@@ -344,7 +373,8 @@ static int loc_eng_reinit(loc_eng_data_s_type &loc_eng_data)
                                                        gps_conf.SENSOR_ACCEL_SAMPLES_PER_BATCH,
                                                        gps_conf.SENSOR_ACCEL_BATCHES_PER_SEC,
                                                        gps_conf.SENSOR_GYRO_SAMPLES_PER_BATCH,
-                                                       gps_conf.SENSOR_GYRO_BATCHES_PER_SEC));
+                                                       gps_conf.SENSOR_GYRO_BATCHES_PER_SEC,
+                                                       gps_conf.SENSOR_ALGORITHM_CONFIG_MASK));
         msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
                   sensor_perf_control_conf_msg, loc_eng_free_msg);
     }
@@ -1391,7 +1421,16 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_SET_SENSOR_PROPERTIES:
         {
             loc_eng_msg_sensor_properties *spMsg = (loc_eng_msg_sensor_properties*)msg;
-            loc_eng_data_p->client_handle->setSensorProperties(spMsg->gyroBiasVarianceRandomWalk);
+            loc_eng_data_p->client_handle->setSensorProperties(spMsg->gyroBiasVarianceRandomWalk_valid,
+                                                               spMsg->gyroBiasVarianceRandomWalk,
+                                                               spMsg->accelRandomWalk_valid,
+                                                               spMsg->accelRandomWalk,
+                                                               spMsg->angleRandomWalk_valid,
+                                                               spMsg->angleRandomWalk,
+                                                               spMsg->rateRandomWalk_valid,
+                                                               spMsg->rateRandomWalk,
+                                                               spMsg->velocityRandomWalk_valid,
+                                                               spMsg->velocityRandomWalk);
         }
         break;
 
@@ -1399,7 +1438,7 @@ static void loc_eng_deferred_action_thread(void* arg)
         {
             loc_eng_msg_sensor_perf_control_config *spccMsg = (loc_eng_msg_sensor_perf_control_config*)msg;
             loc_eng_data_p->client_handle->setSensorPerfControlConfig(spccMsg->controlMode, spccMsg->accelSamplesPerBatch, spccMsg->accelBatchesPerSec,
-                                                                      spccMsg->gyroSamplesPerBatch, spccMsg->gyroBatchesPerSec);
+                                                                      spccMsg->gyroSamplesPerBatch, spccMsg->gyroBatchesPerSec, spccMsg->algorithmConfig);
         }
         break;
 

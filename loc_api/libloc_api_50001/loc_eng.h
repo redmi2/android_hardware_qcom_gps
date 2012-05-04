@@ -160,6 +160,15 @@ typedef struct loc_gps_cfg_s
   unsigned long  SENSOR_USAGE;
   unsigned long  QUIPC_ENABLED;
   unsigned long  LPP_PROFILE;
+  unsigned long  SENSOR_ALGORITHM_CONFIG_MASK;
+  uint8_t        ACCEL_RANDOM_WALK_SPECTRAL_DENSITY_VALID;
+  double         ACCEL_RANDOM_WALK_SPECTRAL_DENSITY;
+  uint8_t        ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_VALID;
+  double         ANGLE_RANDOM_WALK_SPECTRAL_DENSITY;
+  uint8_t        RATE_RANDOM_WALK_SPECTRAL_DENSITY_VALID;
+  double         RATE_RANDOM_WALK_SPECTRAL_DENSITY;
+  uint8_t        VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_VALID;
+  double         VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY;
 } loc_gps_cfg_s_type;
 
 extern loc_gps_cfg_s_type gps_conf;

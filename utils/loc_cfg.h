@@ -32,7 +32,7 @@
 
 #include <stdint.h>
 
-#define LOC_MAX_PARAM_NAME                 36
+#define LOC_MAX_PARAM_NAME                 48
 #define LOC_MAX_PARAM_STRING               80
 #define LOC_MAX_PARAM_LINE                 80
 

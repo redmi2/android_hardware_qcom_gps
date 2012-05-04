@@ -1273,7 +1273,11 @@ enum loc_api_adapter_err LocApiV02Adapter :: setSensorControlConfig(int sensorsD
 }
 
 /* set the Sensor Properties */
-enum loc_api_adapter_err LocApiV02Adapter :: setSensorProperties(float gyroBiasVarianceRandomWalk)
+enum loc_api_adapter_err LocApiV02Adapter :: setSensorProperties(bool gyroBiasVarianceRandomWalk_valid, float gyroBiasVarianceRandomWalk,
+                            bool accelBiasVarianceRandomWalk_valid, float accelBiasVarianceRandomWalk,
+                            bool angleBiasVarianceRandomWalk_valid, float angleBiasVarianceRandomWalk,
+                            bool rateBiasVarianceRandomWalk_valid, float rateBiasVarianceRandomWalk,
+                            bool velocityBiasVarianceRandomWalk_valid, float velocityBiasVarianceRandomWalk)
 {
   locClientStatusEnumType result = eLOC_CLIENT_SUCCESS;
   locClientReqUnionType req_union;
@@ -1281,14 +1285,29 @@ enum loc_api_adapter_err LocApiV02Adapter :: setSensorProperties(float gyroBiasV
   qmiLocSetSensorPropertiesReqMsgT_v02 sensor_prop_req;
   qmiLocSetSensorPropertiesIndMsgT_v02 sensor_prop_ind;
 
-  LOC_LOGI("%s:%d]: sensors prop gyroBiasRandomWalk = %f\n",
-                 __func__, __LINE__, gyroBiasVarianceRandomWalk);
+  LOC_LOGI("%s:%d]: sensors prop: gyroBiasRandomWalk = %f, accelRandomWalk = %f, "
+           "angleRandomWalk = %f, rateRandomWalk = %f, velocityRandomWalk = %f\n",
+                 __func__, __LINE__, gyroBiasVarianceRandomWalk, accelBiasVarianceRandomWalk,
+           angleBiasVarianceRandomWalk, rateBiasVarianceRandomWalk, velocityBiasVarianceRandomWalk);
 
   memset(&sensor_prop_req, 0, sizeof(sensor_prop_req));
   memset(&sensor_prop_ind, 0, sizeof(sensor_prop_ind));
 
-  sensor_prop_req.gyroBiasVarianceRandomWalk_valid = 1;
+  /* Set the validity bit and value for each sensor property */
+  sensor_prop_req.gyroBiasVarianceRandomWalk_valid = gyroBiasVarianceRandomWalk_valid;
   sensor_prop_req.gyroBiasVarianceRandomWalk = gyroBiasVarianceRandomWalk;
+
+  sensor_prop_req.accelerationRandomWalkSpectralDensity_valid = accelBiasVarianceRandomWalk_valid;
+  sensor_prop_req.accelerationRandomWalkSpectralDensity = accelBiasVarianceRandomWalk;
+
+  sensor_prop_req.angleRandomWalkSpectralDensity_valid = angleBiasVarianceRandomWalk_valid;
+  sensor_prop_req.angleRandomWalkSpectralDensity = angleBiasVarianceRandomWalk;
+
+  sensor_prop_req.rateRandomWalkSpectralDensity_valid = rateBiasVarianceRandomWalk_valid;
+  sensor_prop_req.rateRandomWalkSpectralDensity = rateBiasVarianceRandomWalk;
+
+  sensor_prop_req.velocityRandomWalkSpectralDensity_valid = velocityBiasVarianceRandomWalk_valid;
+  sensor_prop_req.velocityRandomWalkSpectralDensity = velocityBiasVarianceRandomWalk;
 
   req_union.pSetSensorPropertiesReq = &sensor_prop_req;
 
@@ -1315,7 +1334,8 @@ enum loc_api_adapter_err LocApiV02Adapter :: setSensorProperties(float gyroBiasV
 /* set the Sensor Performance Config */
 enum loc_api_adapter_err LocApiV02Adapter :: setSensorPerfControlConfig(int controlMode,
                                                                         int accelSamplesPerBatch, int accelBatchesPerSec,
-                                                                        int gyroSamplesPerBatch, int gyroBatchesPerSec)
+                                                                        int gyroSamplesPerBatch, int gyroBatchesPerSec,
+                                                                        int algorithmConfig)
 {
   locClientStatusEnumType result = eLOC_CLIENT_SUCCESS;
   locClientReqUnionType req_union;
@@ -1324,14 +1344,16 @@ enum loc_api_adapter_err LocApiV02Adapter :: setSensorPerfControlConfig(int cont
   qmiLocSetSensorPerformanceControlConfigIndMsgT_v02 sensor_perf_config_ind;
 
   LOC_LOGD("%s:%d]: Sensor Perf Control Config (performanceControlMode)(%u) "
-                "accel(#smp,#batches) (%u,%u) gyro(#smp,#batches) (%u,%u)\n",
+                "accel(#smp,#batches) (%u,%u) gyro(#smp,#batches) (%u,%u) "
+                "algorithmConfig(%u)\n",
                 __FUNCTION__,
                 __LINE__,
                 controlMode,
                 accelSamplesPerBatch,
                 accelBatchesPerSec,
                 gyroSamplesPerBatch,
-                gyroBatchesPerSec
+                gyroBatchesPerSec,
+                algorithmConfig
                 );
 
   memset(&sensor_perf_config_req, 0, sizeof(sensor_perf_config_req));
@@ -1345,6 +1367,8 @@ enum loc_api_adapter_err LocApiV02Adapter :: setSensorPerfControlConfig(int cont
   sensor_perf_config_req.gyroSamplingSpec_valid = 1;
   sensor_perf_config_req.gyroSamplingSpec.batchesPerSecond = gyroBatchesPerSec;
   sensor_perf_config_req.gyroSamplingSpec.samplesPerBatch = gyroSamplesPerBatch;
+  sensor_perf_config_req.algorithmConfig_valid = 1;
+  sensor_perf_config_req.algorithmConfig = algorithmConfig;
 
   req_union.pSetSensorPerformanceControlConfigReq = &sensor_perf_config_req;
 

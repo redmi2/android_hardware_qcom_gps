@@ -156,12 +156,51 @@ struct loc_eng_msg_sensor_control_config : public loc_eng_msg {
 };
 
 struct loc_eng_msg_sensor_properties : public loc_eng_msg {
+    const bool gyroBiasVarianceRandomWalk_valid;
     const float gyroBiasVarianceRandomWalk;
-    inline loc_eng_msg_sensor_properties(void* instance, float gyroBiasRandomWalk) :
+    const bool accelRandomWalk_valid;
+    const float accelRandomWalk;
+    const bool angleRandomWalk_valid;
+    const float angleRandomWalk;
+    const bool rateRandomWalk_valid;
+    const float rateRandomWalk;
+    const bool velocityRandomWalk_valid;
+    const float velocityRandomWalk;
+    inline loc_eng_msg_sensor_properties(void* instance, bool gyroBiasRandomWalk_valid, float gyroBiasRandomWalk,
+                                          bool accelRandomWalk_valid, float accelRandomWalk,
+                                          bool angleRandomWalk_valid, float angleRandomWalk,
+                                          bool rateRandomWalk_valid, float rateRandomWalk,
+                                          bool velocityRandomWalk_valid, float velocityRandomWalk) :
             loc_eng_msg(instance, LOC_ENG_MSG_SET_SENSOR_PROPERTIES),
-            gyroBiasVarianceRandomWalk(gyroBiasRandomWalk)
+            gyroBiasVarianceRandomWalk_valid(gyroBiasRandomWalk_valid),
+            gyroBiasVarianceRandomWalk(gyroBiasRandomWalk),
+            accelRandomWalk_valid(accelRandomWalk_valid),
+            accelRandomWalk(accelRandomWalk),
+            angleRandomWalk_valid(angleRandomWalk_valid),
+            angleRandomWalk(angleRandomWalk),
+            rateRandomWalk_valid(rateRandomWalk_valid),
+            rateRandomWalk(rateRandomWalk),
+            velocityRandomWalk_valid(velocityRandomWalk_valid),
+            velocityRandomWalk(velocityRandomWalk)
         {
-            LOC_LOGV("Gyro Bias Random Walk: %f", gyroBiasRandomWalk);
+            LOC_LOGV("Sensor properties validity, Gyro Random walk: %d Accel Random Walk: %d "
+                     "Angle Random Walk: %d Rate Random Walk: %d "
+                     "Velocity Random Walk: %d",
+                     gyroBiasRandomWalk_valid,
+                     accelRandomWalk_valid,
+                     angleRandomWalk_valid,
+                     rateRandomWalk_valid,
+                     velocityRandomWalk_valid
+                     );
+            LOC_LOGV("Sensor properties, Gyro Random walk: %f Accel Random Walk: %f "
+                     "Angle Random Walk: %f Rate Random Walk: %f "
+                     "Velocity Random Walk: %f",
+                     gyroBiasRandomWalk,
+                     accelRandomWalk,
+                     angleRandomWalk,
+                     rateRandomWalk,
+                     velocityRandomWalk
+                     );
         }
 };
 
@@ -171,23 +210,27 @@ struct loc_eng_msg_sensor_perf_control_config : public loc_eng_msg {
     const int accelBatchesPerSec;
     const int gyroSamplesPerBatch;
     const int gyroBatchesPerSec;
+    const int algorithmConfig;
     inline loc_eng_msg_sensor_perf_control_config(void* instance, int controlMode,
                                                   int accelSamplesPerBatch, int accelBatchesPerSec,
-                                                  int gyroSamplesPerBatch, int gyroBatchesPerSec) :
+                                                  int gyroSamplesPerBatch, int gyroBatchesPerSec,
+                                                  int algorithmConfig) :
             loc_eng_msg(instance, LOC_ENG_MSG_SET_SENSOR_PERF_CONTROL_CONFIG),
             controlMode(controlMode),
             accelSamplesPerBatch(accelSamplesPerBatch),
             accelBatchesPerSec(accelBatchesPerSec),
             gyroSamplesPerBatch(gyroSamplesPerBatch),
-            gyroBatchesPerSec(gyroBatchesPerSec)
+            gyroBatchesPerSec(gyroBatchesPerSec),
+            algorithmConfig(algorithmConfig)
         {
             LOC_LOGV("Sensor Perf Control Config (performanceControlMode)(%u) "
-                "accel(#smp,#batches) (%u,%u) gyro(#smp,#batches) (%u,%u)\n",
+                "accel(#smp,#batches) (%u,%u) gyro(#smp,#batches) (%u,%u), algorithmConfig(%u)\n",
                 controlMode,
                 accelSamplesPerBatch,
                 accelBatchesPerSec,
                 gyroSamplesPerBatch,
-                gyroBatchesPerSec
+                gyroBatchesPerSec,
+                algorithmConfig
                 );
         }
 };

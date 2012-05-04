@@ -195,11 +195,15 @@ public:
         setSensorControlConfig(int sensorUsage)
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
     inline virtual enum loc_api_adapter_err
-        setSensorProperties(float gyroBiasVarianceRandomWalk)
+        setSensorProperties(bool gyroBiasVarianceRandomWalk_valid, float gyroBiasVarianceRandomWalk,
+                            bool accelBiasVarianceRandomWalk_valid, float accelBiasVarianceRandomWalk,
+                            bool angleBiasVarianceRandomWalk_valid, float angleBiasVarianceRandomWalk,
+                            bool rateBiasVarianceRandomWalk_valid, float rateBiasVarianceRandomWalk,
+                            bool velocityBiasVarianceRandomWalk_valid, float velocityBiasVarianceRandomWalk)
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
     inline virtual enum loc_api_adapter_err
         setSensorPerfControlConfig(int controlMode, int accelSamplesPerBatch, int accelBatchesPerSec,
-                            int gyroSamplesPerBatch, int gyroBatchesPerSec)
+                            int gyroSamplesPerBatch, int gyroBatchesPerSec, int algorithmConfig)
     {LOC_LOGW("%s: default implementation invoked", __func__); return LOC_API_ADAPTER_ERR_SUCCESS;}
     inline virtual enum loc_api_adapter_err
         setExtPowerConfig(int isBatteryCharging)
