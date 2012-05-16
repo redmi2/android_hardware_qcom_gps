@@ -1693,7 +1693,7 @@ void  LocApiV02Adapter :: reportSv (
     }
   }
 
-  if (SvStatus.num_svs != 0)
+  if (SvStatus.num_svs >= 0)
   {
     LOC_LOGV ("%s:%d]: firing SV callback\n", __func__, __LINE__);
     LocApiAdapter::reportSv(SvStatus,
