@@ -941,6 +941,11 @@ static bool locClientHandleIndication(
       status = true;
       break;
     }
+    case QMI_LOC_GET_ENGINE_LOCK_IND_V02:
+    {
+      status = true;
+      break;
+    }
 
     // for indications that only have a "status" field
     case QMI_LOC_NI_USER_RESPONSE_IND_V02:
@@ -1410,6 +1415,12 @@ static bool validateRequest(
       break;
     }
 
+    case QMI_LOC_GET_SENSOR_PROPERTIES_REQ_V02:
+    {
+      *pOutLen = sizeof(qmiLocGetSensorPropertiesReqMsgT_v02);
+      break;
+    }
+
     case QMI_LOC_SET_SENSOR_PROPERTIES_REQ_V02:
     {
       *pOutLen = sizeof(qmiLocSetSensorPropertiesReqMsgT_v02);
@@ -1484,7 +1495,6 @@ static bool validateRequest(
     case QMI_LOC_GET_CRADLE_MOUNT_CONFIG_REQ_V02:
     case QMI_LOC_GET_EXTERNAL_POWER_CONFIG_REQ_V02:
     case QMI_LOC_GET_SENSOR_CONTROL_CONFIG_REQ_V02:
-    case QMI_LOC_GET_SENSOR_PROPERTIES_REQ_V02:
     case QMI_LOC_GET_SENSOR_PERFORMANCE_CONTROL_CONFIGURATION_REQ_V02:
     {
       noPayloadFlag = true;

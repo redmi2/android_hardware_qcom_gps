@@ -157,6 +157,8 @@ typedef enum
   - GetOperationMode
   - GetCradleMountConfig
   - GetExternalPowerConfig
+  - GetSensorControlConfig
+  - GetSensorPerformanceControlConfiguration
 */
 typedef union
 {
@@ -452,6 +454,17 @@ typedef union
 
         To send this request, set the reqId field in locClientSendReq() to
         QMI_LOC_SET_SENSOR_PERFORMANCE_CONTROL_CONFIGURATION_REQ_V02.
+        @newpage */
+
+   const qmiLocGetSensorPropertiesReqMsgT_v02* pGetSensorPropertiesReq;
+   /**< Retrieves the sensor properties from the engine.
+
+        If the request is accepted by the service, the client receives the
+        following indication containing a response:
+        QMI_LOC_GET_SENSOR_PROPERTIES_IND_V02.
+
+        To send this request, set the reqId field in locClientSendReq() to
+        QMI_LOC_GET_SENSOR_PROPERTIES_REQ_V02.
         @newpage */
 
    const qmiLocSetSensorPropertiesReqMsgT_v02* pSetSensorPropertiesReq;
