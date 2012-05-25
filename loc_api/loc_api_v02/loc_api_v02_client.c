@@ -64,7 +64,8 @@
 #endif //LOC_UTIL_TARGET_OFF_TARGET
 
 //timeout in ms to wait for the service to come up
-#define LOC_CLIENT_SERVICE_TIMEOUT  (20000)
+#define LOC_CLIENT_SERVICE_TIMEOUT_UNIT  (4000)
+#define LOC_CLIENT_SERVICE_TIMEOUT_TOTAL  (40000)
 
 /* Table to relate eventId, size and mask value used to enable the event*/
 typedef struct
@@ -1530,8 +1531,8 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
   do
   {
     uint32_t num_services = 0, num_entries = 0;
-    qmi_client_os_params os_params;
     qmi_client_error_type rc = QMI_NO_ERR;
+    bool nosignal = false;
 
     // Get the service object for the qmiLoc Service
     qmi_idl_service_object_type locClientServiceObject =
@@ -1546,51 +1547,59 @@ static locClientStatusEnumType locClientQmiCtrlPointInit(
        break;
     }
 
-
-    // register for service notification
-    rc = qmi_client_notifier_init(locClientServiceObject, &os_params, &notifier);
-
-    if(rc != QMI_NO_ERR)
-    {
-      LOC_LOGE("%s:%d]: qmi_client_notifier_init failed %d\n",
-                    __func__, __LINE__, rc );
-      status = eLOC_CLIENT_FAILURE_INTERNAL;
-      break;
-    }
-
-    notifierInitFlag = true;
-
-    /* If service is not up wait on a signal until the service is up
-     * or a timeout occurs. */
-
-    QMI_CCI_OS_SIGNAL_WAIT(&os_params, LOC_CLIENT_SERVICE_TIMEOUT);
-
-
-    if(QMI_CCI_OS_SIGNAL_TIMED_OUT(&os_params))
-    {
-      // timed out, return with error
-      LOC_LOGE("%s:%d]: timed out waiting for service\n",
-                      __func__, __LINE__);
-
-      status = eLOC_CLIENT_FAILURE_TIMEOUT;
-      break;
-    }
-
     // get the service addressing information
     rc = qmi_client_get_service_list( locClientServiceObject, NULL, NULL,
                                       &num_services);
-    LOC_LOGV("%s:%d]: qmi_client_get_service_list() returned %d "
-             "num_services = %d\n", __func__, __LINE__, rc,
-             num_services);
+    LOC_LOGV("%s:%d]: qmi_client_get_service_list() first try rc %d, "
+             "num_services %d", __func__, __LINE__, rc, num_services);
 
-    if(rc != QMI_NO_ERR)
-    {
-      LOC_LOGE("%s:%d]: qmi_client_get_service_list failed even though"
-               "service is up !!!\n", __func__, __LINE__);
+    if (rc != QMI_NO_ERR) {
+        // bummer, service list is not up.
+        // We need to try again after a timed wait
+        qmi_client_os_params os_params;
+        int timeout = 0;
 
-       status = eLOC_CLIENT_FAILURE_INTERNAL;
-       break;
-     }
+        // register for service notification
+        rc = qmi_client_notifier_init(locClientServiceObject, &os_params, &notifier);
+        notifierInitFlag = (NULL != notifier);
+
+        if (rc != QMI_NO_ERR) {
+            LOC_LOGE("%s:%d]: qmi_client_notifier_init failed %d\n",
+                     __func__, __LINE__, rc);
+            status = eLOC_CLIENT_FAILURE_INTERNAL;
+            break;
+        }
+
+        do {
+            QMI_CCI_OS_SIGNAL_CLEAR(&os_params);
+            /* If service is not up wait on a signal until the service is up
+             * or a timeout occurs. */
+            QMI_CCI_OS_SIGNAL_WAIT(&os_params, LOC_CLIENT_SERVICE_TIMEOUT_UNIT);
+            nosignal = QMI_CCI_OS_SIGNAL_TIMED_OUT(&os_params);
+
+            // get the service addressing information
+            rc = qmi_client_get_service_list(locClientServiceObject, NULL, NULL,
+                                             &num_services);
+
+            timeout += LOC_CLIENT_SERVICE_TIMEOUT_UNIT;
+
+            LOC_LOGV("%s:%d]: qmi_client_get_service_list() rc %d, nosignal %d, "
+                     "total timeout %d", __func__, __LINE__, rc, nosignal, timeout);
+        } while (timeout < LOC_CLIENT_SERVICE_TIMEOUT_TOTAL && nosignal && rc != QMI_NO_ERR);
+    }
+
+    if (0 == num_services || rc != QMI_NO_ERR) {
+        if (!nosignal) {
+            LOC_LOGE("%s:%d]: qmi_client_get_service_list failed even though"
+                     "service is up !!!  Error %d \n", __func__, __LINE__, rc);
+            status = eLOC_CLIENT_FAILURE_INTERNAL;
+        } else {
+            LOC_LOGE("%s:%d]: qmi_client_get_service_list failed after retries,"
+                     " final Err %d", __func__, __LINE__, rc);
+            status = eLOC_CLIENT_FAILURE_TIMEOUT;
+        }
+        break;
+    }
 
     pServiceInfo =
       (qmi_service_info *)malloc(num_services * sizeof(qmi_service_info));
