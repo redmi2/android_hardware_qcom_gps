@@ -377,9 +377,9 @@ struct loc_eng_msg_request_bit : public loc_eng_msg {
         if (NULL != ipv6Addr)
             memcpy(ipv6Addr, ipv6, 16);
         LOC_LOGV("ifType: %d, ipv4: %d.%d.%d.%d, ipv6: %s", ifType,
-                 (unsigned char)ipv4>>24,
-                 (unsigned char)ipv4>>16,
-                 (unsigned char)ipv4>>8,
+                 (unsigned char)(ipv4>>24),
+                 (unsigned char)(ipv4>>16),
+                 (unsigned char)(ipv4>>8),
                  (unsigned char)ipv4,
                  NULL != ipv6Addr ? ipv6Addr : "");
     }
@@ -444,9 +444,9 @@ struct loc_eng_msg_release_bit : public loc_eng_msg {
         if (NULL != ipv6Addr)
             memcpy(ipv6Addr, ipv6, 16);
         LOC_LOGV("ifType: %d, ipv4: %d.%d.%d.%d, ipv6: %s", ifType,
-                 (unsigned char)ipv4>>24,
-                 (unsigned char)ipv4>>16,
-                 (unsigned char)ipv4>>8,
+                 (unsigned char)(ipv4>>24),
+                 (unsigned char)(ipv4>>16),
+                 (unsigned char)(ipv4>>8),
                  (unsigned char)ipv4,
                  NULL != ipv6Addr ? ipv6Addr : "");
     }
