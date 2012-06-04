@@ -82,7 +82,7 @@ extern "C" {
 /** Major Version Number of the IDL used to generate this file */
 #define LOC_V02_IDL_MAJOR_VERS 0x02
 /** Revision Number of the IDL used to generate this file */
-#define LOC_V02_IDL_MINOR_VERS 0x0A
+#define LOC_V02_IDL_MINOR_VERS 0x0B
 /** Major Version Number of the qmi_idl_compiler used to generate this file */
 #define LOC_V02_IDL_TOOL_VERS 0x05
 /** Maximum Defined Message ID */
@@ -105,7 +105,7 @@ extern "C" {
 /**  Maximum string length for the Version field in the application ID.  */
 #define QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 8
 
-/**  Maximum length of the list containing the SV's that were used to generate
+/**  Maximum length of the list containing the SVs that were used to generate
      a position report.  */
 #define QMI_LOC_MAX_SV_USED_LIST_LENGTH_V02 80
 
@@ -146,13 +146,13 @@ extern "C" {
      engine.  */
 #define QMI_LOC_MAX_PREDICTED_ORBITS_SERVERS_V02 3
 
-/**  Maximum GNSS Measurement Engine Firmware Version string length.  */
+/**  Maximum GNSS Measurement Engine Firmware Version String length.  */
 #define QMI_LOC_GNSS_ME_VERSION_STRING_MAX_LENGTH_V02 127
 
-/**  Maximum GNSS Measurement Engine Hosted Software Version string length.  */
+/**  Maximum GNSS Measurement Engine Hosted Software Version String length.  */
 #define QMI_LOC_GNSS_HOSTED_SW_VERSION_STRING_MAX_LENGTH_V02 127
 
-/**  Maximum GNSS Measurement Engine Full Version string length.  */
+/**  Maximum GNSS Measurement Engine Full Version String length.  */
 #define QMI_LOC_GNSS_SW_VERSION_STRING_MAX_LENGTH_V02 255
 
 /**  Maximum part length that can be injected. The client should
@@ -210,8 +210,7 @@ typedef struct {
   /* Mandatory */
   /*  Revision */
   uint32_t revision;
-  /**<   Revision that the control point is using. \n
-       - Type: Unsigned integer   */
+  /**<   Revision that the control point is using.   */
 }qmiLocInformClientRevisionReqMsgT_v02;  /* Message */
 /**
     @}
@@ -250,11 +249,11 @@ typedef uint64_t qmiLocEventRegMaskT_v02;
        requests. These requests are generated when the service wishes to
        establish a connection with a location server. */
 #define QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00004000ull) /**<  The control point must enable this mask to receive notifications
-       related to network initiated Geofences. These events notify the client
-       when a network initiated Geofence is added, deleted or edited.  */
+       related to network-initiated Geofences. These events notify the client
+       when a network-initiated Geofence is added, deleted, or edited.  */
 #define QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT_V02 ((qmiLocEventRegMaskT_v02)0x00008000ull) /**<  The control point must enable this mask to receive Geofence alerts.
        These alerts are generated to inform the client of the changes that may
-       affect Geofence. For example if GPS is turned off, or if the network is
+       affect Geofence, e.g., if GPS is turned off or if the network is
        unavailable.  */
 #define QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00010000ull) /**<  The control point must enable this mask to receive notifications when
        a Geofence is breached. These events are generated when the UE enters
@@ -270,25 +269,26 @@ typedef struct {
   /*  Event Registration Mask */
   qmiLocEventRegMaskT_v02 eventRegMask;
   /**<   Specifies the events that the control point is interested in receiving.
-       Refer to the definition of the following bitmasks: \n
-
-       - 0x00000001 -- POSITION_REPORT \n
-       - 0x00000002 -- GNSS_SV_INFO \n
-       - 0x00000004 -- NMEA \n
-       - 0x00000008 -- NI_NOTIFY_VERIFY_REQ \n
-       - 0x00000010 -- INJECT_TIME_REQ \n
-       - 0x00000020 -- INJECT_PREDICTED_ORBITS_REQ \n
-       - 0x00000040 -- INJECT_POSITION_REQ \n
-       - 0x00000080 -- ENGINE_STATE \n
-       - 0x00000100 -- FIX_SESSION_STATE \n
-       - 0x00000200 -- WIFI_REQ \n
-       - 0x00000400 -- SENSOR_STREAMING_READY_STATUS \n
-       - 0x00000800 -- TIME_SYNC_REQ \n
-       - 0x00001000 -- SET_SPI_STREAMING_REPORT \n
-       - 0x00002000 -- LOCATION_SERVER_CONNECTION_REQ \n
-       - 0x00004000 -- NI_GEOFENCE_NOTIFICATION \n
-       - 0x00008000 -- GEOFENCE_GEN_ALERT \n
-       - 0x00010000 -- GEOFENCE_BREACH_NOTIFICATION \n
+       Refer to the definition of the following bitmasks:
+       \vspace{0.05in} \begin{itemize1}
+       \item    0x00000001 -- POSITION_REPORT
+       \item    0x00000002 -- GNSS_SV_INFO
+       \item    0x00000004 -- NMEA
+       \item    0x00000008 -- NI_NOTIFY_VERIFY_REQ
+       \item    0x00000010 -- INJECT_TIME_REQ
+       \item    0x00000020 -- INJECT_PREDICTED_ORBITS_REQ
+       \item    0x00000040 -- INJECT_POSITION_REQ
+       \item    0x00000080 -- ENGINE_STATE
+       \item    0x00000100 -- FIX_SESSION_STATE
+       \item    0x00000200 -- WIFI_REQ
+       \item    0x00000400 -- SENSOR_STREAMING_READY_STATUS
+       \item    0x00000800 -- TIME_SYNC_REQ
+       \item    0x00001000 -- SET_SPI_STREAMING_REPORT
+       \item    0x00002000 -- LOCATION_SERVER_CONNECTION_REQ
+       \item    0x00004000 -- NI_GEOFENCE_NOTIFICATION
+       \item    0x00008000 -- GEOFENCE_GEN_ALERT
+       \item    0x00010000 -- GEOFENCE_BREACH_NOTIFICATION
+       \end{itemize1} \vspace{0.05in}
        Multiple events can be registered by ORing the individual masks and
        sending them in this TLV. All unused bits in this mask must be set to 0.
    */
@@ -352,9 +352,11 @@ typedef struct {
   /**<   Application name.  */
 
   uint8_t applicationVersion_valid;
-  /**<   Specifies whether the application version string contains a valid value: \n
-      - 0x00 (FALSE) -- Application version string is invalid \n
-      - 0x01 (TRUE) -- Application version string is valid  */
+  /**<   Specifies whether the application version string contains a valid value:
+       \begin{itemize1}
+       \item    0x00 (FALSE) -- Application version string is invalid
+       \item    0x01 (TRUE) -- Application version string is valid
+       \vspace{-0.18in} \end{itemize1}  */
 
   char applicationVersion[QMI_LOC_MAX_APP_ID_VERSION_LENGTH_V02 + 1];
   /**<   Application version.  */
@@ -376,7 +378,6 @@ typedef struct {
   /**<   ID of the session as identified by the control point. The session ID
        is reported back in the position reports. The control point must
        specify the same session ID in the QMI_LOC_STOP_REQ message. \n
-       - Type: Unsigned integer \n
        - Range: 0 to 255
    */
 
@@ -399,10 +400,13 @@ typedef struct {
   /**<   Specifies the horizontal accuracy level required by the control point.
        If not specified, accuracy defaults to LOW.
 
-       Valid values: \n
-         - 0x00000001 -- LOW: Client requires low horizontal accuracy.\n
-         - 0x00000002 -- MED: Client requires medium horizontal accuracy.\n
-         - 0x00000003 -- HIGH: Client requires high horizontal accuracy.
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- LOW: Client requires low horizontal accuracy
+       \item    0x00000002 -- MED: Client requires medium horizontal accuracy
+       \item    0x00000003 -- HIGH: Client requires high horizontal accuracy
+       \vspace{-0.18in}
+       \end{itemize1}
     */
 
   /* Optional */
@@ -418,9 +422,14 @@ typedef struct {
        report is set to IN_PROGRESS in order for the control point to identify
        intermediate reports.
 
-       Valid values: \n
-         - 0x00000001 -- ON: Client is interested in receiving intermediate reports \n
-         - 0x00000002 -- OFF: Client is not interested in receiving intermediate reports
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- ON: Client is interested in receiving intermediate
+                              reports
+       \item    0x00000002 -- OFF: Client is not interested in receiving
+                              intermediate reports
+       \vspace{-0.18in}
+       \end{itemize1}
    */
 
   /* Optional */
@@ -429,7 +438,6 @@ typedef struct {
   uint32_t minInterval;
   /**<   Minimum time interval, specified by the control point, that must elapse between
        position reports. \n
-       - Type: Unsigned integer \n
        - Units: Milliseconds \n
        - Default: 1000 ms
    */
@@ -456,7 +464,6 @@ typedef struct {
   uint8_t sessionId;
   /**<   ID of the session that was specified in the Start request
        (QMI_LOC_START_REQ).\n
-       - Type: Unsigned integer \n
        - Range: 0 to 255  */
 }qmiLocStopReqMsgT_v02;  /* Message */
 /**
@@ -467,6 +474,8 @@ typedef uint32_t qmiLocPosTechMaskT_v02;
 #define QMI_LOC_POS_TECH_MASK_SATELLITE_V02 ((qmiLocPosTechMaskT_v02)0x00000001) /**<  Satellites were used to generate the fix.  */
 #define QMI_LOC_POS_TECH_MASK_CELLID_V02 ((qmiLocPosTechMaskT_v02)0x00000002) /**<  Cell towers were used to generate the fix.  */
 #define QMI_LOC_POS_TECH_MASK_WIFI_V02 ((qmiLocPosTechMaskT_v02)0x00000004) /**<  WiFi access points were used to generate the fix.  */
+#define QMI_LOC_POS_TECH_MASK_SENSORS_V02 ((qmiLocPosTechMaskT_v02)0x00000008) /**<  Sensors were used to generate the fix.  */
+#define QMI_LOC_POS_TECH_MASK_REFERENCE_LOCATION_V02 ((qmiLocPosTechMaskT_v02)0x00000010) /**<  Reference Location was used to generate the fix.  */
 /** @addtogroup loc_qmi_enums
     @{
   */
@@ -496,12 +505,10 @@ typedef struct {
 
   uint16_t gpsWeek;
   /**<   Current GPS week as calculated from midnight, Jan. 6, 1980. \n
-       - Type: Unsigned integer \n
        - Units: Weeks  */
 
   uint32_t gpsTimeOfWeekMs;
   /**<   Amount of time into the current GPS week. \n
-       - Type: Unsigned integer \n
        - Units: Milliseconds  */
 }qmiLocGPSTimeStructT_v02;  /* Type */
 /**
@@ -514,20 +521,23 @@ typedef struct {
 typedef struct {
 
   float PDOP;
-  /**<   Position dilution of precision.\n
-       - Type: Floating point \n
-       - Range: 1 (highest accuracy) to 50 (lowest accuracy)\n
-       - PDOP = square root of (HDOP^2 + VDOP^2)        */
+  /**<   Position dilution of precision.
+       \begin{itemize1}
+       \item    Range: 1 (highest accuracy) to 50 (lowest accuracy)
+       \item    PDOP = square root of (HDOP^2 + VDOP^2)
+       \vspace{-0.18in} \end{itemize1}  */
 
   float HDOP;
-  /**<   Horizontal dilution of precision.\n
-       - Type: Floating point \n
-       - Range: 1 (highest accuracy) to 50 (lowest accuracy)  */
+  /**<   Horizontal dilution of precision.
+       \begin{itemize1}
+       \item    Range: 1 (highest accuracy) to 50 (lowest accuracy)
+       \vspace{-0.18in} \end{itemize1}  */
 
   float VDOP;
-  /**<   Vertical dilution of precision.\n
-       - Type: Floating point. \n
-       - Range: 1 (highest accuracy) to 50 (lowest accuracy)  */
+  /**<   Vertical dilution of precision.
+       \begin{itemize1}
+       \item    Range: 1 (highest accuracy) to 50 (lowest accuracy)
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocDOPStructT_v02;  /* Type */
 /**
     @}
@@ -547,16 +557,19 @@ typedef uint32_t qmiLocSensorAidedMaskT_v02;
 typedef struct {
 
   qmiLocSensorUsageMaskT_v02 usageMask;
-  /**<   Specifies which sensors are used.
+  /**<   Specifies which sensors were used in calculating the position in the
+       position report.
 
-       Valid bitmasks are specified by the following constants: \n
-         - 0x00000001 -- SENSOR_USED_ACCEL \n
-         - 0x00000002 -- SENSOR_USED_GYRO  */
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- SENSOR_USED_ACCEL
+       \item    0x00000002 -- SENSOR_USED_GYRO
+       \vspace{-0.18in} \end{itemize1}  */
 
   qmiLocSensorAidedMaskT_v02 aidingIndicatorMask;
-  /**<   Specifies which results are aided by sensors.
+  /**<   Specifies which results were aided by sensors.
 
-       Valid bitmasks are specified by the following constants: \n
+       Valid bitmasks: \n
          - 0x00000001 -- AIDED_HEADING \n
          - 0x00000002 -- AIDED_SPEED \n
          - 0x00000004 -- AIDED_POSITION \n
@@ -625,15 +638,17 @@ typedef struct {
   qmiLocSessionStatusEnumT_v02 sessionStatus;
   /**<   Session status.
 
-        Valid values: \n
-          - 0x00000000 -- SESS_STATUS_SUCCESS \n
-          - 0x00000001 -- SESS_STATUS_IN_PROGRESS \n
-          - 0x00000002 -- SESS_STATUS_GENERAL_FAILURE \n
-          - 0x00000003 -- SESS_STATUS_TIMEOUT \n
-          - 0x00000004 -- SESS_STATUS_USER_END \n
-          - 0x00000005 -- SESS_STATUS_BAD_PARAMETER \n
-          - 0x00000006 -- SESS_STATUS_PHONE_OFFLINE \n
-          - 0x00000007 -- SESS_STATUS_ENGINE_LOCKED
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SESS_STATUS_SUCCESS
+        \item    0x00000001 -- SESS_STATUS_IN_PROGRESS
+        \item    0x00000002 -- SESS_STATUS_GENERAL_FAILURE
+        \item    0x00000003 -- SESS_STATUS_TIMEOUT
+        \item    0x00000004 -- SESS_STATUS_USER_END
+        \item    0x00000005 -- SESS_STATUS_BAD_PARAMETER
+        \item    0x00000006 -- SESS_STATUS_PHONE_OFFLINE
+        \item    0x00000007 -- SESS_STATUS_ENGINE_LOCKED
+        \vspace{-0.18in} \end{itemize1}
        */
 
   /* Mandatory */
@@ -641,37 +656,39 @@ typedef struct {
   uint8_t sessionId;
   /**<    ID of the session that was specified in the Start request
         QMI_LOC_START_REQ. \n
-        - Type: Unsigned integer \n
         - Range: 0 to 255  */
 
   /* Optional */
   /*  Latitude */
   uint8_t latitude_valid;  /**< Must be set to true if latitude is being passed */
   double latitude;
-  /**<   Latitude (specified in WGS84 datum). \n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -90.0 to 90.0 \n
-       - Positive values indicate northern latitude \n
-       - Negative values indicate southern latitude  */
+  /**<   Latitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -90.0 to 90.0   \begin{itemize1}
+         \item    Positive values indicate northern latitude
+         \item    Negative values indicate southern latitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /* Optional */
   /*   Longitude */
   uint8_t longitude_valid;  /**< Must be set to true if longitude is being passed */
   double longitude;
-  /**<   Longitude (specified in WGS84 datum).\n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -180.0 to 180.0 \n
-       - Positive values indicate eastern longitude \n
-       - Negative values indicate western longitude  */
+  /**<   Longitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -180.0 to 180.0   \begin{itemize1}
+         \item    Positive values indicate eastern longitude
+         \item    Negative values indicate western longitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /* Optional */
   /*   Circular Horizontal Position Uncertainty */
   uint8_t horUncCircular_valid;  /**< Must be set to true if horUncCircular is being passed */
   float horUncCircular;
   /**<   Horizontal position uncertainty (circular).\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
@@ -679,7 +696,6 @@ typedef struct {
   uint8_t horUncEllipseSemiMinor_valid;  /**< Must be set to true if horUncEllipseSemiMinor is being passed */
   float horUncEllipseSemiMinor;
   /**<   Semi-minor axis of horizontal elliptical uncertainty.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
@@ -687,7 +703,6 @@ typedef struct {
   uint8_t horUncEllipseSemiMajor_valid;  /**< Must be set to true if horUncEllipseSemiMajor is being passed */
   float horUncEllipseSemiMajor;
   /**<   Semi-major axis of horizontal elliptical uncertainty.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
@@ -695,7 +710,6 @@ typedef struct {
   uint8_t horUncEllipseOrientAzimuth_valid;  /**< Must be set to true if horUncEllipseOrientAzimuth is being passed */
   float horUncEllipseOrientAzimuth;
   /**<   Elliptical horizontal uncertainty azimuth of orientation.\n
-       - Type: Floating point \n
        - Units: Decimal degrees \n
        - Range: 0 to 180  */
 
@@ -704,7 +718,6 @@ typedef struct {
   uint8_t horConfidence_valid;  /**< Must be set to true if horConfidence is being passed */
   uint8_t horConfidence;
   /**<   Horizontal uncertainty confidence.\n
-       - Type: Unsigned integer \n
        - Units: Percent \n
        - Range: 0 to 99  */
 
@@ -712,14 +725,15 @@ typedef struct {
   /*  Horizontal Reliability */
   uint8_t horReliability_valid;  /**< Must be set to true if horReliability is being passed */
   qmiLocReliabilityEnumT_v02 horReliability;
-  /**<   Specifies the reliability of the horizontal position.
-
-       Valid values: \n
-         - 0x00000000 -- RELIABILITY_NOT_SET \n
-         - 0x00000001 -- RELIABILITY_VERY_LOW \n
-         - 0x00000002 -- RELIABILITY_LOW \n
-         - 0x00000003 -- RELIABILITY_MEDIUM \n
-         - 0x00000004 -- RELIABILITY_HIGH
+  /**<   Specifies the reliability of the horizontal position. \n
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- RELIABILITY_NOT_SET
+       \item    0x00000001 -- RELIABILITY_VERY_LOW
+       \item    0x00000002 -- RELIABILITY_LOW
+       \item    0x00000003 -- RELIABILITY_MEDIUM
+       \item    0x00000004 -- RELIABILITY_HIGH
+       \vspace{-0.18in} \end{itemize1}
     */
 
   /* Optional */
@@ -727,15 +741,13 @@ typedef struct {
   uint8_t speedHorizontal_valid;  /**< Must be set to true if speedHorizontal is being passed */
   float speedHorizontal;
   /**<   Horizontal speed.\n
-       - Type: Floating point \n
        - Units: Meters/second  */
 
   /* Optional */
   /*  Speed Uncertainty */
   uint8_t speedUnc_valid;  /**< Must be set to true if speedUnc is being passed */
   float speedUnc;
-  /**<   Speed uncertainty.\n
-       - Type: Floating point \n
+  /**<   3-D Speed uncertainty.\n
        - Units: Meters/second  */
 
   /* Optional */
@@ -743,7 +755,6 @@ typedef struct {
   uint8_t altitudeWrtEllipsoid_valid;  /**< Must be set to true if altitudeWrtEllipsoid is being passed */
   float altitudeWrtEllipsoid;
   /**<   Altitude with respect to the WGS84 ellipsoid.\n
-       - Type: Floating point \n
        - Units: Meters \n
        - Range: -500 to 15883  */
 
@@ -752,7 +763,6 @@ typedef struct {
   uint8_t altitudeWrtMeanSeaLevel_valid;  /**< Must be set to true if altitudeWrtMeanSeaLevel is being passed */
   float altitudeWrtMeanSeaLevel;
   /**<   Altitude with respect to mean sea level.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
@@ -760,7 +770,6 @@ typedef struct {
   uint8_t vertUnc_valid;  /**< Must be set to true if vertUnc is being passed */
   float vertUnc;
   /**<   Vertical uncertainty.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
@@ -768,7 +777,6 @@ typedef struct {
   uint8_t vertConfidence_valid;  /**< Must be set to true if vertConfidence is being passed */
   uint8_t vertConfidence;
   /**<   Vertical uncertainty confidence.\n
-       - Type: Unsigned integer \n
        - Units: Percent    \n
        - Range: 0 to 99  */
 
@@ -776,21 +784,21 @@ typedef struct {
   /*  Vertical Reliability */
   uint8_t vertReliability_valid;  /**< Must be set to true if vertReliability is being passed */
   qmiLocReliabilityEnumT_v02 vertReliability;
-  /**<   Specifies the reliability of the vertical position.
-
-        Valid values: \n
-          - 0x00000000 -- RELIABILITY_NOT_SET \n
-          - 0x00000001 -- RELIABILITY_VERY_LOW \n
-          - 0x00000002 -- RELIABILITY_LOW \n
-          - 0x00000003 -- RELIABILITY_MEDIUM \n
-          - 0x00000004 -- RELIABILITY_HIGH  */
+  /**<   Specifies the reliability of the vertical position. \n
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- RELIABILITY_NOT_SET
+        \item    0x00000001 -- RELIABILITY_VERY_LOW
+        \item    0x00000002 -- RELIABILITY_LOW
+        \item    0x00000003 -- RELIABILITY_MEDIUM
+        \item    0x00000004 -- RELIABILITY_HIGH
+        \vspace{-0.18in} \end{itemize1} */
 
   /* Optional */
   /*  Vertical Speed */
   uint8_t speedVertical_valid;  /**< Must be set to true if speedVertical is being passed */
   float speedVertical;
   /**<   Vertical speed.\n
-         - Type: Floating point \n
          - Units: Meters/second  */
 
   /* Optional */
@@ -798,7 +806,6 @@ typedef struct {
   uint8_t heading_valid;  /**< Must be set to true if heading is being passed */
   float heading;
   /**<   Heading.\n
-         - Type: Floating point \n
          - Units: Degrees \n
          - Range: 0 to 359.999   */
 
@@ -807,7 +814,6 @@ typedef struct {
   uint8_t headingUnc_valid;  /**< Must be set to true if headingUnc is being passed */
   float headingUnc;
   /**<   Heading uncertainty.\n
-       - Type: Floating point \n
        - Units: Degrees \n
        - Range: 0 to 359.999  */
 
@@ -817,8 +823,7 @@ typedef struct {
   float magneticDeviation;
   /**<   Difference between the bearing to true north and the bearing shown
       on a magnetic compass. The deviation is positive when the magnetic
-      north is east of true north. \n
-      - Type: Floating point  */
+      north is east of true north.  */
 
   /* Optional */
   /*  Technology Used */
@@ -829,7 +834,9 @@ typedef struct {
        Valid bitmasks: \n
          - 0x00000001 -- SATELLITE \n
          - 0x00000002 -- CELLID \n
-         - 0x00000004 -- WIFI  */
+         - 0x00000004 -- WIFI \n
+         - 0x00000008 -- SENSORS \n
+         - 0x00000010 -- REFERENCE_LOCATION   */
 
   /* Optional */
   /*  Dilution of Precision */
@@ -842,7 +849,6 @@ typedef struct {
   uint8_t timestampUtc_valid;  /**< Must be set to true if timestampUtc is being passed */
   uint64_t timestampUtc;
   /**<   UTC timestamp. \n
-       - Type: Unsigned integer \n
        - Units: Milliseconds since Jan. 1, 1970  */
 
   /* Optional */
@@ -852,7 +858,6 @@ typedef struct {
   /**<   Leap second information. If leapSeconds is not available,
          timestampUtc is calculated based on a hard-coded value
          for leap seconds. \n
-         - Type: Unsigned integer \n
          - Units: Seconds  */
 
   /* Optional */
@@ -867,7 +872,6 @@ typedef struct {
   uint8_t timeUnc_valid;  /**< Must be set to true if timeUnc is being passed */
   float timeUnc;
   /**<   Time uncertainty. \n
-       - Type: Floating point \n
        - Units: Milliseconds   */
 
   /* Optional */
@@ -876,16 +880,18 @@ typedef struct {
   qmiLocTimeSourceEnumT_v02 timeSrc;
   /**<   Time source.
 
-        Valid values: \n
-          - 0x00000000 -- TIME_SRC_INVALID \n
-          - 0x00000001 -- TIME_SRC_NETWORK_TIME_TRANSFER \n
-          - 0x00000002 -- TIME_SRC_NETWORK_TIME_TAGGING \n
-          - 0x00000003 -- TIME_SRC_EXTERNAL_ INPUT \n
-          - 0x00000004 -- TIME_SRC_TOW_DECODE \n
-          - 0x00000005 -- TIME_SRC_TOW_CONFIRMED \n
-          - 0x00000006 -- TIME_SRC_TOW_AND_WEEK_CONFIRMED \n
-          - 0x00000007 -- TIME_SRC_NAV_SOLUTION \n
-          - 0x00000008 -- TIME_SRC_SOLVE_FOR_TIME  */
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- TIME_SRC_INVALID
+        \item    0x00000001 -- TIME_SRC_NETWORK_TIME_TRANSFER
+        \item    0x00000002 -- TIME_SRC_NETWORK_TIME_TAGGING
+        \item    0x00000003 -- TIME_SRC_EXTERNAL_ INPUT
+        \item    0x00000004 -- TIME_SRC_TOW_DECODE
+        \item    0x00000005 -- TIME_SRC_TOW_CONFIRMED
+        \item    0x00000006 -- TIME_SRC_TOW_AND_WEEK_CONFIRMED
+        \item    0x00000007 -- TIME_SRC_NAV_SOLUTION
+        \item    0x00000008 -- TIME_SRC_SOLVE_FOR_TIME
+        \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  Sensor Data Usage */
@@ -902,10 +908,19 @@ typedef struct {
        for each successive position report for a particular session.  */
 
   /* Optional */
-  /*  SV's Used to Calculate the Fix */
+  /*  SVs Used to Calculate the Fix */
   uint8_t gnssSvUsedList_valid;  /**< Must be set to true if gnssSvUsedList is being passed */
   uint32_t gnssSvUsedList_len;  /**< Must be set to # of elements in gnssSvUsedList */
   uint16_t gnssSvUsedList[QMI_LOC_MAX_SV_USED_LIST_LENGTH_V02];
+  /**<   Each entry in the list contains the SV ID of a satellite
+      used for calculating this position report. The following
+      information is associated with each SV ID: \begin{itemize1}
+         \item    Range:    \begin{itemize1}
+         \item    For GPS:     1 to 32
+         \item    For SBAS:    33 to 64
+         \item    For GLONASS: 65 to 96
+         \item    For QZSS: 193 to 197
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 }qmiLocEventPositionReportIndMsgT_v02;  /* Message */
 /**
     @}
@@ -963,43 +978,46 @@ typedef struct {
   qmiLocSvInfoValidMaskT_v02 validMask;
   /**<   Bitmask indicating which of the fields in this TLV are valid.
 
-         Valid bitmasks: \n
-           - 0x00000001 -- VALID_SYSTEM \n
-           - 0x00000002 -- VALID_GNSS_SVID \n
-           - 0x00000004 -- VALID_HEALTH_STATUS \n
-           - 0x00000008 -- VALID_PROCESS_STATUS \n
-           - 0x00000010 -- VALID_SVINFO_MASK \n
-           - 0x00000020 -- VALID_ELEVATION \n
-           - 0x00000040 -- VALID_AZIMUTH \n
-           - 0x00000080 -- VALID_SNR
-
-     */
+         Valid bitmasks:
+         \begin{itemize1}
+         \item    0x00000001 -- VALID_SYSTEM
+         \item    0x00000002 -- VALID_GNSS_SVID
+         \item    0x00000004 -- VALID_HEALTH_STATUS
+         \item    0x00000008 -- VALID_PROCESS_STATUS
+         \item    0x00000010 -- VALID_SVINFO_MASK
+         \item    0x00000020 -- VALID_ELEVATION
+         \item    0x00000040 -- VALID_AZIMUTH
+         \item    0x00000080 -- VALID_SNR
+         \vspace{-0.18in} \end{itemize1}   */
 
   qmiLocSvSystemEnumT_v02 system;
   /**<   Indicates to which constellation this SV belongs.
 
-         Valid values: \n
-           - 0x00000001 -- eQMI_LOC_SV_SYSTEM_GPS \n
-           - 0x00000002 -- eQMI_LOC_SV_SYSTEM_GALILEO \n
-           - 0x00000003 -- eQMI_LOC_SV_SYSTEM_SBAS \n
-           - 0x00000004 -- eQMI_LOC_SV_SYSTEM_COMPASS \n
-           - 0x00000005 -- eQMI_LOC_SV_SYSTEM_GLONASS
-     */
+         Valid values:
+         \begin{itemize1}
+         \item    0x00000001 -- eQMI_LOC_SV_SYSTEM_GPS
+         \item    0x00000002 -- eQMI_LOC_SV_SYSTEM_GALILEO
+         \item    0x00000003 -- eQMI_LOC_SV_SYSTEM_SBAS
+         \item    0x00000004 -- eQMI_LOC_SV_SYSTEM_COMPASS
+         \item    0x00000005 -- eQMI_LOC_SV_SYSTEM_GLONASS
+         \vspace{-0.18in} \end{itemize1}  */
 
   uint16_t gnssSvId;
-  /**<   GNSS SV ID. \n
+  /**<   GNSS SV ID.
+         \begin{itemize1}
+         \item Range:  \begin{itemize1}
+           \item For GPS:      1 to 32
+           \item For GLONASS: 1 to 32
+           \item For SBAS:    120 to 151
+         \end{itemize1} \end{itemize1}
 
-         - Type: Unsigned integer \n
-         - Range: \n
-             -- For GPS:      1 to 32 \n
-             -- For GLONASS: 1 to 32 \n
-             -- For SBAS:    120 to 151 \n
         The GPS and GLONASS SVs can be disambiguated using the system field.  */
 
   uint8_t healthStatus;
-  /**<   Health status. \n
-         - Type: Unsigned integer \n
-         - Range: 0 = unhealthy; 1 = healthy  */
+  /**<   Health status.
+         \begin{itemize1}
+         \item    Range: 0 to 1; 0 = unhealthy, \newline 1 = healthy
+         \vspace{-0.18in} \end{itemize1} */
 
   qmiLocSvStatusEnumT_v02 svStatus;
   /**<   SV processing status. \n
@@ -1018,19 +1036,16 @@ typedef struct {
 
   float elevation;
   /**<   SV elevation angle.\n
-         - Type: Floating point \n
          - Units: Degrees \n
          - Range: 0 to 90  */
 
   float azimuth;
   /**<   SV azimuth angle.\n
-         - Type: Floating point \n
          - Units: Degrees \n
          - Range: 0 to 360  */
 
   float snr;
   /**<   SV signal-to-noise ratio. \n
-         - Type: Floating point \n
          - Units: dB-Hz  */
 }qmiLocSvInfoStructT_v02;  /* Type */
 /**
@@ -1046,10 +1061,12 @@ typedef struct {
   /* Mandatory */
   /*  Altitude Source */
   uint8_t altitudeAssumed;
-  /**<   Altitude assumed or calculated:\n
-         - 0x00 (FALSE) -- Valid altitude is calculated \n
-         - 0x01 (TRUE) -- Valid altitude is assumed; there may not be enough
-                          satellites to determine precise altitude  */
+  /**<   Whether altitude is assumed or calculated:
+         \begin{itemize1}
+         \item    0x00 (FALSE) -- Valid altitude is calculated
+         \item    0x01 (TRUE) -- Valid altitude is assumed; there may not be
+                                 enough satellites to determine precise altitude
+          \vspace{-0.18in} \end{itemize1} */
 
   /* Optional */
   /*  Satellite Info */
@@ -1071,9 +1088,11 @@ typedef struct {
   /* Mandatory */
   /*  NMEA String */
   char nmea[QMI_LOC_NMEA_STRING_MAX_LENGTH_V02 + 1];
-  /**<   NMEA string. \n
-       - Type: NULL-terminated string \n
-       - Maximum string length (including NULL terminator): 201   */
+  /**<   NMEA string.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 201
+       \vspace{-0.18in} \end{itemize1} */
 }qmiLocEventNmeaIndMsgT_v02;  /* Message */
 /**
     @}
@@ -1146,43 +1165,44 @@ typedef struct {
 
   uint8_t posQos;
   /**<   Position QoS timeout. \n
-         - Type: Unsigned integer \n
          - Units: Seconds \n
          - Range: 0 to 255  */
 
   uint32_t numFixes;
-  /**<   Number of fixes allowed. \n
-         - Type: Unsigned integer  */
+  /**<   Number of fixes allowed.  */
 
   uint32_t timeBetweenFixes;
   /**<   Time between fixes.\n
-         - Type: Unsigned integer \n
          - Units: Seconds  */
 
   qmiLocNiVxPosModeEnumT_v02 posMode;
   /**<   Position mode.
 
-         Valid values: \n
-           - 0x00000001 -- NI_VX_MS_ASSISTED_ONLY \n
-           - 0x00000002 -- NI_VX_MS_BASED_ONLY \n
-           - 0x00000003 -- NI_VX_MS_ASSISTED_PREFERRED_MS_BASED_ALLOWED \n
-           - 0x00000004 -- NI_VX_MS_BASED_PREFERRED_MS_ASSISTED_ALLOWED
+         Valid values:
+         \begin{itemize1}
+         \item    0x00000001 -- NI_VX_MS_ASSISTED_ONLY
+         \item    0x00000002 -- NI_VX_MS_BASED_ONLY
+         \item    0x00000003 -- NI_VX_MS_ASSISTED_PREFERRED_MS_BASED_ALLOWED
+         \item    0x00000004 -- NI_VX_MS_BASED_PREFERRED_MS_ASSISTED_ALLOWED
+         \vspace{-0.18in} \end{itemize1}
      */
 
   qmiLocNiVxRequestorIdEncodingSchemeEnumT_v02 encodingScheme;
   /**<   VX encoding scheme.
 
-         Valid values: \n
-           - 0x00000000 -- NI_VX_OCTET \n
-           - 0x00000001 -- NI_VX_EXN_PROTOCOL_MSG \n
-           - 0x00000002 -- NI_VX_ASCII \n
-           - 0x00000003 -- NI_VX_IA5 \n
-           - 0x00000004 -- NI_VX_UNICODE \n
-           - 0x00000005 -- NI_VX_SHIFT_JIS \n
-           - 0x00000006 -- NI_VX_KOREAN \n
-           - 0x00000007 -- NI_VX_LATIN_HEBREW \n
-           - 0x00000008 -- NI_VX_LATIN \n
-           - 0x00000009 -- NI_VX_GSM
+         Valid values:
+         \begin{itemize1}
+         \item    0x00000000 -- NI_VX_OCTET
+         \item    0x00000001 -- NI_VX_EXN_PROTOCOL_MSG
+         \item    0x00000002 -- NI_VX_ASCII
+         \item    0x00000003 -- NI_VX_IA5
+         \item    0x00000004 -- NI_VX_UNICODE
+         \item    0x00000005 -- NI_VX_SHIFT_JIS
+         \item    0x00000006 -- NI_VX_KOREAN
+         \item    0x00000007 -- NI_VX_LATIN_HEBREW
+         \item    0x00000008 -- NI_VX_LATIN
+         \item    0x00000009 -- NI_VX_GSM
+         \vspace{-0.18in} \end{itemize1}
      */
 
   uint32_t requestorId_len;  /**< Must be set to # of elements in requestorId */
@@ -1194,7 +1214,6 @@ typedef struct {
 
   uint16_t userRespTimerInSeconds;
   /**<   Time to wait for the user to respond. \n
-         - Type: Unsigned integer \n
          - Units: Seconds  */
 }qmiLocNiVxNotifyVerifyStructT_v02;  /* Type */
 /**
@@ -1283,16 +1302,18 @@ typedef struct {
   qmiLocNiSuplFormatEnumType_v02 formatType;
   /**<   Format of the formatted string.
 
-        Valid values: \n
-          - 0x00000000 -- FORMAT_LOGICAL_NAME \n
-          - 0x00000001 -- FORMAT_EMAIL_ADDRESS \n
-          - 0x00000002 -- FORMAT_MSISDN \n
-          - 0x00000003 -- FORMAT_URL \n
-          - 0x00000004 -- FORMAT_SIP_URL \n
-          - 0x00000005 -- FORMAT_MIN \n
-          - 0x00000006 -- FORMAT_MDN \n
-          - 0x00000007 -- FORMAT_IMSPUBLIC_IDENTITY \n
-          - 0x7FFFFFFF -- FORMAT_OSS_UNKNOWN
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- FORMAT_LOGICAL_NAME
+        \item    0x00000001 -- FORMAT_EMAIL_ADDRESS
+        \item    0x00000002 -- FORMAT_MSISDN
+        \item    0x00000003 -- FORMAT_URL
+        \item    0x00000004 -- FORMAT_SIP_URL
+        \item    0x00000005 -- FORMAT_MIN
+        \item    0x00000006 -- FORMAT_MDN
+        \item    0x00000007 -- FORMAT_IMSPUBLIC_IDENTITY
+        \item    0x7FFFFFFF -- FORMAT_OSS_UNKNOWN
+        \vspace{-0.18in} \end{itemize1}
     */
 
   uint32_t formattedString_len;  /**< Must be set to # of elements in formattedString */
@@ -1327,23 +1348,19 @@ typedef struct {
 
   uint8_t horizontalAccuracy;
   /**<   Horizontal accuracy. \n
-        - Type: Unsigned integer \n
         - Units: Meters  */
 
   uint8_t verticalAccuracy;
   /**<   Vertical accuracy. \n
-        - Type: Unsigned integer \n
         - Units: Meters  */
 
   uint16_t maxLocAge;
   /**<   Maximum age of the location if the engine sends a previously
         computed position. \n
-        - Type: Unsigned integer \n
         - Units: Seconds  */
 
   uint8_t delay;
   /**<   Delay the server is willing to tolerate for the fix. \n
-        - Type: Unsigned integer \n
         - Units: Seconds  */
 }qmiLocNiSuplQopStructT_v02;  /* Type */
 /**
@@ -1360,12 +1377,10 @@ typedef uint8_t qmiLocServerAddrTypeMaskT_v02;
 typedef struct {
 
   uint32_t addr;
-  /**<   IPV4 address. \n
-       - Type: Unsigned integer  */
+  /**<   IPV4 address.  */
 
   uint16_t port;
-  /**<   IPV4 port. \n
-       - Type: Unsigned integer  */
+  /**<   IPV4 port.  */
 }qmiLocIpV4AddrStructType_v02;  /* Type */
 /**
     @}
@@ -1382,8 +1397,7 @@ typedef struct {
        - Maximum length of the array: 8  */
 
   uint32_t port;
-  /**<   IPV6 port. \n
-       - Type: Unsigned integer  */
+  /**<   IPV6 port.  */
 }qmiLocIpV6AddrStructType_v02;  /* Type */
 /**
     @}
@@ -1410,9 +1424,11 @@ typedef struct {
   /**<   IPV6 address and port.  */
 
   char urlAddr[QMI_LOC_MAX_SERVER_ADDR_LENGTH_V02 + 1];
-  /**<   URL. \n
-       - Type: NULL-terminated string \n
-       - Maximum string length (including NULL terminator): 256
+  /**<   URL.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 256
+       \vspace{-0.18in} \end{itemize1}
          */
 }qmiLocNiSuplServerInfoStructT_v02;  /* Type */
 /**
@@ -1463,16 +1479,18 @@ typedef struct {
   qmiLocNiSuplNotifyVerifyValidMaskT_v02 valid_flags;
   /**<   Indicates which of the following fields are present in this value.
 
-        Valid bitmasks: \n
-          - 0x00000001 -- SUPL_SERVER_INFO \n
-          - 0x00000002 -- SUPL_SESSION_ID \n
-          - 0x00000004 -- SUPL_HASH \n
-          - 0x00000008 -- SUPL_POS_METHOD \n
-          - 0x00000010 -- SUPL_DATA_CODING_SCHEME \n
-          - 0x00000020 -- SUPL_REQUESTOR_ID \n
-          - 0x00000040 -- SUPL_CLIENT_NAME \n
-          - 0x00000080 -- SUPL_QOP \n
-          - 0x00000100 -- SUPL_USER_RESP_TIMER
+        Valid bitmasks:
+        \begin{itemize1}
+        \item    0x00000001 -- SUPL_SERVER_INFO
+        \item    0x00000002 -- SUPL_SESSION_ID
+        \item    0x00000004 -- SUPL_HASH
+        \item    0x00000008 -- SUPL_POS_METHOD
+        \item    0x00000010 -- SUPL_DATA_CODING_SCHEME
+        \item    0x00000020 -- SUPL_REQUESTOR_ID
+        \item    0x00000040 -- SUPL_CLIENT_NAME
+        \item    0x00000080 -- SUPL_QOP
+        \item    0x00000100 -- SUPL_USER_RESP_TIMER
+        \vspace{-0.18in} \end{itemize1}
    */
 
   qmiLocNiSuplServerInfoStructT_v02 suplServerInfo;
@@ -1492,43 +1510,47 @@ typedef struct {
   qmiLocNiSuplPosMethodEnumT_v02 posMethod;
   /**<   GPS mode to be used for the fix.
 
-       Valid values: \n
-         - 0x00000001 -- AGPS_SETASSISTED \n
-         - 0x00000002 -- AGPS_SETBASED \n
-         - 0x00000003 -- AGPS_SETASSISTED_PREF \n
-         - 0x00000004 -- AGPS_SETBASED_PREF \n
-         - 0x00000005 -- AUTONOMOUS_GPS \n
-         - 0x00000006 -- AFLT \n
-         - 0x00000007 -- ECID \n
-         - 0x00000008 -- EOTD \n
-         - 0x00000009 -- OTDOA \n
-         - 0x0000000A -- NO_POSITION
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- AGPS_SETASSISTED
+       \item    0x00000002 -- AGPS_SETBASED
+       \item    0x00000003 -- AGPS_SETASSISTED_PREF
+       \item    0x00000004 -- AGPS_SETBASED_PREF
+       \item    0x00000005 -- AUTONOMOUS_GPS
+       \item    0x00000006 -- AFLT
+       \item    0x00000007 -- ECID
+       \item    0x00000008 -- EOTD
+       \item    0x00000009 -- OTDOA
+       \item    0x0000000A -- NO_POSITION
+       \vspace{-0.18in} \end{itemize1}
    */
 
   qmiLocNiDataCodingSchemeEnumT_v02 dataCodingScheme;
   /**<   Data coding scheme applies to both the requestor ID and the client
        name.
 
-       Valid values: \n
-         - 0x0000000C -- NI_SS_GERMAN \n
-         - 0x0000000D -- NI_SS_ENGLISH \n
-         - 0x0000000E -- NI_SS_ITALIAN \n
-         - 0x0000000F -- NI_SS_FRENCH \n
-         - 0x00000010 -- NI_SS_SPANISH \n
-         - 0x00000011 -- NI_SS_DUTCH \n
-         - 0x00000012 -- NI_SS_SWEDISH \n
-         - 0x00000013 -- NI_SS_DANISH \n
-         - 0x00000014 -- NI_SS_PORTUGUESE \n
-         - 0x00000015 -- NI_SS_FINNISH \n
-         - 0x00000016 -- NI_SS_NORWEGIAN \n
-         - 0x00000017 -- NI_SS_GREEK \n
-         - 0x00000018 -- NI_SS_TURKISH \n
-         - 0x00000019 -- NI_SS_HUNGARIAN \n
-         - 0x0000001A -- NI_SS_POLISH \n
-         - 0x0000001B -- NI_SS_LANGUAGE_UNSPEC \n
-         - 0x0000001C -- NI_SUPL_UTF8 \n
-         - 0x0000001D -- NI_SUPL_UCS2 \n
-         - 0x0000001E -- NI_SUPL_GSM_DEFAULT
+       Valid values:
+       \begin{itemize1}
+       \item    0x0000000C -- NI_SS_GERMAN
+       \item    0x0000000D -- NI_SS_ENGLISH
+       \item    0x0000000E -- NI_SS_ITALIAN
+       \item    0x0000000F -- NI_SS_FRENCH
+       \item    0x00000010 -- NI_SS_SPANISH
+       \item    0x00000011 -- NI_SS_DUTCH
+       \item    0x00000012 -- NI_SS_SWEDISH
+       \item    0x00000013 -- NI_SS_DANISH
+       \item    0x00000014 -- NI_SS_PORTUGUESE
+       \item    0x00000015 -- NI_SS_FINNISH
+       \item    0x00000016 -- NI_SS_NORWEGIAN
+       \item    0x00000017 -- NI_SS_GREEK
+       \item    0x00000018 -- NI_SS_TURKISH
+       \item    0x00000019 -- NI_SS_HUNGARIAN
+       \item    0x0000001A -- NI_SS_POLISH
+       \item    0x0000001B -- NI_SS_LANGUAGE_UNSPEC
+       \item    0x0000001C -- NI_SUPL_UTF8
+       \item    0x0000001D -- NI_SUPL_UCS2
+       \item    0x0000001E -- NI_SUPL_GSM_DEFAULT
+       \vspace{-0.18in} \end{itemize1}
     */
 
   qmiLocNiSuplFormattedStringStructT_v02 requestorId;
@@ -1544,7 +1566,6 @@ typedef struct {
 
   uint16_t userResponseTimer;
   /**<   Time to wait for the user to respond. \n
-       - Type: Unsigned integer \n
        - Units: Seconds */
 }qmiLocNiSuplNotifyVerifyStructT_v02;  /* Type */
 /**
@@ -1574,26 +1595,28 @@ typedef struct {
   qmiLocNiDataCodingSchemeEnumT_v02 dataCodingScheme;
   /**<   Identifies the coding scheme of the coded string.
 
-       Valid values: \n
-         - 0x0000000C -- NI_SS_GERMAN \n
-         - 0x0000000D -- NI_SS_ENGLISH \n
-         - 0x0000000E -- NI_SS_ITALIAN \n
-         - 0x0000000F -- NI_SS_FRENCH \n
-         - 0x00000010 -- NI_SS_SPANISH \n
-         - 0x00000011 -- NI_SS_DUTCH \n
-         - 0x00000012 -- NI_SS_SWEDISH \n
-         - 0x00000013 -- NI_SS_DANISH \n
-         - 0x00000014 -- NI_SS_PORTUGUESE \n
-         - 0x00000015 -- NI_SS_FINNISH \n
-         - 0x00000016 -- NI_SS_NORWEGIAN \n
-         - 0x00000017 -- NI_SS_GREEK \n
-         - 0x00000018 -- NI_SS_TURKISH \n
-         - 0x00000019 -- NI_SS_HUNGARIAN \n
-         - 0x0000001A -- NI_SS_POLISH \n
-         - 0x0000001B -- NI_SS_LANGUAGE_UNSPEC \n
-         - 0x0000001C -- NI_SUPL_UTF8 \n
-         - 0x0000001D -- NI_SUPL_UCS2 \n
-         - 0x0000001E -- NI_SUPL_GSM_DEFAULT
+       Valid values:
+       \begin{itemize1}
+       \item    0x0000000C -- NI_SS_GERMAN
+       \item    0x0000000D -- NI_SS_ENGLISH
+       \item    0x0000000E -- NI_SS_ITALIAN
+       \item    0x0000000F -- NI_SS_FRENCH
+       \item    0x00000010 -- NI_SS_SPANISH
+       \item    0x00000011 -- NI_SS_DUTCH
+       \item    0x00000012 -- NI_SS_SWEDISH
+       \item    0x00000013 -- NI_SS_DANISH
+       \item    0x00000014 -- NI_SS_PORTUGUESE
+       \item    0x00000015 -- NI_SS_FINNISH
+       \item    0x00000016 -- NI_SS_NORWEGIAN
+       \item    0x00000017 -- NI_SS_GREEK
+       \item    0x00000018 -- NI_SS_TURKISH
+       \item    0x00000019 -- NI_SS_HUNGARIAN
+       \item    0x0000001A -- NI_SS_POLISH
+       \item    0x0000001B -- NI_SS_LANGUAGE_UNSPEC
+       \item    0x0000001C -- NI_SUPL_UTF8
+       \item    0x0000001D -- NI_SUPL_UCS2
+       \item    0x0000001E -- NI_SUPL_GSM_DEFAULT
+       \vspace{-0.18in} \end{itemize1}
 
    */
 
@@ -1652,46 +1675,49 @@ typedef struct {
   qmiLocNiUmtsCpNotifyVerifyValidMaskT_v02 valid_flags;
   /**<   Fields that are valid in this value.
 
-       Valid bitmasks: \n
-         - 0x0001 -- INVOKE_ID_MASK \n
-         - 0x0002 -- DATA_CODING_SCHEME_MASK \n
-         - 0x0004 -- NOTIFICATION_TEXT_MASK \n
-         - 0x0008 -- CLIENT_ADDRESS_MASK \n
-         - 0x0010 -- LOCATION_TYPE_MASK \n
-         - 0x0020 -- REQUESTOR_ID_MASK \n
-         - 0x0040 -- CODEWORD_STRING_MASK \n
-         - 0x0080 -- SERVICE_TYPE_MASK \n
-         - 0x0100 -- USER_RESP_TIMER_MASK
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x0001 -- INVOKE_ID_MASK
+       \item    0x0002 -- DATA_CODING_SCHEME_MASK
+       \item    0x0004 -- NOTIFICATION_TEXT_MASK
+       \item    0x0008 -- CLIENT_ADDRESS_MASK
+       \item    0x0010 -- LOCATION_TYPE_MASK
+       \item    0x0020 -- REQUESTOR_ID_MASK
+       \item    0x0040 -- CODEWORD_STRING_MASK
+       \item    0x0080 -- SERVICE_TYPE_MASK
+       \item    0x0100 -- USER_RESP_TIMER_MASK
+       \vspace{-0.18in} \end{itemize1}
    */
 
   uint8_t invokeId;
-  /**<   Supplementary Services invoke ID. \n
-       - Type: Unsigned integer  */
+  /**<   Supplementary Services invoke ID.  */
 
   qmiLocNiDataCodingSchemeEnumT_v02 dataCodingScheme;
   /**<   Type of data encoding scheme for the text.
        Applies to both the notification text and the client address.
 
-       Valid values: \n
-         - 0x0000000C -- NI_SS_GERMAN \n
-         - 0x0000000D -- NI_SS_ENGLISH \n
-         - 0x0000000E -- NI_SS_ITALIAN \n
-         - 0x0000000F -- NI_SS_FRENCH \n
-         - 0x00000010 -- NI_SS_SPANISH \n
-         - 0x00000011 -- NI_SS_DUTCH \n
-         - 0x00000012 -- NI_SS_SWEDISH \n
-         - 0x00000013 -- NI_SS_DANISH \n
-         - 0x00000014 -- NI_SS_PORTUGUESE \n
-         - 0x00000015 -- NI_SS_FINNISH \n
-         - 0x00000016 -- NI_SS_NORWEGIAN \n
-         - 0x00000017 -- NI_SS_GREEK \n
-         - 0x00000018 -- NI_SS_TURKISH \n
-         - 0x00000019 -- NI_SS_HUNGARIAN \n
-         - 0x0000001A -- NI_SS_POLISH \n
-         - 0x0000001B -- NI_SS_LANGUAGE_UNSPEC \n
-         - 0x0000001C -- NI_SUPL_UTF8 \n
-         - 0x0000001D -- NI_SUPL_UCS2 \n
-         - 0x0000001E -- NI_SUPL_GSM_DEFAULT
+       Valid values:
+       \begin{itemize1}
+       \item    0x0000000C -- NI_SS_GERMAN
+       \item    0x0000000D -- NI_SS_ENGLISH
+       \item    0x0000000E -- NI_SS_ITALIAN
+       \item    0x0000000F -- NI_SS_FRENCH
+       \item    0x00000010 -- NI_SS_SPANISH
+       \item    0x00000011 -- NI_SS_DUTCH
+       \item    0x00000012 -- NI_SS_SWEDISH
+       \item    0x00000013 -- NI_SS_DANISH
+       \item    0x00000014 -- NI_SS_PORTUGUESE
+       \item    0x00000015 -- NI_SS_FINNISH
+       \item    0x00000016 -- NI_SS_NORWEGIAN
+       \item    0x00000017 -- NI_SS_GREEK
+       \item    0x00000018 -- NI_SS_TURKISH
+       \item    0x00000019 -- NI_SS_HUNGARIAN
+       \item    0x0000001A -- NI_SS_POLISH
+       \item    0x0000001B -- NI_SS_LANGUAGE_UNSPEC
+       \item    0x0000001C -- NI_SUPL_UTF8
+       \item    0x0000001D -- NI_SUPL_UCS2
+       \item    0x0000001E -- NI_SUPL_GSM_DEFAULT
+       \vspace{-0.18in} \end{itemize1}
   */
 
   uint32_t notificationText_len;  /**< Must be set to # of elements in notificationText */
@@ -1710,10 +1736,12 @@ typedef struct {
   qmiLocNiLocationTypeEnumT_v02 locationType;
   /**<   Location type.
 
-       Valid values: \n
-         - 0x00000001 -- CURRENT_LOCATION \n
-         - 0x00000002 -- CURRENT_OR_LAST_KNOWN_LOCATION \n
-         - 0x00000004 -- INITIAL_LOCATION
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- CURRENT_LOCATION
+       \item    0x00000002 -- CURRENT_OR_LAST_KNOWN_LOCATION
+       \item    0x00000004 -- INITIAL_LOCATION
+       \vspace{-0.18in} \end{itemize1}
    */
 
   qmiLocNiUmtsCpCodedStringStructT_v02 requestorId;
@@ -1725,12 +1753,10 @@ typedef struct {
        qmiLocNiUmtsCpCodedStringStructT.dataCodingScheme field.  */
 
   uint8_t lcsServiceTypeId;
-  /**<   Service type ID. \n
-       - Type: Unsigned integer  */
+  /**<   Service type ID.  */
 
   uint16_t userResponseTimer;
   /**<   Time to wait for the user to respond. \n
-       - Type: Unsigned integer \n
        - Units: Seconds  */
 }qmiLocNiUmtsCpNotifyVerifyStructT_v02;  /* Type */
 /**
@@ -1760,8 +1786,10 @@ typedef struct {
   qmiLocNiServiceInteractionEnumT_v02 serviceInteractionType;
   /**<   Service interaction type specified in qmiLocNiServiceInteractionEnumT.
 
-        Valid values: \n
-          - 0x00000001 -- ONGOING_NI_INCOMING_MO
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000001 -- ONGOING_NI_INCOMING_MO
+        \vspace{-0.18in} \end{itemize1}
     */
 }qmiLocNiVxServiceInteractionStructT_v02;  /* Type */
 /**
@@ -1770,7 +1798,7 @@ typedef struct {
 
 typedef uint16_t qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02;
 #define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_WLAN_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0001) /**<  Denotes that WLAN measurements are allowed as part of location ID
-       and multiple location ID in the SUPL_POS_INIT message.  */
+       and multiple location IDs in the SUPL_POS_INIT message.  */
 #define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_GSM_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0002) /**<  Denotes that GSM measurements are allowed as part of location ID
        and multiple location ID in the SUPL_POS_INIT message.  */
 #define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_WCDMA_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0004) /**<  Denotes that WCDMA measurements are allowed as part of location ID
@@ -1787,7 +1815,7 @@ typedef uint16_t qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02;
        and multiple location ID in the SUPL_POS_INIT message.   */
 #define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_HISTORIC_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0100) /**<  Denotes that historical information is allowed as part of
        multiple location ID in the SUPL_POS_INIT message.  */
-#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_NONSVRV_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0200) /**<  Denotes that information of non-serving cells is allowed
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_SUPPORTED_NETWORK_NONSVRV_V02 ((qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02)0x0200) /**<  Denotes that information about nonserving cells is allowed
        as part of multiple location ID in the SUPL_POS_INIT message.    */
 /** @addtogroup loc_qmi_enums
     @{
@@ -1808,12 +1836,12 @@ typedef enum {
   */
 
 typedef uint16_t qmiLocNiSuplVer2ExtGnssTypeMaskT_v02;
-#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GPS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0001) /**<  GPS is allowed to be used as the positioning technology   */
-#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GLONASS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0002) /**<  GLONASS is allowed to be used as the positioning technology  */
-#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GALILEO_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0004) /**<  Galileo is allowed to be used as the positioning technology  */
-#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_SBAS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0008) /**<  SBAS is allowed to be used as the positioning technology  */
-#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_QZSS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0010) /**<  QZSS is allowed to be used as the positioning technology  */
-#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_MODERN_GPS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0020) /**<  Modern GPS is allowed to be used as the positioning technology    */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GPS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0001) /**<  GPS is allowed to be used as the positioning technology.   */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GLONASS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0002) /**<  GLONASS is allowed to be used as the positioning technology.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_GALILEO_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0004) /**<  Galileo is allowed to be used as the positioning technology.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_SBAS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0008) /**<  SBAS is allowed to be used as the positioning technology.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_QZSS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0010) /**<  QZSS is allowed to be used as the positioning technology.  */
+#define QMI_LOC_SUPL_VER_2_EXT_MASK_GNSS_MODERN_GPS_V02 ((qmiLocNiSuplVer2ExtGnssTypeMaskT_v02)0x0020) /**<  Modern GPS is allowed to be used as the positioning technology.    */
 /** @addtogroup loc_qmi_aggregates
     @{
   */
@@ -1821,38 +1849,45 @@ typedef struct {
 
   qmiLocNiSuplVer2ExtSupportedNetworksMaskT_v02 supportedNetworksMask;
   /**<   Specifies which type of network measurements are allowed to be sent as
-       part of the location ID or mutiple location IDs parameter in the SUPL_POS_INIT
-       message.
-       Valid bitmasks: \n
-        - 0x0001 -- SUPPORTED_NETWORK_WLAN
-        - 0x0002 -- SUPPORTED_NETWORK_GSM
-        - 0x0004 -- SUPPORTED_NETWORK_WCDMA
-        - 0x0008 -- SUPPORTED_NETWORK_CDMA
-        - 0x0010 -- SUPPORTED_NETWORK_HRDP
-        - 0x0020 -- SUPPORTED_NETWORK_UMB
-        - 0x0040 -- SUPPORTED_NETWORK_LTE
-        - 0x0080 -- SUPPORTED_NETWORK_WIMAX
-        - 0x0100 -- SUPPORTED_NETWORK_HISTORIC
-        - 0x0200 -- SUPPORTED_NETWORK_NONSVRV
+       part of the Location ID or Multiple Location IDs parameter in the
+       SUPL_POS_INIT message (see \hyperref[S4]{[S4]}).
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x0001 -- SUPPORTED_NETWORK_WLAN
+       \item    0x0002 -- SUPPORTED_NETWORK_GSM
+       \item    0x0004 -- SUPPORTED_NETWORK_WCDMA
+       \item    0x0008 -- SUPPORTED_NETWORK_CDMA
+       \item    0x0010 -- SUPPORTED_NETWORK_HRDP
+       \item    0x0020 -- SUPPORTED_NETWORK_UMB
+       \item    0x0040 -- SUPPORTED_NETWORK_LTE
+       \item    0x0080 -- SUPPORTED_NETWORK_WIMAX
+       \item    0x0100 -- SUPPORTED_NETWORK_HISTORIC
+       \item    0x0200 -- SUPPORTED_NETWORK_NONSVRV
+       \vspace{-0.18in} \end{itemize1}
     */
 
   qmiLocNiSuplVer2ExtTriggerTypeEnumT_v02 triggerType;
   /**<   Specifies the type of session trigger requested in the
-       SUPL INIT message.
-       Valid values: \n
-        - 0xFFFFFFFF  -- TRIGGER_TYPE_SINGLE_SHOT \n
-        - 0x00000000  -- TRIGGER_TYPE_PERIODIC \n
-        - 0x00000001  -- TRIGGER_TYPE_AREA_EVENT    */
+       SUPL_POS_INIT message (see \hyperref[S4]{[S4]}).
+
+       Valid values:
+       \begin{itemize1}
+       \item    0xFFFFFFFF  -- TRIGGER_TYPE_SINGLE_SHOT
+       \item    0x00000000  -- TRIGGER_TYPE_PERIODIC
+       \item    0x00000001  -- TRIGGER_TYPE_AREA_EVENT
+       \vspace{-0.18in} \end{itemize1}    */
 
   qmiLocNiSuplVer2ExtGnssTypeMaskT_v02 gnssType;
   /**<   Specifies which GNSS technologies are allowed as positioning
        technologies.
+
        Valid bitmasks: \n
-        - 0x0001 -- GNSS_GPS
-        - 0x0002 -- GNSS_GLONASS
-        - 0x0004 -- GNSS_GALILEO
-        - 0x0008 -- GNSS_SBAS
-        - 0x0010 -- GNSS_QZSS
+        - 0x0001 -- GNSS_GPS \n
+        - 0x0002 -- GNSS_GLONASS \n
+        - 0x0004 -- GNSS_GALILEO \n
+        - 0x0008 -- GNSS_SBAS \n
+        - 0x0010 -- GNSS_QZSS \n
         - 0x0020 -- GNSS_MODERN_GPS
    */
 }qmiLocNiSuplVer2ExtStructT_v02;  /* Type */
@@ -1871,12 +1906,14 @@ typedef struct {
   qmiLocNiNotifyVerifyEnumT_v02 notificationType;
   /**<   Type of notification/verification performed.
 
-       Valid values: \n
-         - 0x00000001 -- NO_NOTIFY_NO_VERIFY \n
-         - 0x00000002 -- NOTIFY_ONLY \n
-         - 0x00000003 -- ALLOW_NO_RESP \n
-         - 0x00000004 -- NOT_ALLOW_NO_RESP \n
-         - 0x00000005 -- PRIVACY_OVERRIDE
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- NO_NOTIFY_NO_VERIFY
+       \item    0x00000002 -- NOTIFY_ONLY
+       \item    0x00000003 -- ALLOW_NO_RESP
+       \item    0x00000004 -- NOT_ALLOW_NO_RESP
+       \item    0x00000005 -- PRIVACY_OVERRIDE
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -1907,8 +1944,8 @@ typedef struct {
   /*  Network Initiated SUPL Version 2 Extension */
   uint8_t NiSuplVer2ExtInd_valid;  /**< Must be set to true if NiSuplVer2ExtInd is being passed */
   qmiLocNiSuplVer2ExtStructT_v02 NiSuplVer2ExtInd;
-  /**<   \n Optional NI SUPL Version 2 Extension payload. When present
-          this payload should be used in conjunction with the SUPL
+  /**<   \n Optional NI SUPL Version 2 Extension payload. When present,
+          this payload is to be used in conjunction with the SUPL
           indication payload.  */
 }qmiLocEventNiNotifyVerifyReqIndMsgT_v02;  /* Message */
 /**
@@ -1921,9 +1958,11 @@ typedef struct {
 typedef struct {
 
   char serverUrl[QMI_LOC_MAX_SERVER_ADDR_LENGTH_V02 + 1];
-  /**<   Assistance server URL. \n
-       - Type: NULL-terminated string \n
-       - Maximum string length (including NULL terminator): 256  */
+  /**<   Assistance server URL.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 256
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocAssistanceServerUrlStructT_v02;  /* Type */
 /**
     @}
@@ -1937,7 +1976,6 @@ typedef struct {
   uint32_t delayThreshold;
   /**<   The time server is to be skipped if a one-way delay to the server
        exceeds this threshold. \n
-       - Type: Unsigned integer \n
        - Units: Milliseconds  */
 
   uint32_t timeServerList_len;  /**< Must be set to # of elements in timeServerList */
@@ -1975,12 +2013,10 @@ typedef struct {
 typedef struct {
 
   uint32_t maxFileSizeInBytes;
-  /**<   Maximum allowable predicted orbits file size (in bytes). \n
-         - Type: Unsigned integer  */
+  /**<   Maximum allowable predicted orbits file size (in bytes).  */
 
   uint32_t maxPartSize;
-  /**<   Maximum allowable predicted orbits file chunk size (in bytes). \n
-         - Type: Unsigned integer  */
+  /**<   Maximum allowable predicted orbits file chunk size (in bytes).  */
 }qmiLocPredictedOrbitsAllowedSizesStructT_v02;  /* Type */
 /**
     @}
@@ -2034,36 +2070,40 @@ typedef struct {
   /* Mandatory */
   /*  Latitude */
   double latitude;
-  /**<   Latitude (specified in WGS84 datum).\n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -90.0 to 90.0 \n
-       - Positive values indicate northern latitude \n
-       - Negative values indicate southern latitude  */
+  /**<   Latitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -90.0 to 90.0      \begin{itemize1}
+         \item    Positive values indicate northern latitude
+         \item    Negative values indicate southern latitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /* Mandatory */
   /*  Longitude */
   double longitude;
-  /**<   Longitude (specified in WGS84 datum).\n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -180.0 to 180.0 \n
-       - Positive values indicate eastern longitude \n
-       - Negative values indicate western longitude  */
+  /**<   Longitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -180.0 to 180.0     \begin{itemize1}
+         \item    Positive values indicate eastern longitude
+         \item    Negative values indicate western longitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /* Mandatory */
   /*  Circular Horizontal Uncertainty */
   float horUncCircular;
   /**<   Horizontal position uncertainty (circular).\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Mandatory */
   /*  UTC Timestamp */
   uint64_t timestampUtc;
-  /**<   UTC timestamp.\n
-       - Type: Unsigned integer \n
-       - Units: Milliseconds since Jan. 1, 1970  */
+  /**<   UTC timestamp.
+       \begin{itemize1}
+       \item    Units: Milliseconds since Jan. 1, 1970
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocEventInjectPositionReqIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2140,7 +2180,6 @@ typedef struct {
   /**<   ID of the session that was specified in the Start request.
     This may not be specified for a fix session corresponding to
     a network-initiated request. \n
-    - Type: Unsigned integer \n
     - Range: 0 to 255  */
 }qmiLocEventFixSessionStateIndMsgT_v02;  /* Message */
 /**
@@ -2173,10 +2212,12 @@ typedef struct {
   qmiLocWifiRequestEnumT_v02 requestType;
   /**<   Request type as specified in qmiWifiRequestEnumT.
 
-        Valid values: \n
-          - 0x00000000 -- START_PERIODIC_HI_FREQ_FIXES \n
-          - 0x00000001 -- START_PERIODIC_KEEP_WARM \n
-          - 0x00000002 -- STOP_PERIODIC_FIXES
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- START_PERIODIC_HI_FREQ_FIXES
+        \item    0x00000001 -- START_PERIODIC_KEEP_WARM
+        \item    0x00000002 -- STOP_PERIODIC_FIXES
+        \vspace{-0.18in} \end{itemize1}
     */
 
   /* Optional */
@@ -2184,7 +2225,6 @@ typedef struct {
   uint8_t tbfInMs_valid;  /**< Must be set to true if tbfInMs is being passed */
   uint16_t tbfInMs;
   /**<   Time between fixes for a periodic request.\n
-        - Type: Unsigned integer \n
         - Units: Milliseconds  */
 }qmiLocEventWifiReqIndMsgT_v02;  /* Message */
 /**
@@ -2226,10 +2266,13 @@ typedef struct {
   /**<   Whether the GNSS location engine is ready to accept data from this
        sensor.
 
-       Valid values: \n
-       - 0x01 (TRUE)  -- GNSS location engine is ready to accept sensor data \n
-       - 0x00 (FALSE) -- GNSS location engine is not ready to accept sensor
-                         data
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE)  -- GNSS location engine is ready to accept sensor
+                                data
+       \item    0x00 (FALSE) -- GNSS location engine is not ready to accept
+                                sensor data
+        \vspace{-0.18in} \end{itemize1}
    */
 
   qmiLocSensorControlConfigSamplingSpecStructT_v02 dataFrequency;
@@ -2282,8 +2325,7 @@ typedef struct {
   /**<   This TLV is sent to registered control points. It is sent by
         the location engine when it needs to synchronize location engine and
         control point (sensor processor) times.
-        This TLV must be echoed back in the Time Sync Inject request. \n
-        - Type: Unsigned integer  */
+        This TLV must be echoed back in the Time Sync Inject request.  */
 }qmiLocEventTimeSyncReqIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2299,9 +2341,11 @@ typedef struct {
   /* Mandatory */
   /*  Enable/Disable SPI Requests */
   uint8_t enable;
-  /**<   Whether the client is to start or stop sending an SPI status stream.\n
-       - 0x01 (TRUE)  -- Client is to start sending an SPI status stream\n
-       - 0x00 (FALSE) -- Client is to stop sending an SPI status stream  */
+  /**<   Whether the client is to start or stop sending an SPI status stream.
+       \begin{itemize1}
+       \item    0x01 (TRUE)  -- Client is to start sending an SPI status stream
+       \item    0x00 (FALSE) -- Client is to stop sending an SPI status stream
+       \vspace{-0.18in} \end{itemize1} */
 }qmiLocEventSetSpiStreamingReportIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2345,8 +2389,7 @@ typedef struct {
   /* Mandatory */
   /*  Connection Handle */
   uint32_t connHandle;
-  /**<   Identifies a connection across Open and Close request events. \n
-       - Type: Unsigned integer  */
+  /**<   Identifies a connection across Open and Close request events.  */
 
   /* Mandatory */
   /*  Request Type */
@@ -2362,9 +2405,11 @@ typedef struct {
   /*  WWAN Type */
   qmiLocWWANTypeEnumT_v02 wwanType;
   /**<   Identifies the WWAN type for this request. \n
-       Valid values: \n
-         - 0x00000000 -- WWAN_TYPE_INTERNET \n
-         - 0x00000001 -- WWAN_TYPE_AGNSS
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- WWAN_TYPE_INTERNET
+       \item    0x00000001 -- WWAN_TYPE_AGNSS
+       \vspace{-0.18in} \end{itemize1}
     */
 }qmiLocEventLocationServerConnectionReqIndMsgT_v02;  /* Message */
 /**
@@ -2379,7 +2424,7 @@ typedef enum {
   eQMI_LOC_NI_GEOFENCE_ADDED_V02 = 1, /**<  An NI Geofence was added.   */
   eQMI_LOC_NI_GEOFENCE_DELETED_V02 = 2, /**<  An NI Geofence was deleted.
  An NI Geofence was edited. The control point can query the
-       Geofence to find the current state of the Geofence.  */
+       Geofence to find the its current state.  */
   eQMI_LOC_NI_GEOFENCE_EDITED_V02 = 3,
   QMILOCNIGEOFENCEOPERATIONENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
 }qmiLocNiGeofenceOperationEnumT_v02;
@@ -2390,25 +2435,26 @@ typedef enum {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Notification to inform the control point about
-                    Network Initiated Geofences.  */
+/** Indication Message; Informs the control point about
+                    network-initiated Geofences.  */
 typedef struct {
 
   /* Mandatory */
-  /*  Geofence Id */
+  /*  Geofence ID  */
   uint32_t geofenceId;
   /**<   ID of the Geofence for which this
-       notification was generated.
-       - Type: Unsigned Integer \n  */
+       notification was generated.  */
 
   /* Mandatory */
   /*  Operation Type */
   qmiLocNiGeofenceOperationEnumT_v02 operationType;
-  /**<   Operation for which this notification was generated.
-       Valid values : \n
-       - 0x00000001 --  NI_GEOFENCE_ADDED
-       - 0x00000002 --  NI_GEOFENCE_DELETED
-       - 0x00000003 --  NI_GEOFENCE_EDITED
+  /**<   Operation for which this notification was generated. \n
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 --  NI_GEOFENCE_ADDED
+       \item    0x00000002 --  NI_GEOFENCE_DELETED
+       \item    0x00000003 --  NI_GEOFENCE_EDITED
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocEventNiGeofenceNotificationIndMsgT_v02;  /* Message */
 /**
@@ -2424,9 +2470,9 @@ typedef enum {
        cannot be used to monitor Geofences.   */
   eQMI_LOC_GEOFENCE_GEN_ALERT_GNSS_AVAILABLE_V02 = 2, /**<  GNSS is now available and GNSS postion fixes can
        be used to monitor Geofences.  */
-  eQMI_LOC_GEOFENCE_GEN_ALERT_OOS_V02 = 3, /**<  The engine is out of service and no Cell Id coverage
+  eQMI_LOC_GEOFENCE_GEN_ALERT_OOS_V02 = 3, /**<  The engine is out of service and no cell ID coverage
        information is available.
- The engine has invalid time.  */
+ The engine has an invalid time.  */
   eQMI_LOC_GEOFENCE_GEN_ALERT_TIME_INVALID_V02 = 4,
   QMILOCGEOFENCEGENALERTENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
 }qmiLocGeofenceGenAlertEnumT_v02;
@@ -2437,19 +2483,21 @@ typedef enum {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Notification to inform the control point about
+/** Indication Message; Notifies the control point of the
                     Geofence status.  */
 typedef struct {
 
   /* Mandatory */
   /*  Geofence General Alert  */
   qmiLocGeofenceGenAlertEnumT_v02 geofenceAlert;
-  /**<   Specifies the Geofence general alert type
-       Valid values : \n
-       - 0x00000001 --  GEOFENCE_GEN_ALERT_GNSS_UNAVAILABLE
-       - 0x00000002 --  GEOFENCE_GEN_ALERT_GNSS_AVAILABLE
-       - 0x00000003 --  GEOFENCE_GEN_ALERT_OOS
-       - 0x00000004 --  GEOFENCE_GEN_ALERT_TIME_INVALID
+  /**<   Specifies the Geofence general alert type. \n
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_GEN_ALERT_GNSS_UNAVAILABLE
+       \item    0x00000002 -- GEOFENCE_GEN_ALERT_GNSS_AVAILABLE
+       \item    0x00000003 -- GEOFENCE_GEN_ALERT_OOS
+       \item    0x00000004 -- GEOFENCE_GEN_ALERT_TIME_INVALID
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocEventGeofenceGenAlertIndMsgT_v02;  /* Message */
 /**
@@ -2477,116 +2525,124 @@ typedef struct {
 
   /*  UTC Timestamp */
   uint64_t timestampUtc;
-  /**<   UTC timestamp. \n
-       - Type: Unsigned integer \n
-       - Units: Milliseconds since Jan. 1, 1970  */
+  /**<   UTC timestamp.
+       \begin{itemize1}
+       \item    Units: Milliseconds since Jan. 1, 1970
+       \vspace{-0.18in} \end{itemize1}  */
 
   /*  Latitude */
   double latitude;
-  /**<   Latitude (specified in WGS84 datum). \n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -90.0 to 90.0 \n
-       - Positive values indicate northern latitude \n
-       - Negative values indicate southern latitude  */
+  /**<   Latitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -90.0 to 90.0       \begin{itemize1}
+         \item    Positive values indicate northern latitude
+         \item    Negative values indicate southern latitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /*   Longitude */
   double longitude;
-  /**<   Longitude (specified in WGS84 datum).\n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -180.0 to 180.0 \n
-       - Positive values indicate eastern longitude \n
-       - Negative values indicate western longitude  */
+  /**<   Longitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -180.0 to 180.0     \begin{itemize1}
+         \item    Positive values indicate eastern longitude
+         \item    Negative values indicate western longitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /*  Horizontal Elliptical Uncertainty (Semi-Minor Axis) */
   float horUncEllipseSemiMinor;
   /**<   Semi-minor axis of horizontal elliptical uncertainty.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /*  Horizontal Elliptical Uncertainty (Semi-Major Axis) */
   float horUncEllipseSemiMajor;
   /**<   Semi-major axis of horizontal elliptical uncertainty.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /*  Elliptical Horizontal Uncertainty Azimuth */
   float horUncEllipseOrientAzimuth;
   /**<   Elliptical horizontal uncertainty azimuth of orientation.\n
-       - Type: Floating point \n
        - Units: Decimal degrees \n
        - Range: 0 to 180  */
 
   /*  Horizontal Speed validity bit */
   uint8_t speedHorizontal_valid;
-  /**<   Indicates if the Horizontal speed field contains valid
+  /**<   Indicates whether the Horizontal speed field contains valid
        information.
-        - 0x01 (TRUE)  --  Horizontal speed is valid
-        - 0x00 (FALSE) --  Horizontal speed is invalid
-                           and should be ignored  */
+       \begin{itemize1}
+       \item    0x01 (TRUE)  --  Horizontal speed is valid
+       \item    0x00 (FALSE) --  Horizontal speed is invalid
+                                 and is to be ignored
+       \vspace{-0.18in} \end{itemize1}  */
 
   /*  Horizontal Speed */
   float speedHorizontal;
   /**<   Horizontal speed.\n
-       - Type: Floating point \n
        - Units: Meters/second  */
 
   /*  Altitude validity bit */
   uint8_t altitudeWrtEllipsoid_valid;
-  /**<   Indicates if the altitude field contains valid
+  /**<   Indicates whether the altitude field contains valid
        information.
-        - 0x01 (TRUE)  --  Altitude field is valid
-        - 0x00 (FALSE) --  Atitude field is invalid
-                           and should be ignored  */
+       \begin{itemize1}
+       \item    0x01 (TRUE)  --  Altitude field is valid
+       \item    0x00 (FALSE) --  Altitude field is invalid
+                                 and is to be ignored
+       \vspace{-0.18in} \end{itemize1}
+        */
 
   /*  Altitude With Respect to Ellipsoid */
   float altitudeWrtEllipsoid;
   /**<   Altitude with respect to the WGS84 ellipsoid.\n
-       - Type: Floating point \n
        - Units: Meters \n
        - Range: -500 to 15883  */
 
   /*  Vertical Uncertainty validity bit */
   uint8_t vertUnc_valid;
-  /**<   Indicates if the Vertical Uncertainty field contains valid
+  /**<   Indicates whether the Vertical Uncertainty field contains valid
        information.
-        - 0x01 (TRUE)  --  Vertical uncertainty field is valid
-        - 0x00 (FALSE) --  Vertical uncertainty field is invalid
-                           and should be ignored  */
+       \begin{itemize1}
+       \item    0x01 (TRUE)  --  Vertical Uncertainty field is valid
+       \item    0x00 (FALSE) --  Vertical Uncertainty field is invalid
+                                 and is to be ignored
+       \vspace{-0.18in} \end{itemize1}  */
 
   /*  Vertical Uncertainty */
   float vertUnc;
   /**<   Vertical uncertainty.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /*  Vertical Speed validity bit */
   uint8_t speedVertical_valid;
-  /**<   Indicates if the Vertical Speed field contains valid
+  /**<   Indicates whether the Vertical Speed field contains valid
        information.
-        - 0x01 (TRUE)  --  Vertical Speed field is valid
-        - 0x00 (FALSE) --  Vertical Speed field is invalid
-                           and should be ignored  */
+       \begin{itemize1}
+       \item    0x01 (TRUE)  --  Vertical Speed field is valid
+       \item    0x00 (FALSE) --  Vertical Speed field is invalid
+                                 and is to be ignored
+       \vspace{-0.18in} \end{itemize1}  */
 
   /*  Vertical Speed */
   float speedVertical;
   /**<   Vertical speed.\n
-       - Type: Floating point \n
        - Units: Meters/second  */
 
   /*  heading validity bit */
   uint8_t heading_valid;
-  /**<   Indicates if the heading field contains valid
+  /**<   Indicates whether the Heading field contains valid
        information.
-        - 0x01 (TRUE)  --  heading field is valid
-        - 0x00 (FALSE) --  heading field is invalid
-                           and should be ignored  */
+       \begin{itemize1}
+       \item    0x01 (TRUE)  --  Heading field is valid
+       \item    0x00 (FALSE) --  Heading field is invalid
+                                 and is to be ignored
+       \vspace{-0.18in} \end{itemize1}  */
 
   /*  Heading */
   float heading;
   /**<   Heading.\n
-        - Type: Floating point \n
         - Units: Degrees \n
         - Range: 0 to 359.999   */
 }qmiLocGeofencePositionStructT_v02;  /* Type */
@@ -2597,35 +2653,37 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Notification to inform the control point about
+/** Indication Message; Notifies the control point of
                     a Geofence breach event.  */
 typedef struct {
 
   /* Mandatory */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint32_t geofenceId;
   /**<   ID of the Geofence for which this
-       notification was generated.
-       - Type: Unsigned Integer \n  */
+       notification was generated.  */
 
   /* Mandatory */
   /*  Geofence Breach Type */
   qmiLocGeofenceBreachTypeEnumT_v02 breachType;
   /**<   The type of breach that generated this event.
-       Valid values : \n
-       - 0x00000001 -- GEOFENCE_BREACH_TYPE_ENTERING
-       - 0x00000001 -- GEOFENCE_BREACH_TYPE_LEAVING
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_BREACH_TYPE_ENTERING
+       \item    0x00000001 -- GEOFENCE_BREACH_TYPE_LEAVING
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
   /*  Geofence Position */
   uint8_t geofencePosition_valid;  /**< Must be set to true if geofencePosition is being passed */
   qmiLocGeofencePositionStructT_v02 geofencePosition;
-  /**<   Position of the client when it breached the Geofence.
-       This field is included if the client configures the
+  /**<   \n Position of the client when it breached the Geofence.
+       This TLV is included if the client configures the
        Geofence to report position. The position is reported
-       at the same confidence level which was specified in add
-       geofence request.   */
+       at the same confidence level that was specified in the
+       Add Circular Geofence request.   */
 }qmiLocEventGeofenceBreachIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2638,7 +2696,7 @@ typedef enum {
   QMILOCSTATUSENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
   eQMI_LOC_SUCCESS_V02 = 0, /**<  Request was completed successfully.       */
   eQMI_LOC_GENERAL_FAILURE_V02 = 1, /**<  Request failed because of a general failure.  */
-  eQMI_LOC_UNSUPPORTED_V02 = 2, /**<  Request failed because it is unsupported.  */
+  eQMI_LOC_UNSUPPORTED_V02 = 2, /**<  Request failed because it is not supported.  */
   eQMI_LOC_INVALID_PARAMETER_V02 = 3, /**<  Request failed because it contained invalid parameters.    */
   eQMI_LOC_ENGINE_BUSY_V02 = 4, /**<  Request failed because the engine is busy.  */
   eQMI_LOC_PHONE_OFFLINE_V02 = 5, /**<  Request failed because the phone is offline.  */
@@ -2670,14 +2728,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Revision request.
 
-        Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Mandatory */
@@ -2685,38 +2745,46 @@ typedef struct {
   uint32_t revision;
   /**<   Revision of the service. This is the minor revision of the interface that
        the service implements. Minor revision updates of the service are always
-       backward compatible. \n
-       - Type: Unsigned integer  */
+       backward compatible.  */
 
   /* Optional */
-  /*  GNSS Measurement Engine Firmware Version String. This string will only
- be provided on platforms that have a measurement engine that supports
- this version string. On all other platforms, this optional TLV shall not
- be provided. */
+  /*  GNSS Measurement Engine Firmware Version String */
   uint8_t gnssMeFWVerString_valid;  /**< Must be set to true if gnssMeFWVerString is being passed */
   char gnssMeFWVerString[QMI_LOC_GNSS_ME_VERSION_STRING_MAX_LENGTH_V02 + 1];
-  /**<   Version of the GNSS measurement engine Sw running under the Loc API. \n
-       - Type: NULL terminated String
-       - Maximum string length (including NULL terminator): 128  */
+  /**<   Version of the GNSS measurement engine software running under the LOC API.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 128
+       \vspace{0.1in} \end{itemize1}
+
+       \textbf{Note:} This string is only provided on platforms that have
+       a measurement engine that supports this version string. On all other
+       platforms, this optional TLV is not provided.  */
 
   /* Optional */
-  /*  GNSS Hosted Software Version String. This string will only be provided on
- hosted architectures (measurement and position engine running on different
- processors) that support this version string. On all other platforms, this
- optional TLV shall not be provided. */
+  /*  GNSS Hosted Software Version String */
   uint8_t gnssHostSWVerString_valid;  /**< Must be set to true if gnssHostSWVerString is being passed */
   char gnssHostSWVerString[QMI_LOC_GNSS_HOSTED_SW_VERSION_STRING_MAX_LENGTH_V02 + 1];
-  /**<   Version of the GNSS hosted software running under the Loc API. \n
-       - Type: NULL terminated String
-       - Maximum string length (including NULL terminator): 128  */
+  /**<   Version of the GNSS hosted software running under the LOC API.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 128
+       \vspace{0.1in}\end{itemize1}
+
+       \textbf{Note:} This string is only provided on hosted architectures
+       (measurement and position engine running on different processors) that
+       support this version string. On all other platforms, this optional TLV
+       is not provided.  */
 
   /* Optional */
   /*  GNSS Software Version String */
   uint8_t gnssSWVerString_valid;  /**< Must be set to true if gnssSWVerString is being passed */
   char gnssSWVerString[QMI_LOC_GNSS_SW_VERSION_STRING_MAX_LENGTH_V02 + 1];
-  /**<   Aggregate version of the GNSS software. \n
-       - Type: NULL terminated String
-       - Maximum string length (including NULL terminator): 256  */
+  /**<   Aggregate version of the GNSS software.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 256
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocGetServiceRevisionIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2739,14 +2807,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Fix Criteria request.
 
-        Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -2755,10 +2825,12 @@ typedef struct {
   qmiLocAccuracyLevelEnumT_v02 horizontalAccuracyLevel;
   /**<   Horizontal accuracy level.
 
-       Valid values: \n
-         - 0x00000001 -- LOW: Client requires low horizontal accuracy. \n
-         - 0x00000002 -- MED: Client requires medium horizontal accuracy. \n
-         - 0x00000003 -- HIGH: Client requires high horizontal accuracy.
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- LOW: Client requires low horizontal accuracy
+       \item    0x00000002 -- MED: Client requires medium horizontal accuracy
+       \item    0x00000003 -- HIGH: Client requires high horizontal accuracy
+       \vspace{-0.18in} \end{itemize1}
     */
 
   /* Optional */
@@ -2772,9 +2844,13 @@ typedef struct {
        are turned ON, the client receives position reports even if the
        accuracy criteria is not met. The status in the position report is
        set to IN_PROGRESS for intermediate reports. \n
-       Valid values: \n
-         - 0x00000001 -- ON: Client is interested in receiving intermediate reports \n
-         - 0x00000002 -- OFF: Client is not interested in receiving intermediate reports
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- ON: Client is interested in receiving intermediate
+                              reports
+       \item    0x00000002 -- OFF: Client is not interested in receiving
+                              intermediate reports
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -2782,7 +2858,6 @@ typedef struct {
   uint8_t minInterval_valid;  /**< Must be set to true if minInterval is being passed */
   uint32_t minInterval;
   /**<   Time that must elapse before alerting the client. \n
-       - Type: Unsigned integer \n
        - Units: Milliseconds  */
 
   /* Optional */
@@ -2822,10 +2897,12 @@ typedef struct {
   qmiLocNiUserRespEnumT_v02 userResp;
   /**<   User accepted or denied.
 
-       Valid values: \n
-         - 0x00000001 -- NOTIFY_VERIFY_ACCEPT \n
-         - 0x00000002 -- NOTIFY_VERIFY_DENY \n
-         - 0x00000003 -- NOTIFY_VERIFY_NORESP
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- NOTIFY_VERIFY_ACCEPT
+       \item    0x00000002 -- NOTIFY_VERIFY_DENY
+       \item    0x00000003 -- NOTIFY_VERIFY_NORESP
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Mandatory */
@@ -2833,12 +2910,14 @@ typedef struct {
   qmiLocNiNotifyVerifyEnumT_v02 notificationType;
   /**<   Type of notification/verification performed.
 
-       Valid values: \n
-         - 0x00000001 -- NO_NOTIFY_NO_VERIFY \n
-         - 0x00000002 -- NOTIFY_ONLY \n
-         - 0x00000003 -- ALLOW_NO_RESP \n
-         - 0x00000004 -- NOT_ALLOW_NO_RESP \n
-         - 0x00000005 -- PRIVACY_OVERRIDE
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- NO_NOTIFY_NO_VERIF
+       \item    0x00000002 -- NOTIFY_ONLY
+       \item    0x00000003 -- ALLOW_NO_RESP
+       \item    0x00000004 -- NOT_ALLOW_NO_RESP
+       \item    0x00000005 -- PRIVACY_OVERRIDE
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -2887,14 +2966,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the NI User Response request.
 
-          Valid values: \n
-            - 0x00000000 -- SUCCESS \n
-            - 0x00000001 -- GENERAL_FAILURE \n
-            - 0x00000002 -- UNSUPPORTED \n
-            - 0x00000003 -- INVALID_PARAMETER \n
-            - 0x00000004 -- ENGINE_BUSY \n
-            - 0x00000005 -- PHONE_OFFLINE \n
-            - 0x00000006 -- TIMEOUT
+          Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocNiUserRespIndMsgT_v02;  /* Message */
 /**
@@ -2923,21 +3004,18 @@ typedef struct {
   /*  Total Size */
   uint32_t totalSize;
   /**<   Total size of the predicted orbits data to be injected. \n
-        - Type: Unsigned integer \n
         - Units: Bytes  */
 
   /* Mandatory */
   /*  Total Parts */
   uint16_t totalParts;
   /**<   Total number of parts into which the predicted orbits data is
-        divided. \n
-        - Type: Unsigned integer  */
+        divided.  */
 
   /* Mandatory */
   /*  Part Number */
   uint16_t partNum;
-  /**<   Number of the current predicted orbits data part; starts at 1. \n
-        - Type: Unsigned integer  */
+  /**<   Number of the current predicted orbits data part; starts at 1.  */
 
   /* Mandatory */
   /*  Data */
@@ -2954,8 +3032,10 @@ typedef struct {
   qmiLocPredictedOrbitsDataFormatEnumT_v02 formatType;
   /**<   Predicted orbits data format.
 
-        Valid values: \n
-          - 0x00000000 -- PREDICTED_ORBITS_XTRA
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- PREDICTED_ORBITS_XTRA
+        \vspace{-0.18in} \end{itemize1}
     */
 }qmiLocInjectPredictedOrbitsDataReqMsgT_v02;  /* Message */
 /**
@@ -2973,14 +3053,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Data Injection request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -2988,8 +3070,7 @@ typedef struct {
   uint8_t partNum_valid;  /**< Must be set to true if partNum is being passed */
   uint16_t partNum;
   /**<   Number of the predicted orbits data part for which this indication
-      is sent; starts at 1. \n
-      - Type: Unsigned integer  */
+      is sent; starts at 1.  */
 }qmiLocInjectPredictedOrbitsDataIndMsgT_v02;  /* Message */
 /**
     @}
@@ -3008,18 +3089,20 @@ typedef struct {
 typedef struct {
 
   /* Mandatory */
-  /*  Predicted Oribits Data Source Status */
+  /*  Predicted Orbits Data Source Status */
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the query request for a predicted orbits data source.
 
-         Valid values: \n
-           - 0x00000000 -- SUCCESS \n
-           - 0x00000001 -- GENERAL_FAILURE \n
-           - 0x00000002 -- UNSUPPORTED \n
-           - 0x00000003 -- INVALID_PARAMETER \n
-           - 0x00000004 -- ENGINE_BUSY \n
-           - 0x00000005 -- PHONE_OFFLINE \n
-           - 0x00000006 -- TIMEOUT
+         Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -3052,13 +3135,11 @@ typedef struct {
 
   uint64_t startTimeInUTC;
   /**<   Predicted orbits data is valid starting from this time. \n
-       - Type: Unsigned integer \n
        - Units: Seconds (since Jan. 1, 1970)
          */
 
   uint16_t durationHours;
   /**<   Duration from the start time for which the data is valid.\n
-       - Type: Unsigned integer \n
        - Units: Hours
          */
 }qmiLocPredictedOrbitsDataValidityStructT_v02;  /* Type */
@@ -3077,14 +3158,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the query request for predicted orbits data validity.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -3106,17 +3189,13 @@ typedef struct {
   /*  UTC Time */
   uint64_t timeUtc;
   /**<   UTC time since Jan. 1, 1970.\n
-       - Type: Unsigned integer \n
-       - Units: Milliseconds
-         */
+       - Units: Milliseconds  */
 
   /* Mandatory */
   /*  Time Uncertainty */
   uint32_t timeUnc;
   /**<   Time uncertainty.\n
-       - Type: Unsigned integer \n
-       - Units: Milliseconds
-         */
+       - Units: Milliseconds  */
 }qmiLocInjectUtcTimeReqMsgT_v02;  /* Message */
 /**
     @}
@@ -3133,14 +3212,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the UTC Time Injection request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocInjectUtcTimeIndMsgT_v02;  /* Message */
 /**
@@ -3211,40 +3292,48 @@ typedef struct {
   qmiLocAltSrcEnumT_v02 source;
   /**<   Specifies the source of the altitude.
 
-       Valid values: \n
-         - 0x00000000 -- ALT_SRC_UNKNOWN \n
-         - 0x00000001 -- ALT_SRC_GPS \n
-         - 0x00000002 -- ALT_SRC_CELL_ID \n
-         - 0x00000003 -- ALT_SRC_ENHANCED_CELL_ID \n
-         - 0x00000004 -- ALT_SRC_WIFI \n
-         - 0x00000005 -- ALT_SRC_TERRESTRIAL \n
-         - 0x00000006 -- ALT_SRC_TERRESTRIAL_HYBRID \n
-         - 0x00000007 -- ALT_SRC_ALTITUDE_DATABASE \n
-         - 0x00000008 -- ALT_SRC_BAROMETRIC_ALTIMETER \n
-         - 0x00000009 -- ALT_SRC_OTHER
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- ALT_SRC_UNKNOWN
+       \item    0x00000001 -- ALT_SRC_GPS
+       \item    0x00000002 -- ALT_SRC_CELL_ID
+       \item    0x00000003 -- ALT_SRC_ENHANCED_CELL_ID
+       \item    0x00000004 -- ALT_SRC_WIFI
+       \item    0x00000005 -- ALT_SRC_TERRESTRIAL
+       \item    0x00000006 -- ALT_SRC_TERRESTRIAL_HYBRID
+       \item    0x00000007 -- ALT_SRC_ALTITUDE_DATABASE
+       \item    0x00000008 -- ALT_SRC_BAROMETRIC_ALTIMETER
+       \item    0x00000009 -- ALT_SRC_OTHER
+       \vspace{-0.18in} \end{itemize1}
    */
 
   qmiLocAltSrcLinkageEnumT_v02 linkage;
   /**<   Specifies the dependency between the horizontal and
        altitude position components.
 
-       Valid values: \n
-         - 0x00000000 -- SRC_LINKAGE_NOT_SPECIFIED \n
-         - 0x00000001 -- SRC_LINKAGE_FULLY_INTERDEPENDENT \n
-         - 0x00000002 -- SRC_LINKAGE_DEPENDS_ON_LAT_LONG \n
-         - 0x00000003 -- SRC_LINKAGE_FULLY_INDEPENDENT
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- SRC_LINKAGE_NOT_SPECIFIED
+       \item    0x00000001 -- SRC_LINKAGE_FULLY_INTERDEPENDENT
+       \item    0x00000002 -- SRC_LINKAGE_DEPENDS_ON_LAT_LONG
+       \item    0x00000003 -- SRC_LINKAGE_FULLY_INDEPENDENT
+       \vspace{-0.18in} \end{itemize1}
    */
 
   qmiLocAltSrcUncertaintyCoverageEnumT_v02 coverage;
   /**<   Specifies the region of uncertainty.
 
-        Valid values: \n
-          - 0x00000000 -- UNCERTAINTY_NOT_SPECIFIED \n
-          - 0x00000001 -- UNCERTAINTY_POINT: Altitude uncertainty is valid at the
-                          injected horizontal position coordinates only. \n
-          - 0x00000002 -- UNCERTAINTY_FULL: Altitude uncertainty applies to the
-                          position of the device regardless of horizontal position
-                          (within the horizontal uncertainty region, if provided).
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- UNCERTAINTY_NOT_SPECIFIED
+        \item    0x00000001 -- UNCERTAINTY_POINT: Altitude uncertainty is valid
+                               at the injected horizontal position coordinates
+                               only.
+        \item   0x00000002 -- UNCERTAINTY_FULL: Altitude uncertainty applies to
+                              the position of the device regardless of
+                              horizontal position (within the horizontal
+                              uncertainty region, if provided).
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocAltitudeSrcInfoStructT_v02;  /* Type */
 /**
@@ -3280,24 +3369,28 @@ typedef struct {
   /*  Latitude */
   uint8_t latitude_valid;  /**< Must be set to true if latitude is being passed */
   double latitude;
-  /**<   Latitude (specified in WGS84 datum).\n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -90.0 to 90.0 \n
-       - Positive values indicate northern latitude \n
-       - Negative values indicate southern latitude
+  /**<   Latitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -90.0 to 90.0       \begin{itemize1}
+         \item    Positive values indicate northern latitude
+         \item    Negative values indicate southern latitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}
      */
 
   /* Optional */
   /*  Longitude */
   uint8_t longitude_valid;  /**< Must be set to true if longitude is being passed */
   double longitude;
-  /**<   Longitude (specified in WGS84 datum).\n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -180.0 to 180.0 \n
-       - Positive values indicate eastern longitude \n
-       - Negative values indicate western longitude
+  /**<   Longitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -180.0 to 180.0     \begin{itemize1}
+         \item    Positive values indicate eastern longitude
+         \item    Negative values indicate western longitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}
     */
 
   /* Optional */
@@ -3305,19 +3398,19 @@ typedef struct {
   uint8_t horUncCircular_valid;  /**< Must be set to true if horUncCircular is being passed */
   float horUncCircular;
   /**<   Horizontal position uncertainty (circular).\n
-        - Type: Floating point \n
         - Units: Meters  */
 
   /* Optional */
   /*  Horizontal Confidence */
   uint8_t horConfidence_valid;  /**< Must be set to true if horConfidence is being passed */
   uint8_t horConfidence;
-  /**<   Horizontal confidence, as defined by  ETSI TS 101 109.\n
-        - Type: Unsigned integer \n
-        - Units: Percent (0 to 99) \n
-        - 0 -- invalid value \n
-        - 100 to 256 -- not used \n
-        - If 100 is received, reinterpret to 99 \n
+  /**<   Horizontal confidence, as defined by ETSI TS 101 109 (\hyperref[S4]{[S4]}).
+        \begin{itemize1}
+        \item    Units: Percent (0 to 99)
+        \item    0 -- invalid value
+        \item    100 to 256 -- not used
+        \item    If 100 is received, reinterpret to 99
+        \end{itemize1}
         This field must be specified together with horizontal uncertainty.
         If not specified, the default value will be 50.  */
 
@@ -3327,28 +3420,32 @@ typedef struct {
   qmiLocReliabilityEnumT_v02 horReliability;
   /**<   Specifies the reliability of the horizontal position.
 
-       Valid values: \n
-         - 0x00000000 -- eQMI_LOC_RELIABILITY_NOT_SET \n
-         - 0x00000001 -- eQMI_LOC_RELIABILITY_VERY_LOW \n
-         - 0x00000002 -- eQMI_LOC_RELIABILITY_LOW \n
-         - 0x00000003 -- eQMI_LOC_RELIABILITY_MEDIUM \n
-         - 0x00000004 -- eQMI_LOC_RELIABILITY_HIGH
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- eQMI_LOC_RELIABILITY_NOT_SET
+       \item    0x00000001 -- eQMI_LOC_RELIABILITY_VERY_LOW
+       \item    0x00000002 -- eQMI_LOC_RELIABILITY_LOW
+       \item    0x00000003 -- eQMI_LOC_RELIABILITY_MEDIUM
+       \item    0x00000004 -- eQMI_LOC_RELIABILITY_HIGH
+       \vspace{-0.18in} \end{itemize1}
        */
 
   /* Optional */
   /*  Altitude With Respect to Ellipsoid */
   uint8_t altitudeWrtEllipsoid_valid;  /**< Must be set to true if altitudeWrtEllipsoid is being passed */
   float altitudeWrtEllipsoid;
-  /**<   Altitude with respect to the WGS84 ellipsoid.\n
-        - Type: Floating point \n
-        - Units: Meters; positive = height, negative = depth   */
+  /**<   Altitude with respect to the WGS84 ellipsoid.
+        \begin{itemize1}
+        \item    Units: Meters    \begin{itemize1}
+          \item    Positive = height
+          \item    Negative = depth
+        \vspace{-0.18in} \end{itemize1} \end{itemize1} */
 
   /* Optional */
   /*  Altitude With Respect to Sea Level */
   uint8_t altitudeWrtMeanSeaLevel_valid;  /**< Must be set to true if altitudeWrtMeanSeaLevel is being passed */
   float altitudeWrtMeanSeaLevel;
   /**<   Altitude with respect to mean sea level.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
@@ -3357,19 +3454,19 @@ typedef struct {
   float vertUnc;
   /**<   Vertical uncertainty. This is mandatory if either altitudeWrtEllipsoid
         or altitudeWrtMeanSeaLevel is specified.\n
-        - Type: Floating point \n
         - Units: Meters  */
 
   /* Optional */
   /*  Vertical Confidence */
   uint8_t vertConfidence_valid;  /**< Must be set to true if vertConfidence is being passed */
   uint8_t vertConfidence;
-  /**<   Vertical confidence, as defined by  ETSI TS 101 109.\n
-        - Type: Unsigned integer \n
-        - Units: Percent (0-99) \n
-        - 0 -- invalid value\n
-        - 100 to 256 -- not used \n
-        - If 100 is received, reinterpret to 99\n
+  /**<   Vertical confidence, as defined by  ETSI TS 101 109 (\hyperref[S4]{[S4]}).
+        \begin{itemize1}
+        \item    Units: Percent (0-99)
+        \item    0 -- invalid value
+        \item    100 to 256 -- not used
+        \item    If 100 is received, reinterpret to 99
+        \end{itemize1}
         This field must be specified together with the vertical uncertainty.
         If not specified, the default value will be 50.  */
 
@@ -3379,12 +3476,14 @@ typedef struct {
   qmiLocReliabilityEnumT_v02 vertReliability;
   /**<   Specifies the reliability of the vertical position.
 
-        Valid values: \n
-          - 0x00000000 -- eQMI_LOC_RELIABILITY_NOT_SET \n
-          - 0x00000001 -- eQMI_LOC_RELIABILITY_VERY_LOW \n
-          - 0x00000002 -- eQMI_LOC_RELIABILITY_LOW \n
-          - 0x00000003 -- eQMI_LOC_RELIABILITY_MEDIUM \n
-          - 0x00000004 -- eQMI_LOC_RELIABILITY_HIGH
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- eQMI_LOC_RELIABILITY_NOT_SET
+        \item    0x00000001 -- eQMI_LOC_RELIABILITY_VERY_LOW
+        \item    0x00000002 -- eQMI_LOC_RELIABILITY_LOW
+        \item    0x00000003 -- eQMI_LOC_RELIABILITY_MEDIUM
+        \item    0x00000004 -- eQMI_LOC_RELIABILITY_HIGH
+        \vspace{-0.18in} \end{itemize1}
      */
 
   /* Optional */
@@ -3398,7 +3497,6 @@ typedef struct {
   uint8_t timestampUtc_valid;  /**< Must be set to true if timestampUtc is being passed */
   uint64_t timestampUtc;
   /**<   UTC timestamp. \n
-        - Type: Unsigned integer \n
         - Units: Milliseconds (since Jan. 1, 1970)  */
 
   /* Optional */
@@ -3406,7 +3504,6 @@ typedef struct {
   uint8_t timestampAge_valid;  /**< Must be set to true if timestampAge is being passed */
   int32_t timestampAge;
   /**<   Position age, which is an estimate of how long ago this fix was made. \n
-        - Type: Signed integer \n
         - Units: Milliseconds  */
 
   /* Optional */
@@ -3414,15 +3511,16 @@ typedef struct {
   uint8_t positionSrc_valid;  /**< Must be set to true if positionSrc is being passed */
   qmiLocPositionSrcEnumT_v02 positionSrc;
   /**<   Source from which this position was obtained. \n
-        Valid values: \n
-          - 0x00000000 -- eQMI_LOC_POSITION_SRC_GNSS \n
-          - 0x00000001 -- eQMI_LOC_POSITION_SRC_CELLID \n
-          - 0x00000002 -- eQMI_LOC_POSITION_SRC_ENH_CELLID  \n
-          - 0x00000003 -- eQMI_LOC_POSITION_SRC_WIFI \n
-          - 0x00000004 -- eQMI_LOC_POSITION_SRC_TERRESTRIAL \n
-          - 0x00000005 -- eQMI_LOC_POSITION_SRC_GNSS_TERRESTRIAL_HYBRID \n
-          - 0x00000006 -- eQMI_LOC_POSITION_SRC_OTHER \n
-
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- eQMI_LOC_POSITION_SRC_GNSS
+        \item    0x00000001 -- eQMI_LOC_POSITION_SRC_CELLID
+        \item    0x00000002 -- eQMI_LOC_POSITION_SRC_ENH_CELLID
+        \item    0x00000003 -- eQMI_LOC_POSITION_SRC_WIFI
+        \item    0x00000004 -- eQMI_LOC_POSITION_SRC_TERRESTRIAL
+        \item    0x00000005 -- eQMI_LOC_POSITION_SRC_GNSS_TERRESTRIAL_HYBRID
+        \item    0x00000006 -- eQMI_LOC_POSITION_SRC_OTHER
+        \end{itemize1} \vspace{0.05in}
        If altitude is specified and the altitude source is not specified, the engine
        assumes that the altitude was obtained using the specified position source. \n
        If both altitude and altitude source are specified, the engine assumes
@@ -3445,14 +3543,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the UTC Position Injection request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocInjectPositionIndMsgT_v02;  /* Message */
 /**
@@ -3509,14 +3609,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Engine Lock request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetEngineLockIndMsgT_v02;  /* Message */
 /**
@@ -3540,14 +3642,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Engine Lock request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -3576,9 +3680,11 @@ typedef struct {
   /* Mandatory */
   /*  SBAS Config */
   uint8_t sbasConfig;
-  /**<   Whether SBAS configuration is enabled. \n
-       - 0x01 (TRUE) -- SBAS configuration is enabled \n
-       - 0x00 (FALSE) -- SBAS configuration is disabled  */
+  /**<   Whether SBAS configuration is enabled.
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- SBAS configuration is enabled
+       \item    0x00 (FALSE) -- SBAS configuration is disabled
+       \vspace{-0.18in} \end{itemize1} */
 }qmiLocSetSbasConfigReqMsgT_v02;  /* Message */
 /**
     @}
@@ -3595,14 +3701,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set SBAS Configuration request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetSbasConfigIndMsgT_v02;  /* Message */
 /**
@@ -3626,23 +3734,27 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get SBAS Configuration request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
   /*  SBAS Config */
   uint8_t sbasConfig_valid;  /**< Must be set to true if sbasConfig is being passed */
   uint8_t sbasConfig;
-  /**<   Whether SBAS configuration is enabled. \n
-       - 0x01 (TRUE) -- SBAS configuration is enabled \n
-       - 0x00 (FALSE) -- SBAS configuration is disabled  */
+  /**<   Whether SBAS configuration is enabled.
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- SBAS configuration is enabled
+       \item    0x00 (FALSE) -- SBAS configuration is disabled
+       \vspace{-0.18in} \end{itemize1} */
 }qmiLocGetSbasConfigIndMsgT_v02;  /* Message */
 /**
     @}
@@ -3692,14 +3804,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of Set NMEA Types request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetNmeaTypesIndMsgT_v02;  /* Message */
 /**
@@ -3723,14 +3837,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get NMEA Types request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -3782,14 +3898,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Low Power Mode request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetLowPowerModeIndMsgT_v02;  /* Message */
 /**
@@ -3813,14 +3931,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get LPM request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -3885,9 +4005,11 @@ typedef struct {
   /*  Uniform Resource Locator */
   uint8_t urlAddr_valid;  /**< Must be set to true if urlAddr is being passed */
   char urlAddr[QMI_LOC_MAX_SERVER_ADDR_LENGTH_V02 + 1];
-  /**<   URL address. \n
-       - Type: NULL-terminated string \n
-       - Maximum string length (including NULL terminator): 256
+  /**<   URL address.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 256
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetServerReqMsgT_v02;  /* Message */
 /**
@@ -3905,14 +4027,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Server request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetServerIndMsgT_v02;  /* Message */
 /**
@@ -3966,14 +4090,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Server request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Mandatory */
@@ -4004,9 +4130,11 @@ typedef struct {
   /*  Uniform Resource Locator */
   uint8_t urlAddr_valid;  /**< Must be set to true if urlAddr is being passed */
   char urlAddr[QMI_LOC_MAX_SERVER_ADDR_LENGTH_V02 + 1];
-  /**<   URL. \n
-       - Type: NULL-terminated string \n
-       - Maximum string length (including NULL terminator): 256
+  /**<   URL.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 256
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetServerIndMsgT_v02;  /* Message */
 /**
@@ -4065,21 +4193,25 @@ typedef uint8_t qmiLocDeleteSvInfoMaskT_v02;
 typedef struct {
 
   uint16_t gnssSvId;
-  /**<   SV ID of the satellite whose data is to be deleted. \n
-      - Type: Unsigned integer \n
-      - Range: \n
-          - For GPS:     1 to 32 \n
-          - For SBAS:    33 to 64 \n
-          - For GLONASS: 65 to 96    */
+  /**<   SV ID of the satellite whose data is to be deleted.
+       \begin{itemize1}
+       \item    Range:    \begin{itemize1}
+         \item    For GPS:     1 to 32
+         \item    For SBAS:    33 to 64
+         \item    For GLONASS: 65 to 96
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}   */
 
   qmiLocSvSystemEnumT_v02 system;
   /**<   Indicates to which constellation this SV belongs.
-         Valid values: \n
-           - 0x00000001 -- eQMI_LOC_SV_SYSTEM_GPS \n
-           - 0x00000002 -- eQMI_LOC_SV_SYSTEM_GALILEO \n
-           - 0x00000003 -- eQMI_LOC_SV_SYSTEM_SBAS \n
-           - 0x00000004 -- eQMI_LOC_SV_SYSTEM_COMPASS \n
-           - 0x00000005 -- eQMI_LOC_SV_SYSTEM_GLONASS
+
+         Valid values:
+         \begin{itemize1}
+         \item    0x00000001 -- eQMI_LOC_SV_SYSTEM_GPS
+         \item    0x00000002 -- eQMI_LOC_SV_SYSTEM_GALILEO
+         \item    0x00000003 -- eQMI_LOC_SV_SYSTEM_SBAS
+         \item    0x00000004 -- eQMI_LOC_SV_SYSTEM_COMPASS
+         \item    0x00000005 -- eQMI_LOC_SV_SYSTEM_GLONASS
+         \vspace{-0.18in} \end{itemize1}
      */
 
   qmiLocDeleteSvInfoMaskT_v02 deleteSvInfoMask;
@@ -4105,13 +4237,16 @@ typedef struct {
   /*  Delete All */
   uint8_t deleteAllFlag;
   /**<   Whether all assistance data is to be deleted.
-       Valid values: \n
-       - 0x01 (TRUE)  -- All assistance data is to be deleted;
-                         if this flag is set, all the other information
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE)  -- All assistance data is to be deleted; if
+                                this flag is set, all the other information
                          contained in the optional fields for this
-                         message are ignored \n
-       - 0x00 (FALSE) -- The optional fields in the message are to be used
-                         to determine which data is to be deleted  */
+                                message are ignored
+       \item    0x00 (FALSE) -- The optional fields in the message are to be
+                                used to determine which data is to be deleted
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  Delete SV Info */
@@ -4126,63 +4261,72 @@ typedef struct {
   uint8_t deleteGnssDataMask_valid;  /**< Must be set to true if deleteGnssDataMask is being passed */
   qmiLocDeleteGnssDataMaskT_v02 deleteGnssDataMask;
   /**<   Mask for the GNSS data that is to be deleted.
-       Valid values: \n
-       - 0x00000001 -- DELETE_GPS_SVDIR \n
-       - 0x00000002 -- DELETE_GPS_SVSTEER \n
-       - 0x00000004 -- DELETE_GPS_TIME\n
-       - 0x00000008 -- DELETE_GPS_ALM_CORR \n
-       - 0x00000010 -- DELETE_GLO_SVDIR \n
-       - 0x00000020 -- DELETE_GLO_SVSTEER \n
-       - 0x00000040 -- DELETE_GLO_TIME \n
-       - 0x00000080 -- DELETE_GLO_ALM_CORR \n
-       - 0x00000100 -- DELETE_SBAS_SVDIR \n
-       - 0x00000200 -- DELETE_SBAS_SVSTEER \n
-       - 0x00000400 -- DELETE_POSITION \n
-       - 0x00000800 -- DELETE_TIME \n
-       - 0x00001000 -- DELETE_IONO \n
-       - 0x00002000 -- DELETE_UTC \n
-       - 0x00004000 -- DELETE_HEALTH \n
-       - 0x00008000 -- DELETE_SADATA \n
-       - 0x00010000 -- DELETE_RTI \n
-       - 0x00020000 -- DELETE_SV_NO_EXIST \n
-       - 0x00040000 -- DELETE_FREQ_BIAS_EST
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- DELETE_GPS_SVDIR
+       \item    0x00000002 -- DELETE_GPS_SVSTEER
+       \item    0x00000004 -- DELETE_GPS_TIME
+       \item    0x00000008 -- DELETE_GPS_ALM_CORR
+       \item    0x00000010 -- DELETE_GLO_SVDIR
+       \item    0x00000020 -- DELETE_GLO_SVSTEER
+       \item    0x00000040 -- DELETE_GLO_TIME
+       \item    0x00000080 -- DELETE_GLO_ALM_CORR
+       \item    0x00000100 -- DELETE_SBAS_SVDIR
+       \item    0x00000200 -- DELETE_SBAS_SVSTEER
+       \item    0x00000400 -- DELETE_POSITION
+       \item    0x00000800 -- DELETE_TIME
+       \item    0x00001000 -- DELETE_IONO
+       \item    0x00002000 -- DELETE_UTC
+       \item    0x00004000 -- DELETE_HEALTH
+       \item    0x00008000 -- DELETE_SADATA
+       \item    0x00010000 -- DELETE_RTI
+       \item    0x00020000 -- DELETE_SV_NO_EXIST
+       \item    0x00040000 -- DELETE_FREQ_BIAS_EST
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
   /*  Delete Cell Database */
   uint8_t deleteCellDbDataMask_valid;  /**< Must be set to true if deleteCellDbDataMask is being passed */
   qmiLocDeleteCelldbDataMaskT_v02 deleteCellDbDataMask;
-  /**<   Mask for the cell database assistance data that is to be deleted. \n
-       Valid values: \n
-       - 0x00000001 -- DELETE_CELLDB_POS \n
-       - 0x00000002 -- DELETE_CELLDB_LATEST_GPS_POS \n
-       - 0x00000004 -- DELETE_CELLDB_OTA_POS \n
-       - 0x00000008 -- DELETE_CELLDB_EXT_REF_POS \n
-       - 0x00000010 -- DELETE_CELLDB_TIMETAG \n
-       - 0x00000020 -- DELETE_CELLDB_CELLID \n
-       - 0x00000040 -- DELETE_CELLDB_CACHED_CELLID \n
-       - 0x00000080 -- DELETE_CELLDB_LAST_SRV_CELL \n
-       - 0x00000100 -- DELETE_CELLDB_CUR_SRV_CELL \n
-       - 0x00000200 -- DELETE_CELLDB_NEIGHBOR_INFO
+  /**<   Mask for the cell database assistance data that is to be deleted.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- DELETE_CELLDB_POS
+       \item    0x00000002 -- DELETE_CELLDB_LATEST_GPS_POS
+       \item    0x00000004 -- DELETE_CELLDB_OTA_POS
+       \item    0x00000008 -- DELETE_CELLDB_EXT_REF_POS
+       \item    0x00000010 -- DELETE_CELLDB_TIMETAG
+       \item    0x00000020 -- DELETE_CELLDB_CELLID
+       \item    0x00000040 -- DELETE_CELLDB_CACHED_CELLID
+       \item    0x00000080 -- DELETE_CELLDB_LAST_SRV_CELL
+       \item    0x00000100 -- DELETE_CELLDB_CUR_SRV_CELL
+       \item    0x00000200 -- DELETE_CELLDB_NEIGHBOR_INFO
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
   /*  Delete Clock Info */
   uint8_t deleteClockInfoMask_valid;  /**< Must be set to true if deleteClockInfoMask is being passed */
   qmiLocDeleteClockInfoMaskT_v02 deleteClockInfoMask;
-  /**<   Mask for the clock information assistance data that is to be deleted. \n
-       Valid values: \n
-       - 0x00000001 -- DELETE_CLOCK_INFO_TIME_EST \n
-       - 0x00000002 -- DELETE_CLOCK_INFO_FREQ_EST \n
-       - 0x00000004 -- DELETE_CLOCK_INFO_WEEK_NUMBER \n
-       - 0x00000008 -- DELETE_CLOCK_INFO_RTC_TIME \n
-       - 0x00000010 -- DELETE_CLOCK_INFO_TIME_TRANSFER \n
-       - 0x00000020 -- DELETE_CLOCK_INFO_GPSTIME_EST \n
-       - 0x00000040 -- DELETE_CLOCK_INFO_GLOTIME_EST \n
-       - 0x00000080 -- DELETE_CLOCK_INFO_GLODAY_NUMBER \n
-       - 0x00000100 -- DELETE_CLOCK_INFO_GLO4YEAR_NUMBER \n
-       - 0x00000200 -- DELETE_CLOCK_INFO_GLO_RF_GRP_DELAY \n
-       - 0x00000400 -- DELETE_CLOCK_INFO_DISABLE_TT
+  /**<   Mask for the clock information assistance data that is to be deleted.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- DELETE_CLOCK_INFO_TIME_EST
+       \item    0x00000002 -- DELETE_CLOCK_INFO_FREQ_EST
+       \item    0x00000004 -- DELETE_CLOCK_INFO_WEEK_NUMBER
+       \item    0x00000008 -- DELETE_CLOCK_INFO_RTC_TIME
+       \item    0x00000010 -- DELETE_CLOCK_INFO_TIME_TRANSFER
+       \item    0x00000020 -- DELETE_CLOCK_INFO_GPSTIME_EST
+       \item    0x00000040 -- DELETE_CLOCK_INFO_GLOTIME_EST
+       \item    0x00000080 -- DELETE_CLOCK_INFO_GLODAY_NUMBER
+       \item    0x00000100 -- DELETE_CLOCK_INFO_GLO4YEAR_NUMBER
+       \item    0x00000200 -- DELETE_CLOCK_INFO_GLO_RF_GRP_DELAY
+       \item    0x00000400 -- DELETE_CLOCK_INFO_DISABLE_TT
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocDeleteAssistDataReqMsgT_v02;  /* Message */
 /**
@@ -4201,14 +4345,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Delete Assist Data request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocDeleteAssistDataIndMsgT_v02;  /* Message */
 /**
@@ -4243,14 +4389,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set XTRA-T Session Control request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetXtraTSessionControlIndMsgT_v02;  /* Message */
 /**
@@ -4275,14 +4423,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get XTRA-T Session Control request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -4305,8 +4455,7 @@ typedef struct {
   uint32_t wifiPositionTime;
   /**<   Common counter (typically, the number of milliseconds since bootup).
         This field is only to be provided if the modem and host processors are
-        synchronized. \n
-        - Type: Unsigned integer  */
+        synchronized.  */
 }qmiLocWifiFixTimeStructT_v02;  /* Type */
 /**
     @}
@@ -4350,12 +4499,10 @@ typedef struct {
 
   uint16_t hepe;
   /**<   WiFi position HEPE.\n
-        - Type: Unsigned integer \n
         - Units: Meters  */
 
   uint8_t numApsUsed;
-  /**<   Number of Access Points (AP) used to generate a fix. \n
-        - Type: Unsigned integer  */
+  /**<   Number of Access Points (AP) used to generate a fix.  */
 
   qmiLocWifiFixErrorCodeEnumT_v02 fixErrorCode;
   /**<   WiFi position error code; set to 0 if the fix succeeds. This position
@@ -4363,14 +4510,16 @@ typedef struct {
         the error code provided by the WiFi positioning system can be provided
         here.
 
-        Valid values: \n
-          - 0x00000000 -- ERROR_SUCCESS \n
-          - 0x00000001 -- ERROR_WIFI_NOT_AVAILABLE \n
-          - 0x00000002 -- ERROR_NO_AP_FOUND \n
-          - 0x00000003 -- ERROR_UNAUTHORIZED \n
-          - 0x00000004 -- ERROR_SERVER_UNAVAILABLE \n
-          - 0x00000005 -- ERROR_LOCATION_CANNOT_BE_DETERMINED \n
-          - 0x00000006 -- ERROR_UNKNOWN
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- ERROR_SUCCESS
+        \item    0x00000001 -- ERROR_WIFI_NOT_AVAILABLE
+        \item    0x00000002 -- ERROR_NO_AP_FOUND
+        \item    0x00000003 -- ERROR_UNAUTHORIZED
+        \item    0x00000004 -- ERROR_SERVER_UNAVAILABLE
+        \item    0x00000005 -- ERROR_LOCATION_CANNOT_BE_DETERMINED
+        \item    0x00000006 -- ERROR_UNKNOWN
+        \vspace{-0.18in} \end{itemize1}
     */
 }qmiLocWifiFixPosStructT_v02;  /* Type */
 /**
@@ -4395,16 +4544,15 @@ typedef struct {
 
   int32_t rssi;
   /**<   Receive signal strength indicator.\n
-        - Type: Signed integer \n
         - Units: dBm (offset with +100 dB)  */
 
   uint16_t channel;
-  /**<   WiFi channel on which a beacon was received. \n
-        - Type: Unsigned integer  */
+  /**<   WiFi channel on which a beacon was received.  */
 
   qmiLocWifiApQualifierMaskT_v02 apQualifier;
   /**<   A bitmask of Boolean qualifiers for APs.
-        All unused bits in this mask must be set to 0. \n
+        All unused bits in this mask must be set to 0.
+
         Valid values: \n
           - 0x01 -- BEING_USED \n
           - 0x02 -- HIDDEN_SSID \n
@@ -4447,12 +4595,14 @@ typedef struct {
   qmiLocReliabilityEnumT_v02 horizontalReliability;
   /**<   Specifies the reliability of the horizontal position.
 
-        Valid values: \n
-          - 0x00000000 -- eQMI_LOC_RELIABILITY_NOT_SET \n
-          - 0x00000001 -- eQMI_LOC_RELIABILITY_VERY_LOW \n
-          - 0x00000002 -- eQMI_LOC_RELIABILITY_LOW \n
-          - 0x00000003 -- eQMI_LOC_RELIABILITY_MEDIUM \n
-          - 0x00000004 -- eQMI_LOC_RELIABILITY_HIGH
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- eQMI_LOC_RELIABILITY_NOT_SET
+        \item    0x00000001 -- eQMI_LOC_RELIABILITY_VERY_LOW
+        \item    0x00000002 -- eQMI_LOC_RELIABILITY_LOW
+        \item    0x00000003 -- eQMI_LOC_RELIABILITY_MEDIUM
+        \item    0x00000004 -- eQMI_LOC_RELIABILITY_HIGH
+        \vspace{-0.18in} \end{itemize1}
        */
 }qmiLocInjectWifiPositionReqMsgT_v02;  /* Message */
 /**
@@ -4470,14 +4620,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Inject WiFi Position request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocInjectWifiPositionIndMsgT_v02;  /* Message */
 /**
@@ -4509,9 +4661,11 @@ typedef struct {
   qmiLocWifiStatusEnumT_v02 wifiStatus;
   /**<   WiFi status information.
 
-        Valid values: \n
-          - 0x00000001 -- WIFI_STATUS_AVAILABLE \n
-          - 0x00000002 -- WIFI_STATUS_UNAVAILABLE
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000001 -- WIFI_STATUS_AVAILABLE
+        \item    0x00000002 -- WIFI_STATUS_UNAVAILABLE
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocNotifyWifiStatusReqMsgT_v02;  /* Message */
 /**
@@ -4529,14 +4683,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Notify WiFi Status request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocNotifyWifiStatusIndMsgT_v02;  /* Message */
 /**
@@ -4561,14 +4717,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Registered Events request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -4577,21 +4735,23 @@ typedef struct {
   qmiLocEventRegMaskT_v02 eventRegMask;
   /**<   Event registration mask.
 
-       Valid bitmasks: \n
-         - 0x00000001 -- POSITION_REPORT \n
-         - 0x00000002 -- GNSS_SV_INFO \n
-         - 0x00000004 -- NMEA \n
-         - 0x00000008 -- NI_NOTIFY_VERIFY_REQ \n
-         - 0x00000010 -- INJECT_TIME_REQ \n
-         - 0x00000020 -- INJECT_PREDICTED_ORBITS_REQ \n
-         - 0x00000040 -- INJECT_POSITION_REQ \n
-         - 0x00000080 -- ENGINE_STATE \n
-         - 0x00000100 -- FIX_SESSION_STATE \n
-         - 0x00000200 -- WIFI_REQ \n
-         - 0x00000400 -- SENSOR_STREAMING_READY_STATUS \n
-         - 0x00000800 -- TIME_SYNC_REQ \n
-         - 0x00001000 -- SET_SPI_STREAMING_REPORT \n
-         - 0x00002000 -- LOCATION_SERVER__CONNECTION_REQ
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- POSITION_REPORT
+       \item    0x00000002 -- GNSS_SV_INFO
+       \item    0x00000004 -- NMEA
+       \item    0x00000008 -- NI_NOTIFY_VERIFY_REQ
+       \item    0x00000010 -- INJECT_TIME_REQ
+       \item    0x00000020 -- INJECT_PREDICTED_ORBITS_REQ
+       \item    0x00000040 -- INJECT_POSITION_REQ
+       \item    0x00000080 -- ENGINE_STATE
+       \item    0x00000100 -- FIX_SESSION_STATE
+       \item    0x00000200 -- WIFI_REQ
+       \item    0x00000400 -- SENSOR_STREAMING_READY_STATUS
+       \item    0x00000800 -- TIME_SYNC_REQ
+       \item    0x00001000 -- SET_SPI_STREAMING_REPORT
+       \item    0x00002000 -- LOCATION_SERVER_CONNECTION_REQ
+       \vspace{-0.18in} \end{itemize1}
              */
 }qmiLocGetRegisteredEventsIndMsgT_v02;  /* Message */
 /**
@@ -4629,12 +4789,14 @@ typedef struct {
   qmiLocOperationModeEnumT_v02 operationMode;
   /**<   Preferred operation mode.
 
-       Valid values: \n
-         - 0x00000001 -- OPER_MODE_DEFAULT \n
-         - 0x00000002 -- OPER_MODE_MSB \n
-         - 0x00000003 -- OPER_MODE_MSA \n
-         - 0x00000004 -- OPER_MODE_STANDALONE \n
-         - 0x00000005 -- OPER_MODE_CELL_ID
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- OPER_MODE_DEFAULT
+       \item    0x00000002 -- OPER_MODE_MSB
+       \item    0x00000003 -- OPER_MODE_MSA
+       \item    0x00000004 -- OPER_MODE_STANDALONE
+       \item    0x00000005 -- OPER_MODE_CELL_ID
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetOperationModeReqMsgT_v02;  /* Message */
 /**
@@ -4654,14 +4816,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Operation Mode request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetOperationModeIndMsgT_v02;  /* Message */
 /**
@@ -4685,14 +4849,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Operation Mode request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -4701,12 +4867,14 @@ typedef struct {
   qmiLocOperationModeEnumT_v02 operationMode;
   /**<   Current operation mode.
 
-       Valid values: \n
-         - 0x00000001 -- OPER_MODE_DEFAULT \n
-         - 0x00000002 -- OPER_MODE_MSB \n
-         - 0x00000003 -- OPER_MODE_MSA \n
-         - 0x00000004 -- OPER_MODE_STANDALONE \n
-         - 0x00000005 -- OPER_MODE_CELL_ID
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- OPER_MODE_DEFAULT
+       \item    0x00000002 -- OPER_MODE_MSB
+       \item    0x00000003 -- OPER_MODE_MSA
+       \item    0x00000004 -- OPER_MODE_STANDALONE
+       \item    0x00000005 -- OPER_MODE_CELL_ID
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetOperationModeIndMsgT_v02;  /* Message */
 /**
@@ -4723,16 +4891,17 @@ typedef struct {
   /* Mandatory */
   /*  Stationary Status */
   uint8_t stationary;
-  /**<   Whether the device is stationary:\n
-       - 0x00 (FALSE) -- Device is not stationary \n
-       - 0x01 (TRUE)  -- Device is stationary  */
+  /**<   Whether the device is stationary:
+       \begin{itemize1}
+       \item    0x00 (FALSE) -- Device is not stationary
+       \item    0x01 (TRUE)  -- Device is stationary
+       \vspace{-0.18in} \end{itemize1} */
 
   /* Optional */
   /*  Confidence */
   uint8_t confidenceStationary_valid;  /**< Must be set to true if confidenceStationary is being passed */
   uint8_t confidenceStationary;
   /**<   Confidence in the Stationary state expressed as a percentage.\n
-       - Type: Unsigned integer \n
        - Range: 0 to 100  */
 }qmiLocSetSpiStatusReqMsgT_v02;  /* Message */
 /**
@@ -4749,15 +4918,18 @@ typedef struct {
   /* Mandatory */
   /*  Status of SPI Status Request */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the SPI Status request. \n
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+  /**<   Status of the SPI Status request.
+
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetSpiStatusIndMsgT_v02;  /* Message */
 /**
@@ -4767,6 +4939,8 @@ typedef struct {
 typedef uint8_t qmiLocSensorDataFlagMaskT_v02;
 #define QMI_LOC_SENSOR_DATA_FLAG_SIGN_REVERSAL_V02 ((qmiLocSensorDataFlagMaskT_v02)0x01) /**<  Bitmask to specify that a sign reversal is required while interpreting
      the sensor data.  */
+#define QMI_LOC_SENSOR_DATA_FLAG_SENSOR_TIME_IS_MODEM_TIME_V02 ((qmiLocSensorDataFlagMaskT_v02)0x02) /**<  Bitmask to specify that the sensor time stamp is the same as the modem
+       time stamp.  */
 /** @addtogroup loc_qmi_aggregates
     @{
   */
@@ -4775,24 +4949,20 @@ typedef struct {
   uint16_t timeOffset;
   /**<   Sample time offset. This time offset must be
        relative to the sensor time of the first sample.\n
-       - Type: Unsigned integer \n
        - Units: Milliseconds  */
 
   float xAxis;
   /**<   Sensor x-axis sample. \n
-       - Type: Floating point \n
        - Units Accelerometer: ( (meters)/(seconds^2) ) \n
        - Units Gyroscope:     ( (rads)/(seconds^2) )  */
 
   float yAxis;
   /**<   Sensor y-axis sample. \n
-       - Type: Floating point \n
        - Units Accelerometer: ( (meters)/(seconds^2) ) \n
        - Units Gyroscope:     ( (rads)/(seconds^2) )  */
 
   float zAxis;
   /**<   Sensor z-axis sample. \n
-       - Type: Floating point \n
        - Units Accelerometer: ( (meters)/(seconds^2) ) \n
        - Units Gyroscope:     ( (rads)/(seconds^2) )  */
 }qmiLoc3AxisSensorSampleStructT_v02;  /* Type */
@@ -4808,16 +4978,16 @@ typedef struct {
   uint32_t timeOfFirstSample;
   /**<   Denotes a full 32-bit time tag of the first (oldest) sample in this
        message. \n
-       - Type: Unsigned integer \n
        - Units: Milliseconds  */
 
   qmiLocSensorDataFlagMaskT_v02 flags;
   /**<   Flags to indicate any deviation from the default measurement
        assumptions. All unused bits in this field must be set to 0.
 
-       Valid bitmasks: \n
-         - 0x01 -- SIGN REVERSAL
-         */
+       Valid bitmasks:     \begin{itemize1}
+       \item    0x01 -- SIGN_REVERSAL
+       \item    0X02 -- SENSOR_TIME_IS_MODEM_TIME
+       \vspace{-0.18in} \end{itemize1}         */
 
   uint32_t sensorData_len;  /**< Must be set to # of elements in sensorData */
   qmiLoc3AxisSensorSampleStructT_v02 sensorData[QMI_LOC_SENSOR_DATA_MAX_SAMPLES_V02];
@@ -4841,8 +5011,7 @@ typedef struct {
   uint32_t opaqueIdentifier;
   /**<   An opaque identifier that is sent in by the client that will be echoed
        in the indication so the client can relate the indication to the
-       request. \n
-       - Type: Unsigned integer  */
+       request.  */
 
   /* Optional */
   /*  3-Axis Accelerometer Data */
@@ -4872,36 +5041,37 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Inject Sensor Data request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
   /*  Opaque Identifier */
   uint8_t opaqueIdentifier_valid;  /**< Must be set to true if opaqueIdentifier is being passed */
   uint32_t opaqueIdentifier;
-  /**<   An opaque identifier that was sent in by the client echoed
-       so the client can relate the indication to the request. \n
-       - Type: Unsigned integer  */
+  /**<   Opaque identifier that was sent in by the client echoed
+       so the client can relate the indication to the request.  */
 
   /* Optional */
   /*  Accelerometer Samples Accepted */
   uint8_t threeAxisAccelSamplesAccepted_valid;  /**< Must be set to true if threeAxisAccelSamplesAccepted is being passed */
   uint8_t threeAxisAccelSamplesAccepted;
-  /**<   This field lets the client know how many 3-axis accelerometer samples
+  /**<   Lets the client know how many 3-axis accelerometer samples
        were accepted.  */
 
   /* Optional */
   /*  Gyroscope Samples Accepted */
   uint8_t threeAxisGyroSamplesAccepted_valid;  /**< Must be set to true if threeAxisGyroSamplesAccepted is being passed */
   uint8_t threeAxisGyroSamplesAccepted;
-  /**<   This field lets the client know how many 3-axis gyroscope samples were
+  /**<   Lets the client know how many 3-axis gyroscope samples were
        accepted.  */
 }qmiLocInjectSensorDataIndMsgT_v02;  /* Message */
 /**
@@ -4918,29 +5088,26 @@ typedef struct {
   /*  Reference Time Sync Counter */
   uint32_t refCounter;
   /**<   Must be set to the value that was sent to the control point when the
-       GNSS location engine requested time sync injection. \n
-       - Type: Unsigned integer  */
+       GNSS location engine requested time sync injection.  */
 
   /* Mandatory */
   /*  Sensor Receive Time */
   uint32_t sensorProcRxTime;
-  /**<   The value of the sensor time when the control point received the
+  /**<   Value of the sensor time when the control point received the
        Time Sync Inject request from the GNSS location engine.
 
        Must be monotonically increasing, jitter @latexonly $\leq$ @endlatexonly 1
        millisecond, never stopping until the process is rebooted.\n
-       - Type: Unsigned integer \n
        - Units: Milliseconds  */
 
   /* Mandatory */
   /*  Sensor Transmit Time */
   uint32_t sensorProcTxTime;
-  /**<   The value of the sensor time when the control point injects this message
+  /**<   Value of the sensor time when the control point injects this message
        for use by the GNSS location engine.
 
        Must be monotonically increasing, jitter @latexonly $\leq$ @endlatexonly 1
        millisecond, never stopping until the process is rebooted.\n
-       - Type: Unsigned integer \n
        - Units: Milliseconds  */
 }qmiLocInjectTimeSyncDataReqMsgT_v02;  /* Message */
 /**
@@ -4958,14 +5125,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Inject Time Sync Data request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocInjectTimeSyncDataIndMsgT_v02;  /* Message */
 /**
@@ -5005,14 +5174,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Cradle Mount Configuration request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5021,10 +5192,12 @@ typedef struct {
   qmiLocCradleMountStateEnumT_v02 cradleMountState;
   /**<   Cradle Mount state set by the control point.
 
-       Valid values: \n
-         - 0x00000000 -- CRADLE_STATE_NOT_MOUNTED \n
-         - 0x00000001 -- CRADLE_STATE_MOUNTED \n
-         - 0x00000002 -- CRADLE_STATE_UNKNOWN
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- CRADLE_STATE_NOT_MOUNTED
+       \item    0x00000001 -- CRADLE_STATE_MOUNTED
+       \item    0x00000002 -- CRADLE_STATE_UNKNOWN
+       \vspace{-0.18in} \end{itemize1}
           */
 
   /* Optional */
@@ -5032,7 +5205,6 @@ typedef struct {
   uint8_t confidenceCradleMountState_valid;  /**< Must be set to true if confidenceCradleMountState is being passed */
   uint8_t confidenceCradleMountState;
   /**<   Confidence of the Cradle Mount state expressed as a percentage.\n
-       - Type: Unsigned integer \n
        - Range: 0 to 100  */
 }qmiLocGetCradleMountConfigIndMsgT_v02;  /* Message */
 /**
@@ -5051,17 +5223,18 @@ typedef struct {
   qmiLocCradleMountStateEnumT_v02 cradleMountState;
   /**<   Cradle Mount state set by the control point.
 
-       Valid values: \n
-         - 0x00000000 -- CRADLE_STATE_NOT_MOUNTED \n
-         - 0x00000001 -- CRADLE_STATE_MOUNTED \n
-         - 0x00000002 -- CRADLE_STATE_UNKNOWN          */
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- CRADLE_STATE_NOT_MOUNTED
+       \item    0x00000001 -- CRADLE_STATE_MOUNTED
+       \item    0x00000002 -- CRADLE_STATE_UNKNOWN
+       \vspace{-0.18in} \end{itemize1}          */
 
   /* Optional */
   /*  Cradle Mount Confidence */
   uint8_t confidenceCradleMountState_valid;  /**< Must be set to true if confidenceCradleMountState is being passed */
   uint8_t confidenceCradleMountState;
   /**<   Confidence in the Cradle Mount state expressed as a percentage.\n
-       - Type: Unsigned integer \n
        - Range: 0 to 100  */
 }qmiLocSetCradleMountConfigReqMsgT_v02;  /* Message */
 /**
@@ -5080,14 +5253,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Cradle Mount Configuration request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetCradleMountConfigIndMsgT_v02;  /* Message */
 /**
@@ -5127,14 +5302,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get External Power Configuration request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5143,10 +5320,12 @@ typedef struct {
   qmiLocExternalPowerConfigEnumT_v02 externalPowerState;
   /**<   Power state; injected by the control point.
 
-       Valid values: \n
-         - 0x00000000 -- EXTERNAL_POWER_NOT_CONNECTED \n
-         - 0x00000001 -- EXTERNAL_POWER_CONNECTED \n
-         - 0x00000002 -- EXTERNAL_POWER_UNKNOWN
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- EXTERNAL_POWER_NOT_CONNECTED
+       \item    0x00000001 -- EXTERNAL_POWER_CONNECTED
+       \item    0x00000002 -- EXTERNAL_POWER_UNKNOWN
+       \vspace{-0.18in} \end{itemize1}
      */
 }qmiLocGetExternalPowerConfigIndMsgT_v02;  /* Message */
 /**
@@ -5165,10 +5344,12 @@ typedef struct {
   qmiLocExternalPowerConfigEnumT_v02 externalPowerState;
   /**<   Power state; injected by the control point.
 
-       Valid values: \n
-         - 0x00000000 -- EXTERNAL_POWER_NOT_CONNECTED \n
-         - 0x00000001 -- EXTERNAL_POWER_CONNECTED \n
-         - 0x00000002 -- EXTERNAL_POWER_UNKNOWN
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- EXTERNAL_POWER_NOT_CONNECTED
+       \item    0x00000001 -- EXTERNAL_POWER_CONNECTED
+       \item    0x00000002 -- EXTERNAL_POWER_UNKNOWN
+       \vspace{-0.18in} \end{itemize1}
      */
 }qmiLocSetExternalPowerConfigReqMsgT_v02;  /* Message */
 /**
@@ -5187,14 +5368,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set External Power Configuration request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetExternalPowerConfigIndMsgT_v02;  /* Message */
 /**
@@ -5233,9 +5416,11 @@ typedef struct {
    */
 
   char apnName[QMI_LOC_MAX_APN_NAME_LENGTH_V02 + 1];
-  /**<   APN name. \n
-       - Type: NULL-terminated string \n
-       - Maximum string length (including NULL terminator): 101
+  /**<   APN name.
+       \begin{itemize1}
+       \item    Type: NULL-terminated string
+       \item    Maximum string length (including NULL terminator): 101
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocApnProfilesStructT_v02;  /* Type */
 /**
@@ -5269,8 +5454,7 @@ typedef struct {
   /*  Connection Handle */
   uint32_t connHandle;
   /**<   Connection handle that the service specified in the
-       Location Server Connection request event. \n
-       - Type: Unsigned integer  */
+       Location Server Connection request event.  */
 
   /* Mandatory */
   /*  Request Type */
@@ -5319,14 +5503,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Inform Location Server Connection Status request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocInformLocationServerConnStatusIndMsgT_v02;  /* Message */
 /**
@@ -5362,8 +5548,8 @@ typedef enum {
   */
 
 typedef uint32_t qmiLocLppConfigMaskT_v02;
-#define QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000001) /**<  Enable User plane configuration for LTE positioning profile (LPP)  */
-#define QMI_LOC_LPP_CONFIG_ENABLE_CONTROL_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000002) /**<  Enable Control plane configuration for LPP.      */
+#define QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000001) /**<  Enable user plane configuration for LTE Positioning Profile (LPP).  */
+#define QMI_LOC_LPP_CONFIG_ENABLE_CONTROL_PLANE_V02 ((qmiLocLppConfigMaskT_v02)0x00000002) /**<  Enable control plane configuration for LPP.      */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5375,9 +5561,11 @@ typedef struct {
   /*  SUPL Security */
   uint8_t suplSecurity_valid;  /**< Must be set to true if suplSecurity is being passed */
   uint8_t suplSecurity;
-  /**<   Indicates whether SUPL security is enabled. \n
-       - 0x01 (TRUE) -- SUPL security is enabled \n
-       - 0x00 (FALSE) -- SUPL security is disabled  */
+  /**<   Indicates whether SUPL security is enabled.
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- SUPL security is enabled
+       \item    0x00 (FALSE) -- SUPL security is disabled
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  VX Version */
@@ -5385,9 +5573,11 @@ typedef struct {
   qmiLocVxVersionEnumT_v02 vxVersion;
   /**<   VX version.
 
-       Valid values: \n
-         - 0x00000001 -- VX_VERSION_V1_ONLY \n
-         - 0x00000002 -- VX_VERSION_V2_ONLY
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- VX_VERSION_V1_ONLY
+       \item    0x00000002 -- VX_VERSION_V2_ONLY
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5407,9 +5597,11 @@ typedef struct {
   qmiLocLppConfigMaskT_v02 lppConfig;
   /**<   LTE Positioning Profile (LPP) configuration.
 
-      Valid bitmasks: \n
-         - 0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE \n
-         - 0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
+      Valid bitmasks:
+      \begin{itemize1}
+      \item    0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE
+      \item    0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
+      \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
@@ -5433,14 +5625,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Configuration Parameters request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5451,11 +5645,13 @@ typedef struct {
        not successful, this field will identify the parameters that were not
        set successfully.
 
-       Valid bitmasks: \n
-         - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
-         - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
-         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION \n
-         - 0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY
+       \item    0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION
+       \item    0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
+       \item    0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
@@ -5474,11 +5670,13 @@ typedef struct {
   qmiLocProtocolConfigParamMaskT_v02 getProtocolConfigParamMask;
   /**<   Mask denoting the configuration parameters to be retrieved.
 
-       Valid bitmasks: \n
-         - 0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY \n
-         - 0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION \n
-         - 0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION \n
-         - 0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY
+       \item    0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION
+       \item    0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
+       \item    0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
@@ -5497,23 +5695,27 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Configuration Parameters request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
      */
 
   /* Optional */
   /*  SUPL Security */
   uint8_t suplSecurity_valid;  /**< Must be set to true if suplSecurity is being passed */
   uint8_t suplSecurity;
-  /**<   Indicates whether SUPL security is enabled. \n
-       - 0x01 (TRUE) -- SUPL security is enabled \n
-       - 0x00 (FALSE) -- SUPL security is disabled  */
+  /**<   Indicates whether SUPL security is enabled.
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- SUPL security is enabled
+       \item    0x00 (FALSE) -- SUPL security is disabled
+       \vspace{-0.18in} \end{itemize1} */
 
   /* Optional */
   /*  VX Version */
@@ -5521,9 +5723,11 @@ typedef struct {
   qmiLocVxVersionEnumT_v02 vxVersion;
   /**<   VX version.
 
-       Valid values: \n
-         - 0x00000001 -- VX_VERSION_V1_ONLY \n
-         - 0x00000002 -- VX_VERSION_V2_ONLY
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- VX_VERSION_V1_ONLY
+       \item    0x00000002 -- VX_VERSION_V2_ONLY
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5543,9 +5747,11 @@ typedef struct {
   qmiLocLppConfigMaskT_v02 lppConfig;
   /**<   LTE Positioning Profile (LPP) configuration.
 
-      Valid bitmasks: \n
-         - 0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE \n
-         - 0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
+      Valid bitmasks:
+      \begin{itemize1}
+      \item    0x00000001 -- LPP_CONFIG_ENABLE_USER_PLANE
+      \item    0x00000002 -- LPP_CONFIG_ENABLE_CONTROL_PLANE
+      \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
@@ -5584,15 +5790,17 @@ typedef struct {
   /**<   Controls how sensors are used to aid heading and positioning
        performance.
 
-       Valid values:\n
-        - 0x00000000 -- SENSORS USE ENABLED: \n
-            Sensors data is to be requested whenever a position request is
-            received. If sensors data is injected, the GNSS location engine
-            attempts to improve the heading and positioning performance using
-            sensors. This is the default. \n
-        - 0x00000001 -- SENSORS USE DISABLED: \n
-            Inertial sensors are not to be used to aid in heading and
-            position improvement.
+       Valid values:
+       \begin{itemize1}
+        \item    0x00000000 -- SENSORS USE ENABLED: \n
+                 Sensors data is to be requested whenever a position request is
+                 received. If sensors data is injected, the GNSS location engine
+                 attempts to improve the heading and positioning performance using
+                 sensors. This is the default.
+        \item    0x00000001 -- SENSORS USE DISABLED: \n
+                 Inertial sensors are not to be used to aid in heading and
+                 position improvement.
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetSensorControlConfigReqMsgT_v02;  /* Message */
 /**
@@ -5610,14 +5818,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Sensor Control Configuration request.
 
-       Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetSensorControlConfigIndMsgT_v02;  /* Message */
 /**
@@ -5641,14 +5851,16 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Sensors Control Configuration request.
 
-       Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5658,15 +5870,17 @@ typedef struct {
   /**<   Controls how sensors are used to aid the heading and positioning
        performance.
 
-       Valid values:\n
-        - 0x00000000 -- SENSORS USE ENABLED: \n
-            Sensors data is to be requested whenever a position request is
-            received. If sensors data is injected, the GNSS location engine
-            attempts to improve the heading and positioning performance using
-            sensors. This is the default. \n
-        - 0x00000001 -- SENSORS USE DISABLED: \n
-            Inertial sensors are not to be used to aid in the heading and
-            position improvement.
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- SENSORS USE ENABLED: \n
+                Sensors data is to be requested whenever a position request is
+                received. If sensors data is injected, the GNSS location engine
+                attempts to improve the heading and positioning performance using
+                sensors. This is the default.
+       \item    0x00000001 -- SENSORS USE DISABLED: \n
+                Inertial sensors are not to be used to aid in the heading and
+                position improvement.
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetSensorControlConfigIndMsgT_v02;  /* Message */
 /**
@@ -5674,11 +5888,11 @@ typedef struct {
   */
 
 typedef uint32_t qmiLocSensorPropertiesMaskT_v02;
-#define QMI_LOC_SENSOR_PROPERTIES_MASK_GYRO_BIAS_VARIANCE_RANDOM_WALK_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000001) /**<  This field denotes the gyro bias variance random walk parameter.  */
-#define QMI_LOC_SENSOR_PROPERTIES_MASK_VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000002) /**<  This field denotes the velocity random walk spectral density parameter.  */
-#define QMI_LOC_SENSOR_PROPERTIES_MASK_ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000004) /**<  This field denotes the acceleration random walk spectral density parameter.  */
-#define QMI_LOC_SENSOR_PROPERTIES_MASK_ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000008) /**<  This field denotes the angle random walk spectral density parameter.  */
-#define QMI_LOC_SENSOR_PROPERTIES_MASK_RATE_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000010) /**<  This field denotes the rate random walk spectral density parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_GYRO_BIAS_VARIANCE_RANDOM_WALK_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000001) /**<  Denotes the gyro bias variance random walk parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000002) /**<  Denotes the velocity random walk spectral density parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000004) /**<  Denotes the acceleration random walk spectral density parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_ANGLE_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000008) /**<  Denotes the angle random walk spectral density parameter.  */
+#define QMI_LOC_SENSOR_PROPERTIES_MASK_RATE_RANDOM_WALK_SPECTRAL_DENSITY_V02 ((qmiLocSensorPropertiesMaskT_v02)0x00000010) /**<  Denotes the rate random walk spectral density parameter.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5766,15 +5980,17 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Set Sensor Properties request.
 
-       Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT \n
-          - 0x00000007 -- CONFIG_NOT_SUPPORTED
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- SUCCESS
+       \item    0x00000001 -- GENERAL_FAILURE
+       \item    0x00000002 -- UNSUPPORTED
+       \item    0x00000003 -- INVALID_PARAMETER
+       \item    0x00000004 -- ENGINE_BUSY
+       \item    0x00000005 -- PHONE_OFFLINE
+       \item    0x00000006 -- TIMEOUT
+       \item    0x00000007 -- CONFIG_NOT_SUPPORTED
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5782,12 +5998,16 @@ typedef struct {
   uint8_t failedSensorPropertiesMask_valid;  /**< Must be set to true if failedSensorPropertiesMask is being passed */
   qmiLocSensorPropertiesMaskT_v02 failedSensorPropertiesMask;
   /**<   This field will be sent only if the status is not a success.
-       Identifies the parameters that were not set successfully.\n
-        - 0x00000001 -- GYRO_BIAS_VARIANCE_RANDOM_WALK \n
-        - 0x00000002 -- VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY \n
-        - 0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY \n
-        - 0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY \n
-        - 0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
+       Identifies the parameters that were not set successfully.
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- GYRO_BIAS_VARIANCE_RANDOM_WALK
+       \item    0x00000002 -- VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY
+       \item    0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY
+       \item    0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY
+       \item    0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetSensorPropertiesIndMsgT_v02;  /* Message */
 /**
@@ -5804,12 +6024,15 @@ typedef struct {
   /*  Sensor Properties Config Parameters */
   qmiLocSensorPropertiesMaskT_v02 getSensorPropertiesMask;
   /**<   Mask denoting the sensor properties parameters to be retrieved.
-       Valid bitmasks: \n
-        - 0x00000001 -- GYRO_BIAS_VARIANCE_RANDOM_WALK \n
-        - 0x00000002 -- VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY \n
-        - 0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY \n
-        - 0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY \n
-        - 0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- GYRO_BIAS_VARIANCE_RANDOM_WALK
+       \item    0x00000002 -- VELOCITY_RANDOM_WALK_SPECTRAL_DENSITY
+       \item    0x00000004 -- ACCELERATION_RANDOM_WALK_SPECTRAL_DENSITY
+       \item    0x00000008 -- ANGLE_RANDOM_WALK_SPECTRAL_DENSITY
+       \item    0x00000010 -- RATE_RANDOM_WALK_SPECTRAL_DENSITY
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetSensorPropertiesReqMsgT_v02;  /* Message */
 /**
@@ -5827,15 +6050,17 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Get Sensors Properties request.
 
-       Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT \n
-          - 0x00000007 -- CONFIG_NOT_SUPPORTED
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- SUCCESS
+       \item    0x00000001 -- GENERAL_FAILURE
+       \item    0x00000002 -- UNSUPPORTED
+       \item    0x00000003 -- INVALID_PARAMETER
+       \item    0x00000004 -- ENGINE_BUSY
+       \item    0x00000005 -- PHONE_OFFLINE
+       \item    0x00000006 -- TIMEOUT
+       \item    0x00000007 -- CONFIG_NOT_SUPPORTED
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5940,13 +6165,15 @@ typedef struct {
        This field is relevant only when sensors have been enabled using the
        sensors control configuration.
 
-       Valid values: \n
-       - 0x00000000 -- AUTO: \n
-         The GNSS location engine can decide when to request sensor data injection
-         based on internal criteria. This is the default. \n
-       - 0x00000001 -- FORCED: \n
-         The GNSS location engine must request use of sensors every time the GNSS
-         location engine turns on.
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- AUTO: \n
+                The GNSS location engine can decide when to request sensor data
+                injection based on internal criteria. This is the default.
+       \item    0x00000001 -- FORCED: \n
+                The GNSS location engine must request use of sensors every time
+                the GNSS location engine turns on.
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -5976,8 +6203,11 @@ typedef struct {
   uint8_t algorithmConfig_valid;  /**< Must be set to true if algorithmConfig is being passed */
   qmiLocSensorAlgorithmMaskT_v02 algorithmConfig;
   /**<   Sets which sensor algorithms are to be used when processing sensor data.
-       Valid bitmasks: \n
-       - 0x00000001 -- DISABLE_INS_POSITIONING_FILTER
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- DISABLE_INS_POSITIONING_FILTER
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetSensorPerformanceControlConfigReqMsgT_v02;  /* Message */
 /**
@@ -5999,15 +6229,18 @@ typedef struct {
   /* Mandatory */
   /*  Set Sensor Perf Control Config Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Set Sensor Performance Control Configuration request. \n
-       Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT
+  /**<   Status of the Set Sensor Performance Control Configuration request.
+
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -6015,12 +6248,15 @@ typedef struct {
   uint8_t failedConfiguration_valid;  /**< Must be set to true if failedConfiguration is being passed */
   qmiLocSensorPerformanceControlConfigFailureMaskT_v02 failedConfiguration;
   /**<   This field is sent only if the status is not a success.
-       When sent, this field identifies which configuration failed. \n
-       Valid bitmasks: \n
-       - 0x00000001 -- PERFORMANCE_MODE \n
-       - 0x00000002 -- ACCEL_SAMPLING_SPEC \n
-       - 0x00000004 -- GYRO_SAMPLING_SPEC \n
-       - 0x00000008 -- ALGORITHM_CONFIG
+       When sent, this field identifies which configuration failed.
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- PERFORMANCE_MODE
+       \item    0x00000002 -- ACCEL_SAMPLING_SPEC
+       \item    0x00000004 -- GYRO_SAMPLING_SPEC
+       \item    0x00000008 -- ALGORITHM_CONFIG
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetSensorPerformanceControlConfigIndMsgT_v02;  /* Message */
 /**
@@ -6043,15 +6279,18 @@ typedef struct {
   /* Mandatory */
   /*  Get Sensor Perf Control Config Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Get Sensor Performance Control Configuration request. \n
-       Valid values: \n
-          - 0x00000000 -- SUCCESS \n
-          - 0x00000001 -- GENERAL_FAILURE \n
-          - 0x00000002 -- UNSUPPORTED \n
-          - 0x00000003 -- INVALID_PARAMETER \n
-          - 0x00000004 -- ENGINE_BUSY \n
-          - 0x00000005 -- PHONE_OFFLINE \n
-          - 0x00000006 -- TIMEOUT
+  /**<   Status of the Get Sensor Performance Control Configuration request.
+
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -6062,13 +6301,15 @@ typedef struct {
        This field is relevant only when sensors have been enabled using the
        sensor control configuration.
 
-       Valid values: \n
-       - 0x00000000 -- AUTO: \n
-         The GNSS location engine can decide when to request sensor data injection
-         based on internal criteria. This is the default. \n
-       - 0x0000001 -- FORCED: \n
-         The GNSS location engine must request use of the sensors every time the GNSS
-         location engine turns on.
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- AUTO: \n
+                The GNSS location engine can decide when to request sensor data
+                injection based on internal criteria. This is the default.
+       \item    0x0000001 -- FORCED: \n
+                The GNSS location engine must request use of the sensors every time
+                the GNSS location engine turns on.
+       \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -6098,8 +6339,11 @@ typedef struct {
   uint8_t algorithmConfig_valid;  /**< Must be set to true if algorithmConfig is being passed */
   qmiLocSensorAlgorithmMaskT_v02 algorithmConfig;
   /**<   Informs which sensor algorithms are currently set.
-       Valid bitmasks: \n
-       - 0x00000001 -- DISABLE_INS_POSITIONING_FILTER
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- DISABLE_INS_POSITIONING_FILTER
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetSensorPerformanceControlConfigIndMsgT_v02;  /* Message */
 /**
@@ -6116,7 +6360,6 @@ typedef struct {
   /*  SUPL Certificate ID */
   uint8_t suplCertId;
   /**<   Certificate ID of the SUPL certificate. \n
-       - Type: Unsigned integer \n
        - Units: Bytes \n
        - Range: 0 to 9   */
 
@@ -6141,15 +6384,18 @@ typedef struct {
   /* Mandatory */
   /*  SUPL Certificate Injection Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Inject SUPL Certificate request. \n
-       Valid Values: \n
-          - 0x00000000 -- SUCCESS\n
-          - 0x00000001 -- GENERAL_FAILURE\n
-          - 0x00000002 -- UNSUPPORTED\n
-          - 0x00000003 -- INVALID_PARAMETER\n
-          - 0x00000004 -- ENGINE_BUSY\n
-          - 0x00000005 -- PHONE_OFFLINE\n
-          - 0x00000006 -- TIMEOUT
+  /**<   Status of the Inject SUPL Certificate request.
+
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocInjectSuplCertificateIndMsgT_v02;  /* Message */
 /**
@@ -6167,7 +6413,6 @@ typedef struct {
   uint8_t suplCertId_valid;  /**< Must be set to true if suplCertId is being passed */
   uint8_t suplCertId;
   /**<   Certificate ID of the SUPL certificate to be deleted. \n
-       - Type: Unsigned integer \n
        - Units: Bytes \n
        - Range: 0 to 9 \n
        If suplCertId is not specified,
@@ -6186,15 +6431,18 @@ typedef struct {
   /* Mandatory */
   /*  SUPL Certificate Deletion Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Delete SUPL Certificate request. \n
-       Valid values: \n
-          - 0x00000000 -- SUCCESS\n
-          - 0x00000001 -- GENERAL_FAILURE\n
-          - 0x00000002 -- UNSUPPORTED\n
-          - 0x00000003 -- INVALID_PARAMETER\n
-          - 0x00000004 -- ENGINE_BUSY\n
-          - 0x00000005 -- PHONE_OFFLINE\n
-          - 0x00000006 -- TIMEOUT
+  /**<   Status of the Delete SUPL Certificate request.
+
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocDeleteSuplCertificateIndMsgT_v02;  /* Message */
 /**
@@ -6219,12 +6467,15 @@ typedef struct {
   /*  Injected Position Control */
   uint8_t injectedPositionControl_valid;  /**< Must be set to true if injectedPositionControl is being passed */
   uint8_t injectedPositionControl;
-  /**<   Controls how the injected position is used in the position engine.\n
-       Valid values: \n
-         - 0x01 (TRUE) -- Use the injected position in a direct position
-                          calculation. \n
-         - 0x00 (FALSE) -- Do not use the injected position in a direct position
-                           calculation. \n
+  /**<   Controls how the injected position is used in the position engine.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- Use the injected position in a direct position
+                               calculation
+       \item    0x00 (FALSE) -- Do not use the injected position in a direct
+                                position calculation
+       \end{itemize1}
        The default value is TRUE.
    */
 
@@ -6232,10 +6483,13 @@ typedef struct {
   /*  Filter SV Usage */
   uint8_t filterSvUsage_valid;  /**< Must be set to true if filterSvUsage is being passed */
   uint8_t filterSvUsage;
-  /**<   Controls whether SV usage is filtered in a position fix. \n
-       Valid values:\n
-         - 0x01 (TRUE) -- Filter the usage of SVs in the fix. \n
-         - 0x00 (FALSE) -- Do not filter the usage of SVs in the fix. \n
+  /**<   Controls whether SV usage is filtered in a position fix.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- Filter the usage of SVs in the fix
+       \item    0x00 (FALSE) -- Do not filter the usage of SVs in the fix
+       \end{itemize1}
        The default value is FALSE.
    */
 
@@ -6244,10 +6498,13 @@ typedef struct {
   uint8_t storeAssistData_valid;  /**< Must be set to true if storeAssistData is being passed */
   uint8_t storeAssistData;
   /**<   Controls whether assistance data is to be stored in
-       persistent memory. \n
-       Valid values:\n
-         - 0x01 (TRUE) -- Store assistance data in persistent memory. \n
-         - 0x00 (FALSE) -- Do not store assistance data in persistent memory. \n
+       persistent memory.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- Store assistance data in persistent memory
+       \item    0x00 (FALSE) -- Do not store assistance data in persistent memory
+       \end{itemize1}
        The default value is TRUE.
    */
 }qmiLocSetPositionEngineConfigParametersReqMsgT_v02;  /* Message */
@@ -6265,16 +6522,18 @@ typedef struct {
   /* Mandatory */
   /*  Set Position Engine Configuration Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Set Configuration Parameters request. \n
+  /**<   Status of the Set Configuration Parameters request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
    */
 
   /* Optional */
@@ -6282,12 +6541,14 @@ typedef struct {
   uint8_t failedPositionEngineConfigParamMask_valid;  /**< Must be set to true if failedPositionEngineConfigParamMask is being passed */
   qmiLocPositionEngineConfigParamMaskT_v02 failedPositionEngineConfigParamMask;
   /**<   Identifies the parameters that were not set successfully.
-       This field is sent only if the status is other than SUCCESS. \n
+       This field is sent only if the status is other than SUCCESS.
 
-       Valid bitmasks: \n
-         - 0x00000001 -- INJECTED_POSITION_CONTROL \n
-         - 0x00000002 -- FILTER_SV_USAGE \n
-         - 0x00000004 -- STORE_ASSIST_DATA
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- INJECTED_POSITION_CONTROL
+       \item    0x00000002 -- FILTER_SV_USAGE
+       \item    0x00000004 -- STORE_ASSIST_DATA
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocSetPositionEngineConfigParametersIndMsgT_v02;  /* Message */
 /**
@@ -6304,11 +6565,14 @@ typedef struct {
   /* Mandatory */
   /*  Config Parameters */
   qmiLocPositionEngineConfigParamMaskT_v02 getPositionEngineConfigParamMask;
-  /**<   Mask denoting the configuration parameters to be retrieved. \n
-       Valid bitmasks: \n
-        - 0x00000001 -- INJECTED_POSITION_CONTROL \n
-        - 0x00000002 -- FILTER_SV_USAGE \n
-        - 0x00000004 -- STORE_ASSIST_DATA
+  /**<   Mask denoting the configuration parameters to be retrieved.
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- INJECTED_POSITION_CONTROL
+       \item    0x00000002 -- FILTER_SV_USAGE
+       \item    0x00000004 -- STORE_ASSIST_DATA
+       \vspace{-0.18in} \end{itemize1}
    */
 }qmiLocGetPositionEngineConfigParametersReqMsgT_v02;  /* Message */
 /**
@@ -6325,16 +6589,18 @@ typedef struct {
   /* Mandatory */
   /*  Get Position Engine Configuration Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Get Configuration Parameters request. \n
+  /**<   Status of the Get Configuration Parameters request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}
      */
 
   /* Optional */
@@ -6342,12 +6608,15 @@ typedef struct {
   uint8_t injectedPositionControl_valid;  /**< Must be set to true if injectedPositionControl is being passed */
   uint8_t injectedPositionControl;
   /**<   Specifies whether the injected position is used for a direct calculation
-       in the position engine.\n
-       Valid values: \n
-         - 0x01 (TRUE) -- The injected position is used in a direct position
-                          calculation. \n
-         - 0x00 (FALSE) -- The injected position is not used a direct position
-                           calculation. \n
+       in the position engine.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- The injected position is used in a direct
+                               position calculation
+       \item    0x00 (FALSE) -- The injected position is not used in a direct
+                                position calculation
+       \end{itemize1}
        The default value is TRUE.
    */
 
@@ -6355,10 +6624,13 @@ typedef struct {
   /*  Filter SV Usage */
   uint8_t filterSvUsage_valid;  /**< Must be set to true if filterSvUsage is being passed */
   uint8_t filterSvUsage;
-  /**<   Specifies whether SV usage is filtered in a position fix. \n
-       Valid values: \n
-         - 0x01 (TRUE) -- SV usage is filtered in the fix. \n
-         - 0x00 (FALSE) -- SV usage is not filtered in the fix. \n
+  /**<   Specifies whether SV usage is filtered in a position fix.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- SV usage is filtered in the fix
+       \item    0x00 (FALSE) -- SV usage is not filtered in the fix
+       \end{itemize1}
        The default value is FALSE.
    */
 
@@ -6366,10 +6638,14 @@ typedef struct {
   /*  Store Assist Data */
   uint8_t storeAssistData_valid;  /**< Must be set to true if storeAssistData is being passed */
   uint8_t storeAssistData;
-  /**<   Specifies whether assistance data is stored in persistent memory. \n
-       Valid values: \n
-         - 0x01 (TRUE) -- Assistance data is stored in persistent memory. \n
-         - 0x00 (FALSE) -- Assistance data is not stored in persistent memory. \n
+  /**<   Specifies whether assistance data is stored in persistent memory.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- Assistance data is stored in persistent memory
+       \item    0x00 (FALSE) -- Assistance data is not stored in persistent
+                                memory
+       \end{itemize1}
        The default value is TRUE.
    */
 }qmiLocGetPositionEngineConfigParametersIndMsgT_v02;  /* Message */
@@ -6378,24 +6654,24 @@ typedef struct {
   */
 
 typedef uint8_t qmiLocGeofenceBreachMaskT_v02;
-#define QMI_LOC_GEOFENCE_BREACH_ENTERING_MASK_V02 ((qmiLocGeofenceBreachMaskT_v02)0x01) /**<  If this mask is set a breach event will be reported
+#define QMI_LOC_GEOFENCE_BREACH_ENTERING_MASK_V02 ((qmiLocGeofenceBreachMaskT_v02)0x01) /**<  If this mask is set, a breach event is reported
        when the Geofence is entered.  */
-#define QMI_LOC_GEOFENCE_BREACH_LEAVING_MASK_V02 ((qmiLocGeofenceBreachMaskT_v02)0x02) /**<  If this mask is set a breach event will be reported
+#define QMI_LOC_GEOFENCE_BREACH_LEAVING_MASK_V02 ((qmiLocGeofenceBreachMaskT_v02)0x02) /**<  If this mask is set, a breach event is reported
        when the Geofence is exited.  */
 /** @addtogroup loc_qmi_enums
     @{
   */
 typedef enum {
   QMILOCGEOFENCERESPONSIVENESSENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_GEOFENCE_RESPONSIVENESS_LOW_V02 = 0x01, /**<  The geofence is monitored for a breach at a
+  eQMI_LOC_GEOFENCE_RESPONSIVENESS_LOW_V02 = 0x01, /**<  The Geofence is monitored for a breach at a
        lower rate. The gap between actual breach and
        the time it is reported is higher. This
-       setting will result in lower power usage.  */
-  eQMI_LOC_GEOFENCE_RESPONSIVENESS_MED_V02 = 0x02, /**<  The geofence is monitored for a breach at a
+       setting results in lower power usage.  */
+  eQMI_LOC_GEOFENCE_RESPONSIVENESS_MED_V02 = 0x02, /**<  The Geofence is monitored for a breach at a
        medium rate. This is the default setting.
- The geofence is monitored for a breach at a
+ The Geofence is monitored for a breach at a
        high rate. The gap between actual breach and
-       the time it is reported is low. This will result
+       the time it is reported is low. This results
        in higher power usage.  */
   eQMI_LOC_GEOFENCE_RESPONSIVENESS_HIGH_V02 = 0x03,
   QMILOCGEOFENCERESPONSIVENESSENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
@@ -6409,14 +6685,14 @@ typedef enum {
   */
 typedef enum {
   QMILOCGEOFENCECONFIDENCEENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_GEOFENCE_CONFIDENCE_LOW_V02 = 0x01, /**<  The Geofence engine can indicate a breach with
-       low confidence. This setting will result in lower
+  eQMI_LOC_GEOFENCE_CONFIDENCE_LOW_V02 = 0x01, /**<  The Geofence engine indicates a breach with
+       low confidence. This setting results in lower
        power usage. This setting can impact the "yield" because
        incorrect breach events may be sent.  */
-  eQMI_LOC_GEOFENCE_CONFIDENCE_MED_V02 = 0x02, /**<  The Geofence engine can indicate a breach with
+  eQMI_LOC_GEOFENCE_CONFIDENCE_MED_V02 = 0x02, /**<  The Geofence engine indicates a breach with
        medium confidence. This is the default setting.
- The Geofence engine will indicate a breach with
-       high confidence. This setting will result in higher
+ The Geofence engine indicates a breach with
+       high confidence. This setting results in higher
        power usage. */
   eQMI_LOC_GEOFENCE_CONFIDENCE_HIGH_V02 = 0x03,
   QMILOCGEOFENCECONFIDENCEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
@@ -6437,7 +6713,7 @@ typedef struct {
   /**<   Longitude of the center of the Geofence. */
 
   uint32_t radius;
-  /**<   Radius of the circular geofence in meters. */
+  /**<   Radius of the circular Geofence in meters.  */
 }qmiLocCircularGeofenceArgsStructT_v02;  /* Type */
 /**
     @}
@@ -6460,66 +6736,75 @@ typedef enum {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Request Message; Used by the control point to add a circular geofence. */
+/** Request Message; Used by the control point to add a circular Geofence. */
 typedef struct {
 
   /* Mandatory */
   /*  Transaction ID */
   uint32_t transactionId;
-  /**<   Identifies the transaction, the transaction Id
-       will be returned with the Add Circular Geofence
-       Indication.
-       - Type -- Unsigned Integer.  */
+  /**<   Identifies the transaction. The transaction ID
+       is returned in the Add Circular Geofence
+       indication.  */
 
   /* Mandatory */
   /*  Circular Geofence Arguments */
   qmiLocCircularGeofenceArgsStructT_v02 circularGeofenceArgs;
-  /**<   The latitude, longitude and the radius which define
-       this Geofence.  */
 
   /* Mandatory */
   /*  Breach Event Mask */
   qmiLocGeofenceBreachMaskT_v02 breachMask;
-  /**<   Specifies the breach events the client is interested in.
-       - Valid values :
-       - 0x01 -- GEOFENCE_BREACH_ENTERING_MASK
-       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK   */
+  /**<   Specifies the breach events in which the client is interested.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 -- GEOFENCE_BREACH_ENTERING_MASK
+       \item    0x02 -- GEOFENCE_BREACH_LEAVING_MASK
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Mandatory */
   /*  Include Position in Breach Event */
   uint8_t includePosition;
-  /**<   Specifies if the Geofence engine should include the position
+  /**<   Specifies whether the Geofence engine is to include the position
        in a breach event.
-       Valid values: \n
-       - 0x01 (TRUE)  -- Position will be reported with the breach event.
-       - 0x00 (FALSE) -- Position will not be reported with the breach event.
-   */
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 (TRUE) -- Position will be reported with the breach event
+       \item    0x00 (FALSE) -- Position will not be reported with the breach
+                                event
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  Responsiveness */
   uint8_t responsiveness_valid;  /**< Must be set to true if responsiveness is being passed */
   qmiLocGeofenceResponsivenessEnumT_v02 responsiveness;
-  /**<   Specifies the rate of detection for a geofence breach.
-       May impact the time lag between the actual breach event and
+  /**<   Specifies the rate of detection for a Geofence breach.
+       This may impact the time lag between the actual breach event and
        when it is reported. This parameter has power implications
-       and should be fine tuned to optimize power savings.
-       - Valid values :\n
-       - 0x00000001 -- GEOFENCE_RESPONSIVENESS_LOW
-       - 0x00000002 -- GEOFENCE_RESPONSIVENESS_MED
-       - 0x00000003 -- GEOFENCE_RESPONSIVENESS_HIGH  */
+       and is to be fine-tuned to optimize power savings.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_RESPONSIVENESS_LOW
+       \item    0x00000002 -- GEOFENCE_RESPONSIVENESS_MED
+       \item    0x00000003 -- GEOFENCE_RESPONSIVENESS_HIGH
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  Confidence */
   uint8_t confidence_valid;  /**< Must be set to true if confidence is being passed */
   qmiLocGeofenceConfidenceEnumT_v02 confidence;
-  /**<   Given a breach event the confidence determines the probability
-       that the breach happened at the geofence boundary.
+  /**<   Given a breach event, the confidence determines the probability
+       that the breach happened at the Geofence boundary.
        This parameter has power implications and
-       should be fine tuned to optimize power savings.
-       - Valid values: \n
-       - 0x00000001 -- GEOFENCE_CONFIDENCE_LOW
-       - 0x00000002 -- GEOFENCE_CONFIDENCE_MED
-       - 0x00000003 -- GEOFENCE_CONFIDENCE_HIGH  */
+       is to be fine-tuned to optimize power savings.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_CONFIDENCE_LOW
+       \item    0x00000002 -- GEOFENCE_CONFIDENCE_MED
+       \item    0x00000003 -- GEOFENCE_CONFIDENCE_HIGH
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocAddCircularGeofenceReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6528,7 +6813,7 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Used by the control point to add a circular geofence. */
+/** Indication Message; Used by the control point to add a circular Geofence. */
 typedef struct {
 
   /* Mandatory */
@@ -6536,34 +6821,34 @@ typedef struct {
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Add Circular Geofence request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000005 -- PHONE_OFFLINE \n
-         - 0x00000006 -- TIMEOUT \n
-         - 0x00000008 -- INSUFFICIENT_MEMORY
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- SUCCESS
+       \item    0x00000001 -- GENERAL_FAILURE
+       \item    0x00000002 -- UNSUPPORTED
+       \item    0x00000003 -- INVALID_PARAMETER
+       \item    0x00000004 -- ENGINE_BUSY
+       \item    0x00000005 -- PHONE_OFFLINE
+       \item    0x00000006 -- TIMEOUT
+       \item    0x00000008 -- INSUFFICIENT_MEMORY
+       \vspace{-0.18in} \end{itemize1}
      */
 
   /* Optional */
-  /*  Transaction Id */
+  /*  Transaction ID */
   uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
   uint32_t transactionId;
-  /**<   Transaction ID which was specified in the Geofence
-       add request. This parameter will always be present
-       if the status field is set to SUCCESS.
-       - Type: Unsigned integer.  */
+  /**<   Transaction ID that was specified in the Add Circular
+       Geofence request. This parameter will always be present
+       if the status field is set to SUCCESS.  */
 
   /* Optional */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
   uint32_t geofenceId;
   /**<   Geofence identifier allocated by the engine.
-       The client should include this identifier in all the transactions
-       pertaining to this Geofence.
-       - Type: Unsigned integer.  */
+       The client must include this identifier in all transactions
+       pertaining to this Geofence.  */
 }qmiLocAddCircularGeofenceIndMsgT_v02;  /* Message */
 /**
     @}
@@ -6572,22 +6857,20 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Request Message; Used by the control point to delete a geofence. */
+/** Request Message; Used by the control point to delete a Geofence. */
 typedef struct {
 
   /* Mandatory */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint32_t geofenceId;
-  /**<   Identifier for the Geofence that is to be deleted.
-       - Type: Unsigned integer.  */
+  /**<   Identifier for the Geofence that is to be deleted.  */
 
   /* Mandatory */
   /*  Transaction ID */
   uint32_t transactionId;
-  /**<   Identifies the transaction, the transaction Id
-       will be returned with the Delete Geofence
-       Indication.
-       - Type -- Unsigned Integer.  */
+  /**<   Identifies the transaction. The transaction ID
+       is returned in the Delete Geofence
+       indication.  */
 }qmiLocDeleteGeofenceReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6596,37 +6879,38 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Used by the control point to delete a geofence. */
+/** Indication Message; Used by the control point to delete a Geofence. */
 typedef struct {
 
   /* Mandatory */
-  /*  Add Circular Geofence Status */
+  /*  Delete Geofence Status */
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Delete Geofence request.
 
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000006 -- TIMEOUT  */
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
   uint32_t geofenceId;
-  /**<   Identifier for the Geofence that was deleted.
-       - Type: Unsigned integer.  */
+  /**<   Identifier for the Geofence that was deleted.  */
 
   /* Optional */
-  /*  Transaction Id */
+  /*  Transaction ID */
   uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
   uint32_t transactionId;
-  /**<   Transaction ID which was specified in the Geofence
-       delete request. This parameter will always be present
-       if the status field is set to SUCCESS.
-       - Type: Unsigned integer.  */
+  /**<   Transaction ID that was specified in the Delete
+       Geofence request. This parameter will always be present
+       if the status field is set to SUCCESS.  */
 }qmiLocDeleteGeofenceIndMsgT_v02;  /* Message */
 /**
     @}
@@ -6637,8 +6921,8 @@ typedef struct {
   */
 typedef enum {
   QMILOCGEOFENCEORIGINENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_GEOFENCE_ORIGIN_NETWORK_V02 = 1, /**<  The geofence was initiated by a network initiated client.
- The geofence was initiated by the device.  */
+  eQMI_LOC_GEOFENCE_ORIGIN_NETWORK_V02 = 1, /**<  The Geofence was initiated by a network-initiated client.
+ The Geofence was initiated by the device.  */
   eQMI_LOC_GEOFENCE_ORIGIN_DEVICE_V02 = 2,
   QMILOCGEOFENCEORIGINENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
 }qmiLocGeofenceOriginEnumT_v02;
@@ -6651,8 +6935,8 @@ typedef enum {
   */
 typedef enum {
   QMILOCGEOFENCESTATEENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_GEOFENCE_STATE_ACTIVE_V02 = 1, /**<  The geofence is being actively monitored.
- The geofence monitoring is suspended.  */
+  eQMI_LOC_GEOFENCE_STATE_ACTIVE_V02 = 1, /**<  The Geofence is being actively monitored.
+ The Geofence monitoring is suspended.  */
   eQMI_LOC_GEOFENCE_STATE_SUSPEND_V02 = 2,
   QMILOCGEOFENCESTATEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
 }qmiLocGeofenceStateEnumT_v02;
@@ -6663,22 +6947,20 @@ typedef enum {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Request Message; Used by the control point to query a geofence. */
+/** Request Message; Used by the control point to query a Geofence. */
 typedef struct {
 
   /* Mandatory */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint32_t geofenceId;
-  /**<   Identifier for the Geofence that is to be queried.
-       - Type: Unsigned integer.  */
+  /**<   Identifier for the Geofence that is to be queried.  */
 
   /* Mandatory */
   /*  Transaction ID */
   uint32_t transactionId;
-  /**<   Identifies the transaction, the transaction Id
-       will be returned with the Query Geofence
-       Indication.
-       - Type -- Unsigned Integer.  */
+  /**<   Identifies the transaction. The transaction ID
+       is returned with the Query Geofence
+       indication.  */
 }qmiLocQueryGeofenceReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6687,73 +6969,81 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Used by the control point to query a geofence. */
+/** Indication Message; Used by the control point to query a Geofence. */
 typedef struct {
 
   /* Mandatory */
   /*  Query Geofence Status */
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Query Geofence request.
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000006 -- TIMEOUT  */
+
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
   uint32_t geofenceId;
-  /**<   Identifier for the Geofence that was queried.
-       - Type: Unsigned integer.  */
+  /**<   Identifier for the Geofence that was queried.  */
 
   /* Optional */
-  /*  Transaction Id */
+  /*  Transaction ID */
   uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
   uint32_t transactionId;
-  /**<   Transaction ID which was specified in the Geofence
-       query request. This parameter will always be present
-       if the status field is set to SUCCESS.
-       - Type: Unsigned integer.  */
+  /**<   Transaction ID that was specified in the Query
+       Geofence request. This parameter will always be present
+       if the status field is set to SUCCESS.  */
 
   /* Optional */
   /*  Geofence Origin */
   uint8_t geofenceOrigin_valid;  /**< Must be set to true if geofenceOrigin is being passed */
   qmiLocGeofenceOriginEnumT_v02 geofenceOrigin;
-  /**<   Originator for the geofence.
-       Valid values: \n
-         - 0x00000001 -- GEOFENCE_ORIGIN_NETWORK
-         - 0x00000002 -- GEOFENCE_ORIGIN_DEVICE
+  /**<   Originator of the Geofence.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_ORIGIN_NETWORK
+       \item    0x00000002 -- GEOFENCE_ORIGIN_DEVICE
+       \vspace{-0.18in} \end{itemize1}
         */
 
   /* Optional */
-  /*  Position with respect to Geofence */
+  /*  Position with Respect to Geofence */
   uint8_t posWrtGeofence_valid;  /**< Must be set to true if posWrtGeofence is being passed */
   qmiLocGeofencePositionEnumT_v02 posWrtGeofence;
-  /**<   Indicates if the client is currently inside outside
+  /**<   Indicates if the client is currently inside or outside
        the Geofence.
-       - Valid values: \n
-       - 0x00000001 -- GEOFENCE_POSITION_INSIDE
-       - 0x00000002 -- GEOFENCE_POSITION_OUTSIDE
-   */
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_POSITION_INSIDE
+       \item    0x00000002 -- GEOFENCE_POSITION_OUTSIDE
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  Circular Geofence Parameters */
   uint8_t circularGeofenceArgs_valid;  /**< Must be set to true if circularGeofenceArgs is being passed */
   qmiLocCircularGeofenceArgsStructT_v02 circularGeofenceArgs;
-  /**<   The latitude and longitude of the center and the radius which
-       defines the are of this geofence.  */
 
   /* Optional */
   /*  Geofence State */
   uint8_t geofenceState_valid;  /**< Must be set to true if geofenceState is being passed */
   qmiLocGeofenceStateEnumT_v02 geofenceState;
-  /**<   Specifies whether the geofence is being monitored actively.
-       Valid values: \n
-       - 0x00000001 -- GEOFENCE_STATE_ACTIVE
-       - 0x00000002 -- GEOFENCE_STATE_SUSPEND  */
+  /**<   Specifies whether the Geofence is to be actively monitored.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_STATE_ACTIVE
+       \item    0x00000002 -- GEOFENCE_STATE_SUSPEND
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocQueryGeofenceIndMsgT_v02;  /* Message */
 /**
     @}
@@ -6762,90 +7052,101 @@ typedef struct {
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Request Message; Used by the control point to edit a geofence. */
+/** Request Message; Used by the control point to edit a Geofence. */
 typedef struct {
 
   /* Mandatory */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint32_t geofenceId;
-  /**<   Identifier for the Geofence to be edited.
-       - Type: Unsigned integer.  */
+  /**<   Identifier for the Geofence to be edited.  */
 
   /* Mandatory */
   /*  Transaction ID */
   uint32_t transactionId;
-  /**<   Identifies the transaction, the transaction Id
-       will be returned with the Edit Geofence Indication.
-        - Type -- Unsigned Integer.  */
+  /**<   Transaction ID that was specified in the Edit Geofence
+       request. This parameter will always be present if the
+       status field is set to SUCCESS.
+  */
 
   /* Optional */
   /*  Geofence State */
   uint8_t geofenceState_valid;  /**< Must be set to true if geofenceState is being passed */
   qmiLocGeofenceStateEnumT_v02 geofenceState;
-  /**<   Specifies whether the geofence should be actively monitored.
-       Valid values: \n
-       - 0x00000001 -- GEOFENCE_STATE_ACTIVE
-       - 0x00000002 -- GEOFENCE_STATE_SUSPEND  */
+  /**<   Specifies whether the Geofence is to be actively monitored.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_STATE_ACTIVE
+       \item    0x00000002 -- GEOFENCE_STATE_SUSPEND
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  Breach Event Mask */
   uint8_t breachMask_valid;  /**< Must be set to true if breachMask is being passed */
   qmiLocGeofenceBreachMaskT_v02 breachMask;
-  /**<   Specifies the breach events the client is interested in.
-       - Valid values :
-       - 0x01 -- GEOFENCE_BREACH_ENTERING_MASK
-       - 0x02 -- GEOFENCE_BREACH_LEAVING_MASK   */
+  /**<   Specifies the breach events in which the client is interested.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x01 -- GEOFENCE_BREACH_ENTERING_MASK
+       \item    0x02 -- GEOFENCE_BREACH_LEAVING_MASK
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocEditGeofenceReqMsgT_v02;  /* Message */
 /**
     @}
   */
 
 typedef uint32_t qmiLocGeofenceConfigParamMaskT_v02;
-#define QMI_LOC_GEOFENCE_PARAM_MASK_GEOFENCE_STATE_V02 ((qmiLocGeofenceConfigParamMaskT_v02)0x00000001) /**<  Mask for the Geofence state parameter  */
-#define QMI_LOC_GEOFENCE_PARAM_MASK_BREACH_MASK_V02 ((qmiLocGeofenceConfigParamMaskT_v02)0x00000002) /**<  Mask for Geofence breach mask parameter */
+#define QMI_LOC_GEOFENCE_PARAM_MASK_GEOFENCE_STATE_V02 ((qmiLocGeofenceConfigParamMaskT_v02)0x00000001) /**<  Mask for the Geofence state parameter.  */
+#define QMI_LOC_GEOFENCE_PARAM_MASK_BREACH_MASK_V02 ((qmiLocGeofenceConfigParamMaskT_v02)0x00000002) /**<  Mask for Geofence breach mask parameter.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
-/** Indication Message; Used by the control point to edit a geofence. */
+/** Indication Message; Used by the control point to edit a Geofence. */
 typedef struct {
 
   /* Mandatory */
   /*  Edit Geofence Status */
   qmiLocStatusEnumT_v02 status;
   /**<   Status of the Edit Geofence request.
-       Valid values: \n
-         - 0x00000000 -- SUCCESS \n
-         - 0x00000001 -- GENERAL_FAILURE \n
-         - 0x00000002 -- UNSUPPORTED \n
-         - 0x00000003 -- INVALID_PARAMETER \n
-         - 0x00000004 -- ENGINE_BUSY \n
-         - 0x00000006 -- TIMEOUT  */
+
+       Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- SUCCESS
+        \item    0x00000001 -- GENERAL_FAILURE
+        \item    0x00000002 -- UNSUPPORTED
+        \item    0x00000003 -- INVALID_PARAMETER
+        \item    0x00000004 -- ENGINE_BUSY
+        \item    0x00000005 -- PHONE_OFFLINE
+        \item    0x00000006 -- TIMEOUT
+        \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
-  /*  Geofence Id */
+  /*  Geofence ID */
   uint8_t geofenceId_valid;  /**< Must be set to true if geofenceId is being passed */
   uint32_t geofenceId;
-  /**<   Identifier for the Geofence that was edited.
-       - Type: Unsigned integer.  */
+  /**<   Identifier for the Geofence that was edited.  */
 
   /* Optional */
-  /*  Transaction Id */
+  /*  Transaction ID */
   uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
   uint32_t transactionId;
-  /**<   Identifies the transaction, the transaction Id
-       is specified in the Edit Geofence request.
-        - Type -- Unsigned Integer.  */
+  /**<   Identifies the transaction. The transaction ID
+       is specified in the Edit Geofence request.  */
 
   /* Optional */
   /*  Failed Parameters */
   uint8_t failedParams_valid;  /**< Must be set to true if failedParams is being passed */
   qmiLocGeofenceConfigParamMaskT_v02 failedParams;
   /**<   Specified only when the status is not set to SUCCESS. If
-       the mask corresponding to a field is set it indicates that
+       the mask corresponding to a field is set, it indicates that
        the Geofence parameter could not be edited.
-       Valid values: \n
-       0x00000001 -- GEOFENCE_PARAM_MASK_GEOFENCE_STATE \n
-       0x00000002 -- GEOFENCE_PARAM_MASK_BREACH_MASK \n  */
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000001 -- GEOFENCE_PARAM_MASK_GEOFENCE_STATE
+       \item    0x00000002 -- GEOFENCE_PARAM_MASK_BREACH_MASK
+       \vspace{-0.18in} \end{itemize1}  */
 }qmiLocEditGeofenceIndMsgT_v02;  /* Message */
 /**
     @}
@@ -6859,11 +7160,10 @@ typedef struct {
 typedef struct {
 
   /* Mandatory */
-  /*  Transaction Id */
+  /*  Transaction ID */
   uint32_t transactionId;
-  /**<   Identifies the transaction, the same transaction Id
-       will be returned in the Get Best Available Position indication.
-        - Type -- Unsigned Integer.  */
+  /**<   Identifies the transaction. The transaction ID
+       is returned in the Get Best Available Position indication.  */
 }qmiLocGetBestAvailablePositionReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6877,9 +7177,10 @@ typedef struct {
 typedef struct {
 
   /* Mandatory */
-  /*  Get Best Available Position status */
+  /*  Get Best Available Position Status */
   qmiLocStatusEnumT_v02 status;
-  /**<   Status of the Get Instantaneous Position request.
+  /**<   Status of the Get Best Available Position request.
+
        Valid values: \n
          - 0x00000000 -- SUCCESS \n
          - 0x00000001 -- GENERAL_FAILURE \n
@@ -6888,41 +7189,45 @@ typedef struct {
          - 0x00000006 -- TIMEOUT  */
 
   /* Optional */
-  /*  Transaction Id */
+  /*  Transaction ID */
   uint8_t transactionId_valid;  /**< Must be set to true if transactionId is being passed */
   uint32_t transactionId;
-  /**<   Transaction Id which was specified in the Get Best
-       Available Position request.
-        - Type -- Unsigned Integer.  */
+  /**<   Transaction ID that was specified in the Get Best
+       Available Position request. This parameter will
+       always be present if the status field is set to
+       SUCCESS.  */
 
   /* Optional */
   /*  Latitude */
   uint8_t latitude_valid;  /**< Must be set to true if latitude is being passed */
   double latitude;
-  /**<   Latitude (specified in WGS84 datum). \n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -90.0 to 90.0 \n
-       - Positive values indicate northern latitude \n
-       - Negative values indicate southern latitude  */
+  /**<   Latitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item     Range: -90.0 to 90.0      \begin{itemize1}
+         \item    Positive values indicate northern latitude
+         \item    Negative values indicate southern latitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /* Optional */
   /*   Longitude */
   uint8_t longitude_valid;  /**< Must be set to true if longitude is being passed */
   double longitude;
-  /**<   Longitude (specified in WGS84 datum).\n
-       - Type: Floating point \n
-       - Units: Degrees \n
-       - Range: -180.0 to 180.0 \n
-       - Positive values indicate eastern longitude \n
-       - Negative values indicate western longitude  */
+  /**<   Longitude (specified in WGS84 datum).
+       \begin{itemize1}
+       \item    Type: Floating point
+       \item    Units: Degrees
+       \item    Range: -180.0 to 180.0     \begin{itemize1}
+         \item    Positive values indicate eastern longitude
+         \item    Negative values indicate western longitude
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 
   /* Optional */
   /*   Circular Horizontal Position Uncertainty */
   uint8_t horUncCircular_valid;  /**< Must be set to true if horUncCircular is being passed */
   float horUncCircular;
   /**<   Horizontal position uncertainty (circular).\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
@@ -6930,7 +7235,6 @@ typedef struct {
   uint8_t altitudeWrtEllipsoid_valid;  /**< Must be set to true if altitudeWrtEllipsoid is being passed */
   float altitudeWrtEllipsoid;
   /**<   Altitude with respect to the WGS84 ellipsoid.\n
-       - Type: Floating point \n
        - Units: Meters \n
        - Range: -500 to 15883  */
 
@@ -6939,24 +7243,223 @@ typedef struct {
   uint8_t vertUnc_valid;  /**< Must be set to true if vertUnc is being passed */
   float vertUnc;
   /**<   Vertical uncertainty.\n
-       - Type: Floating point \n
        - Units: Meters  */
 
   /* Optional */
   /*  UTC Timestamp */
   uint8_t timestampUtc_valid;  /**< Must be set to true if timestampUtc is being passed */
   uint64_t timestampUtc;
-  /**<   UTC timestamp. \n
-       - Type: Unsigned integer \n
-       - Units: Milliseconds since Jan. 1, 1970  */
+  /**<   UTC timestamp.
+       \begin{itemize1}
+       \item Units: Milliseconds since Jan. 1, 1970
+       \vspace{-0.18in} \end{itemize1}  */
 
   /* Optional */
   /*  Time Uncertainty */
   uint8_t timeUnc_valid;  /**< Must be set to true if timeUnc is being passed */
   float timeUnc;
   /**<   Time uncertainty. \n
-       - Type: Floating point \n
        - Units: Milliseconds   */
+
+  /* Optional */
+  /*  Horizontal Elliptical Uncertainty Semi-Minor Axis */
+  uint8_t horUncEllipseSemiMinor_valid;  /**< Must be set to true if horUncEllipseSemiMinor is being passed */
+  float horUncEllipseSemiMinor;
+  /**<   Semi-minor axis of horizontal elliptical uncertainty. \n
+       - Units: Meters  */
+
+  /* Optional */
+  /*  Horizontal Elliptical Uncertainty Semi-Major Axis */
+  uint8_t horUncEllipseSemiMajor_valid;  /**< Must be set to true if horUncEllipseSemiMajor is being passed */
+  float horUncEllipseSemiMajor;
+  /**<   Semi-major axis of horizontal elliptical uncertainty. \n
+       - Units: Meters  */
+
+  /* Optional */
+  /*  Horizontal Elliptical Uncertainty Azimuth */
+  uint8_t horUncEllipseOrientAzimuth_valid;  /**< Must be set to true if horUncEllipseOrientAzimuth is being passed */
+  float horUncEllipseOrientAzimuth;
+  /**<   Elliptical horizontal uncertainty azimuth of orientation. \n
+       - Units: Decimal degrees \n
+       - Range: 0 to 180  */
+
+  /* Optional */
+  /*  Horizontal Circular Confidence */
+  uint8_t horCircularConfidence_valid;  /**< Must be set to true if horCircularConfidence is being passed */
+  uint8_t horCircularConfidence;
+  /**<   Horizontal circular uncertainty confidence. \n
+       - Units: Percent \n
+       - Range: 0 to 99  */
+
+  /* Optional */
+  /*  Horizontal Elliptical Confidence */
+  uint8_t horEllipticalConfidence_valid;  /**< Must be set to true if horEllipticalConfidence is being passed */
+  uint8_t horEllipticalConfidence;
+  /**<   Horizontal elliptical uncertainty confidence. \n
+       - Units: Percent \n
+       - Range: 0 to 99  */
+
+  /* Optional */
+  /*  Horizontal Reliability */
+  uint8_t horReliability_valid;  /**< Must be set to true if horReliability is being passed */
+  qmiLocReliabilityEnumT_v02 horReliability;
+  /**<   Specifies the reliability of the horizontal position.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- RELIABILITY_NOT_SET
+       \item    0x00000001 -- RELIABILITY_VERY_LOW
+       \item    0x00000002 -- RELIABILITY_LOW
+       \item    0x00000003 -- RELIABILITY_MEDIUM
+       \item    0x00000004 -- RELIABILITY_HIGH
+       \vspace{-0.18in} \end{itemize1}     */
+
+  /* Optional */
+  /*  Horizontal Speed */
+  uint8_t horSpeed_valid;  /**< Must be set to true if horSpeed is being passed */
+  float horSpeed;
+  /**<   Horizontal speed. \n
+       - Units: Meters/second  */
+
+  /* Optional */
+  /*  Horizontal Speed Uncertainty */
+  uint8_t horSpeedUnc_valid;  /**< Must be set to true if horSpeedUnc is being passed */
+  float horSpeedUnc;
+  /**<   Horizontal speed uncertainty. \n
+       - Units: Meters/second  */
+
+  /* Optional */
+  /*  Altitude With Respect to Sea Level */
+  uint8_t altitudeWrtMeanSeaLevel_valid;  /**< Must be set to true if altitudeWrtMeanSeaLevel is being passed */
+  float altitudeWrtMeanSeaLevel;
+  /**<   Altitude with respect to mean sea level. \n
+       - Units: Meters  */
+
+  /* Optional */
+  /*  Vertical Confidence */
+  uint8_t vertConfidence_valid;  /**< Must be set to true if vertConfidence is being passed */
+  uint8_t vertConfidence;
+  /**<   Vertical uncertainty confidence. \n
+       - Units: Percent    \n
+       - Range: 0 to 99  */
+
+  /* Optional */
+  /*  Vertical Reliability */
+  uint8_t vertReliability_valid;  /**< Must be set to true if vertReliability is being passed */
+  qmiLocReliabilityEnumT_v02 vertReliability;
+  /**<   Specifies the reliability of the vertical position.
+
+        Valid values:
+        \begin{itemize1}
+        \item    0x00000000 -- RELIABILITY_NOT_SET
+        \item    0x00000001 -- RELIABILITY_VERY_LOW
+        \item    0x00000002 -- RELIABILITY_LOW
+        \item    0x00000003 -- RELIABILITY_MEDIUM
+        \item    0x00000004 -- RELIABILITY_HIGH
+        \vspace{-0.18in} \end{itemize1} */
+
+  /* Optional */
+  /*  Vertical Speed */
+  uint8_t vertSpeed_valid;  /**< Must be set to true if vertSpeed is being passed */
+  float vertSpeed;
+  /**<   Vertical speed. \n
+         - Units: Meters/second  */
+
+  /* Optional */
+  /*  Vertical Speed Uncertainty */
+  uint8_t vertSpeedUnc_valid;  /**< Must be set to true if vertSpeedUnc is being passed */
+  float vertSpeedUnc;
+  /**<   Vertical speed uncertainty. \n
+       - Units: Meters/second  */
+
+  /* Optional */
+  /*  Heading */
+  uint8_t heading_valid;  /**< Must be set to true if heading is being passed */
+  float heading;
+  /**<   Heading. \n
+         - Units: Degrees \n
+         - Range: 0 to 359.999   */
+
+  /* Optional */
+  /*  Heading Uncertainty */
+  uint8_t headingUnc_valid;  /**< Must be set to true if headingUnc is being passed */
+  float headingUnc;
+  /**<   Heading uncertainty. \n
+       - Type: Floating point \n
+       - Range: 0 to 359.999  */
+
+  /* Optional */
+  /*  Magnetic Deviation */
+  uint8_t magneticDeviation_valid;  /**< Must be set to true if magneticDeviation is being passed */
+  float magneticDeviation;
+  /**<   Difference between the bearing to true north and the bearing shown
+      on a magnetic compass. The deviation is positive when the magnetic
+      north is east of true north.  */
+
+  /* Optional */
+  /*  Technology Used Mask */
+  uint8_t technologyMask_valid;  /**< Must be set to true if technologyMask is being passed */
+  qmiLocPosTechMaskT_v02 technologyMask;
+  /**<   Technology used in computing this fix.
+
+       Valid bitmasks:
+       \begin{itemize1}
+       \item    0x00000001 -- SATELLITE
+       \item    0x00000002 -- CELLID
+       \item    0x00000004 -- WIFI
+       \item    0x00000008 -- SENSORS
+       \item    0x00000010 -- REFERENCE_LOCATION
+       \vspace{-0.18in} \end{itemize1}  */
+
+  /* Optional */
+  /*  Dilution of Precision */
+  uint8_t DOP_valid;  /**< Must be set to true if DOP is being passed */
+  qmiLocDOPStructT_v02 DOP;
+
+  /* Optional */
+  /*  GPS Time */
+  uint8_t gpsTime_valid;  /**< Must be set to true if gpsTime is being passed */
+  qmiLocGPSTimeStructT_v02 gpsTime;
+
+  /* Optional */
+  /*  Time Source */
+  uint8_t timeSrc_valid;  /**< Must be set to true if timeSrc is being passed */
+  qmiLocTimeSourceEnumT_v02 timeSrc;
+  /**<   Time source.
+
+       Valid values:
+       \begin{itemize1}
+       \item    0x00000000 -- TIME_SRC_INVALID
+       \item    0x00000001 -- TIME_SRC_NETWORK_TIME_TRANSFER
+       \item    0x00000002 -- TIME_SRC_NETWORK_TIME_TAGGING
+       \item    0x00000003 -- TIME_SRC_EXTERNAL_INPUT
+       \item    0x00000004 -- TIME_SRC_TOW_DECODE
+       \item    0x00000005 -- TIME_SRC_TOW_CONFIRMED
+       \item    0x00000006 -- TIME_SRC_TOW_AND_WEEK_CONFIRMED
+       \item    0x00000007 -- TIME_SRC_NAV_SOLUTION
+       \item    0x00000008 -- TIME_SRC_SOLVE_FOR_TIME
+       \vspace{-0.18in} \end{itemize1}  */
+
+  /* Optional */
+  /*  Sensor Data Usage */
+  uint8_t sensorDataUsage_valid;  /**< Must be set to true if sensorDataUsage is being passed */
+  qmiLocSensorUsageIndicatorStructT_v02 sensorDataUsage;
+
+  /* Optional */
+  /*  SVs Used to Calculate the Fix */
+  uint8_t gnssSvUsedList_valid;  /**< Must be set to true if gnssSvUsedList is being passed */
+  uint32_t gnssSvUsedList_len;  /**< Must be set to # of elements in gnssSvUsedList */
+  uint16_t gnssSvUsedList[QMI_LOC_MAX_SV_USED_LIST_LENGTH_V02];
+  /**<   Each entry in the list contains the SV ID of a satellite
+       used for calculating this position report. The following
+       information is associated with each SV ID:
+       \begin{itemize1}
+       \item    Range: \begin{itemize1}
+         \item    For GPS:     1 to 32
+         \item    For SBAS:    33 to 64
+         \item    For GLONASS: 65 to 96
+         \item    For QZSS:    193 to 197
+       \vspace{-0.18in} \end{itemize1} \end{itemize1}  */
 }qmiLocGetBestAvailablePositionIndMsgT_v02;  /* Message */
 /**
     @}
