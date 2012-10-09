@@ -15,6 +15,11 @@ endif #TARGET_NO_RPC
 
 #add QMI libraries for QMI targets
 QMI_BOARD_PLATFORM_LIST := msm8960
+ATLAS_BOARD_PLATFORM_LIST := msm7627a
+
+ifeq ($(call is-board-platform-in-list,$(ATLAS_BOARD_PLATFORM_LIST)),true)
+GPS_DIR_LIST += $(LOCAL_PATH)/loc_api_v02/
+endif #is-board-platform-in-list
 
 ifeq ($(call is-board-platform-in-list,$(QMI_BOARD_PLATFORM_LIST)),true)
 GPS_DIR_LIST += $(LOCAL_PATH)/loc_api_v02/
