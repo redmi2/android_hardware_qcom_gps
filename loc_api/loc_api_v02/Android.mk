@@ -4,6 +4,9 @@ LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
+ATLAS_PLATFORM_LIST := msm7627a
+
+
 LOCAL_MODULE := libloc_api_v02
 
 LOCAL_MODULE_TAGS := optional
@@ -11,11 +14,21 @@ LOCAL_MODULE_TAGS := optional
 LOCAL_SHARED_LIBRARIES := \
     libutils \
     libcutils \
-    libqmi_cci \
-    libqmi_csi \
-    libqmi_common_so \
     libloc_adapter \
     libgps.utils
+
+ifneq ($(call is-board-platform-in-list,$(ATLAS_PLATFORM_LIST)),true)
+LOCAL_SHARED_LIBRARIES += \
+    libqmi_cci \
+    libqmi_csi \
+    libqmi_common_so
+endif
+
+
+ifeq ($(call is-board-platform-in-list,$(ATLAS_PLATFORM_LIST)),true)
+LOCAL_SHARED_LIBRARIES += \
+    libqmi_client_griffon
+endif
 
 LOCAL_SRC_FILES += \
     LocApiV02Adapter.cpp \
@@ -30,9 +43,20 @@ LOCAL_CFLAGS += \
 
 ## Includes
 LOCAL_C_INCLUDES := \
-    $(TARGET_OUT_HEADERS)/qmi-framework/inc \
     $(TARGET_OUT_HEADERS)/libloc_eng \
     $(TARGET_OUT_HEADERS)/gps.utils
+
+ifneq ($(call is-board-platform-in-list,$(ATLAS_PLATFORM_LIST)),true)
+LOCAL_C_INCLUDES += \
+    $(TARGET_OUT_HEADERS)/qmi-framework/inc
+endif
+
+
+ifeq ($(call is-board-platform-in-list,$(ATLAS_PLATFORM_LIST)),true)
+LOCAL_C_INCLUDES += \
+    $(TOP)/vendor/qcom/proprietary/gps/griffon/qmi_framework/inc
+endif
+
 
 LOCAL_PRELINK_MODULE := false
 
