@@ -39,6 +39,8 @@ extern "C" {
 
 #define MIN_POSSIBLE_FIX_INTERVAL 1000 /* msec */
 
+#define XTRA_DATA_MAX_SIZE 100000 /*bytes*/
+
 typedef enum loc_server_type {
     LOC_AGPS_CDMA_PDE_SERVER,
     LOC_AGPS_CUSTOM_PDE_SERVER,
@@ -57,6 +59,7 @@ typedef enum loc_position_mode_type {
 } LocPositionMode;
 
 typedef void (*loc_location_cb_ext) (GpsLocation* location, void* locExt);
+
 typedef void (*loc_sv_status_cb_ext) (GpsSvStatus* sv_status, void* svExt);
 typedef void* (*loc_ext_parser)(void* data);
 
