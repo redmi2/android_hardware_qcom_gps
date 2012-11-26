@@ -38,6 +38,13 @@
 #include <loc_eng_log.h>
 #include "loc_eng_msg_id.h"
 
+#ifdef USE_GLIB
+
+#include <glib.h>
+
+#endif /* USE_GLIB */
+#include "platform_lib_includes.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
