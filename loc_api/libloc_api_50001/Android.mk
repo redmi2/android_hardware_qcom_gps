@@ -65,8 +65,7 @@ LOCAL_SRC_FILES += \
     loc_eng_agps.cpp \
     loc_eng_xtra.cpp \
     loc_eng_ni.cpp \
-    loc_eng_log.cpp \
-    loc_eng_nmea.cpp
+    loc_eng_log.cpp
 
 ifeq ($(FEATURE_GNSS_BIT_API), true)
 LOCAL_CFLAGS += -DFEATURE_GNSS_BIT_API
