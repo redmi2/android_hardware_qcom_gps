@@ -15,7 +15,8 @@ endif #TARGET_NO_RPC
 
 ifeq (exists, $(shell test -d $(TOP)/vendor/qcom/proprietary/qmi-framework && echo exists))
 #add QMI libraries for QMI targets
-QMI_BOARD_PLATFORM_LIST := msm8960
+QMI_BOARD_PLATFORM_LIST := msm7627a
+QMI_BOARD_PLATFORM_LIST += msm8960
 QMI_BOARD_PLATFORM_LIST += msm8974
 endif
 
