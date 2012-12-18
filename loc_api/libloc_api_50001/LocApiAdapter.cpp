@@ -77,21 +77,14 @@ LocApiAdapter* LocApiAdapter::getLocApiAdapter(LocEng &locEng)
 {
     void* handle;
     LocApiAdapter* adapter = NULL;
-    int retVal = -1;
-    struct stat fsBuffer;
-    const char* evkFilePath = "/data/misc/location/atlas/exist";
-    LOC_LOGV("Checking for presence of EVK exist file at %s", evkFilePath);
-    retVal = stat(evkFilePath, &fsBuffer);
-    // Check the EVK to decide whether we need to load the LOC_API RPC or LOC_API QMI
-    if(retVal == 0)
+
+    if(isGriffonTarget())
     {
-      LOC_LOGV("Check EVK test returned %d, EVK present. loading griffon LOC_API QMI", retVal);
       // Load the LOC_API QMI for griffon
       handle = dlopen ("libloc_api_v02.so", RTLD_NOW);
     }
     else
     {
-      LOC_LOGV("Check EVK test returned %d,not present. Warning: %s ", retVal, strerror(errno));
       if( (handle = dlopen ("libloc_api-rpc-qc.so", RTLD_NOW)) != NULL)
       {
         LOC_LOGV("Loading LOC_API RPC ");

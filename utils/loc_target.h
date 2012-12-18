@@ -34,6 +34,8 @@ extern "C"
 {
 #endif
 
+#include <stdbool.h>
+
 typedef enum {
     TARGET_OTHER = 0,
     TARGET_APQ8064_STANDALONE,
@@ -43,6 +45,8 @@ typedef enum {
 }targetEnumType;
 
 targetEnumType get_target(void);
+
+bool isGriffonTarget();
 
 #ifdef __cplusplus
 }
