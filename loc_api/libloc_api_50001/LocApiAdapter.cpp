@@ -34,6 +34,11 @@
 #include "loc_eng_msg.h"
 #include "loc_log.h"
 #include "loc_eng_ni.h"
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <string.h>
+#include <errno.h>
 
 static void* noProc(void* data)
 {
@@ -72,13 +77,32 @@ LocApiAdapter* LocApiAdapter::getLocApiAdapter(LocEng &locEng)
 {
     void* handle;
     LocApiAdapter* adapter = NULL;
-
-    handle = dlopen ("libloc_api_v02.so", RTLD_NOW);
-
-    if (!handle) {
-        handle = dlopen ("libloc_api-rpc-qc.so", RTLD_NOW);
+    int retVal = -1;
+    struct stat fsBuffer;
+    const char* evkFilePath = "/data/misc/location/atlas/exist";
+    LOC_LOGV("Checking for presence of EVK exist file at %s", evkFilePath);
+    retVal = stat(evkFilePath, &fsBuffer);
+    // Check the EVK to decide whether we need to load the LOC_API RPC or LOC_API QMI
+    if(retVal == 0)
+    {
+      LOC_LOGV("Check EVK test returned %d, EVK present. loading griffon LOC_API QMI", retVal);
+      // Load the LOC_API QMI for griffon
+      handle = dlopen ("libloc_api_v02.so", RTLD_NOW);
     }
-
+    else
+    {
+      LOC_LOGV("Check EVK test returned %d,not present. Warning: %s ", retVal, strerror(errno));
+      if( (handle = dlopen ("libloc_api-rpc-qc.so", RTLD_NOW)) != NULL)
+      {
+        LOC_LOGV("Loading LOC_API RPC ");
+      }
+      else
+      {
+        // Load the LOC_API QMI
+        LOC_LOGV("Failed to open LOC_API RPC , loading non-griffon LOC_API QMI");
+        handle = dlopen ("libloc_api_v02.so", RTLD_NOW);
+      }
+    }
     if (!handle) {
         adapter = new LocApiAdapter(locEng);
     } else {
