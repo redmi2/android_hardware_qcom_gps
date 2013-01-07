@@ -25,7 +25,6 @@
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #ifndef LOC_SERVICE_H
 #define LOC_SERVICE_H
 /**
@@ -59,13 +58,12 @@
   elements in the array will be accessed.
 
 */
-
 /*====*====*====*====*====*====*====*====*====*====*====*====*====*====*====*
  *THIS IS AN AUTO GENERATED FILE. DO NOT ALTER IN ANY WAY
  *====*====*====*====*====*====*====*====*====*====*====*====*====*====*====*/
 
-/* This file was generated with Tool version 5.6
-   It was generated on: Fri Oct 26 2012
+/* This file was generated with Tool version 5.5
+   It was generated on: Thu Sep 20 2012
    From IDL File: location_service_v02.idl */
 
 /** @defgroup loc_qmi_consts Constant values defined in the IDL */
@@ -91,11 +89,11 @@ extern "C" {
 /** Major Version Number of the IDL used to generate this file */
 #define LOC_V02_IDL_MAJOR_VERS 0x02
 /** Revision Number of the IDL used to generate this file */
-#define LOC_V02_IDL_MINOR_VERS 0x11
+#define LOC_V02_IDL_MINOR_VERS 0x0F
 /** Major Version Number of the qmi_idl_compiler used to generate this file */
 #define LOC_V02_IDL_TOOL_VERS 0x05
 /** Maximum Defined Message ID */
-#define LOC_V02_MAX_MESSAGE_ID 0x006F;
+#define LOC_V02_MAX_MESSAGE_ID 0x006C;
 /**
     @}
   */
@@ -274,12 +272,6 @@ typedef uint64_t qmiLocEventRegMaskT_v02;
 #define QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION_V02 ((qmiLocEventRegMaskT_v02)0x00010000ull) /**<  The control point must enable this mask to receive notifications when
        a Geofence is breached. These events are generated when the UE enters
        or leaves the perimeter of a Geofence.  */
-#define QMI_LOC_EVENT_MASK_PEDOMETER_CONTROL_V02 ((qmiLocEventRegMaskT_v02)0x00020000ull) /**<  The control point must enable this mask to register for Pedometer
-       control requests from the location engine. Location engine sends
-       this event out to control the injection of pedometer reports.  */
-#define QMI_LOC_EVENT_MASK_MOTION_DATA_CONTROL_V02 ((qmiLocEventRegMaskT_v02)0x00040000ull) /**<  The control point must enable this mask to register for motion data
-       control requests from the location engine. Location engine sends
-       this event out to control the injection of motion data.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -291,58 +283,29 @@ typedef struct {
   /*  Event Registration Mask */
   qmiLocEventRegMaskT_v02 eventRegMask;
   /**<   Specifies the events that the control point is interested in receiving.
- Refer to the definition of the following bitmasks:
-      - QMI_LOC_EVENT_MASK_POSITION_REPORT (0x00000001) --  The control point must enable this mask to receive position report
-       event indications.
-      - QMI_LOC_EVENT_MASK_GNSS_SV_INFO (0x00000002) --  The control point must enable this mask to receive satellite report
-       event indications. These reports are sent at a 1 Hz rate.
-      - QMI_LOC_EVENT_MASK_NMEA (0x00000004) --  The control point must enable this mask to receive NMEA reports for
-       position and satellites in view. The report is at a 1 Hz rate.
-      - QMI_LOC_EVENT_MASK_NI_NOTIFY_VERIFY_REQ (0x00000008) --  The control point must enable this mask to receive NI notify verify request
-       event indications.
-      - QMI_LOC_EVENT_MASK_INJECT_TIME_REQ (0x00000010) --  The control point must enable this mask to receive time injection request
-       event indications.
-      - QMI_LOC_EVENT_MASK_INJECT_PREDICTED_ORBITS_REQ (0x00000020) --  The control point must enable this mask to receive predicted orbits request
-       event indications.
-      - QMI_LOC_EVENT_MASK_INJECT_POSITION_REQ (0x00000040) --  The control point must enable this mask to receive position injection request
-       event indications.
-      - QMI_LOC_EVENT_MASK_ENGINE_STATE (0x00000080) --  The control point must enable this mask to receive engine state report
-       event indications.
-      - QMI_LOC_EVENT_MASK_FIX_SESSION_STATE (0x00000100) --  The control point must enable this mask to receive fix session status report
-       event indications.
-      - QMI_LOC_EVENT_MASK_WIFI_REQ (0x00000200) --  The control point must enable this mask to receive WiFi position request
-       event indications.
-      - QMI_LOC_EVENT_MASK_SENSOR_STREAMING_READY_STATUS (0x00000400) --  The control point must enable this mask to receive notifications from the
-       GPS engine indicating its readiness to accept data from the
-       sensors (accelerometer, gyroscope, etc.).
-      - QMI_LOC_EVENT_MASK_TIME_SYNC_REQ (0x00000800) --  The control point must enable this mask to receive time-sync requests
-       from the GPS engine. Time sync enables the GPS engine to synchronize
-       its clock with the sensor processor's clock.
-      - QMI_LOC_EVENT_MASK_SET_SPI_STREAMING_REPORT (0x00001000) --  The control point must enable this mask to receive Stationary Position
-       Indicator (SPI) streaming report indications.
-      - QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ (0x00002000) --  The control point must enable this mask to receive location server
-       requests. These requests are generated when the service wishes to
-       establish a connection with a location server.
-      - QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION (0x00004000) --  The control point must enable this mask to receive notifications
-       related to network-initiated Geofences. These events notify the client
-       when a network-initiated Geofence is added, deleted, or edited.
-      - QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT (0x00008000) --  The control point must enable this mask to receive Geofence alerts.
-       These alerts are generated to inform the client of the changes that may
-       affect Geofence, e.g., if GPS is turned off or if the network is
-       unavailable.
-      - QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION (0x00010000) --  The control point must enable this mask to receive notifications when
-       a Geofence is breached. These events are generated when the UE enters
-       or leaves the perimeter of a Geofence.
-      - QMI_LOC_EVENT_MASK_PEDOMETER_CONTROL (0x00020000) --  The control point must enable this mask to register for Pedometer
-       control requests from the location engine. Location engine sends
-       this event out to control the injection of pedometer reports.
-      - QMI_LOC_EVENT_MASK_MOTION_DATA_CONTROL (0x00040000) --  The control point must enable this mask to register for motion data
-       control requests from the location engine. Location engine sends
-       this event out to control the injection of motion data.
-
- Multiple events can be registered by ORing the individual masks and
- sending them in this TLV. All unused bits in this mask must be set to 0.
- */
+       Refer to the definition of the following bitmasks:
+       \vspace{0.05in} \begin{itemize1}
+       \item    0x00000001 -- POSITION_REPORT
+       \item    0x00000002 -- GNSS_SV_INFO
+       \item    0x00000004 -- NMEA
+       \item    0x00000008 -- NI_NOTIFY_VERIFY_REQ
+       \item    0x00000010 -- INJECT_TIME_REQ
+       \item    0x00000020 -- INJECT_PREDICTED_ORBITS_REQ
+       \item    0x00000040 -- INJECT_POSITION_REQ
+       \item    0x00000080 -- ENGINE_STATE
+       \item    0x00000100 -- FIX_SESSION_STATE
+       \item    0x00000200 -- WIFI_REQ
+       \item    0x00000400 -- SENSOR_STREAMING_READY_STATUS
+       \item    0x00000800 -- TIME_SYNC_REQ
+       \item    0x00001000 -- SET_SPI_STREAMING_REPORT
+       \item    0x00002000 -- LOCATION_SERVER_CONNECTION_REQ
+       \item    0x00004000 -- NI_GEOFENCE_NOTIFICATION
+       \item    0x00008000 -- GEOFENCE_GEN_ALERT
+       \item    0x00010000 -- GEOFENCE_BREACH_NOTIFICATION
+       \end{itemize1} \vspace{0.05in}
+       Multiple events can be registered by ORing the individual masks and
+       sending them in this TLV. All unused bits in this mask must be set to 0.
+  */
 }qmiLocRegEventsReqMsgT_v02;  /* Message */
 /**
     @}
@@ -646,8 +609,6 @@ typedef enum {
   eQMI_LOC_TIME_SRC_WCDMA_SLEEP_TIME_TAGGING_V02 = 11, /**<  Time is set by the sleep time tag provided by the WCDMA network  */
   eQMI_LOC_TIME_SRC_GSM_SLEEP_TIME_TAGGING_V02 = 12, /**<  Time is set by the sleep time tag provided by the GSM network  */
   eQMI_LOC_TIME_SRC_UNKNOWN_V02 = 13, /**<  Source of the time is unknown  */
-  eQMI_LOC_TIME_SRC_SYSTEM_TIMETICK_V02 = 14, /**<  Time is derived from system clock (better known as slow clock).
-       GNSS time is maintained irrespective of the GNSS receiver state  */
   QMILOCTIMESOURCEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
 }qmiLocTimeSourceEnumT_v02;
 /**
@@ -920,27 +881,19 @@ typedef struct {
   /*  Time Source */
   uint8_t timeSrc_valid;  /**< Must be set to true if timeSrc is being passed */
   qmiLocTimeSourceEnumT_v02 timeSrc;
-  /**<   Time source. Valid values: \n
-      - eQMI_LOC_TIME_SRC_INVALID (0) --  Invalid time.
-      - eQMI_LOC_TIME_SRC_NETWORK_TIME_TRANSFER (1) --  Time is set by the 1x system.
-      - eQMI_LOC_TIME_SRC_NETWORK_TIME_TAGGING (2) --  Time is set by WCDMA/GSM time tagging (i.e.,
-       associating network time with GPS time).
-      - eQMI_LOC_TIME_SRC_EXTERNAL_INPUT (3) --  Time is set by an external injection.
-      - eQMI_LOC_TIME_SRC_TOW_DECODE (4) --  Time is set after decoding over-the-air GPS navigation data
-       from one GPS satellite.
-      - eQMI_LOC_TIME_SRC_TOW_CONFIRMED (5) --  Time is set after decoding over-the-air GPS navigation data
-       from multiple satellites.
-      - eQMI_LOC_TIME_SRC_TOW_AND_WEEK_CONFIRMED (6) --  Both time of the week and the GPS week number are known.
-      - eQMI_LOC_TIME_SRC_NAV_SOLUTION (7) --  Time is set by the position engine after the fix is obtained.
-      - eQMI_LOC_TIME_SRC_SOLVE_FOR_TIME (8) --  Time is set by the position engine after performing SFT.
-       This is done when the clock time uncertainty is large.
-      - eQMI_LOC_TIME_SRC_GLO_TOW_DECODE (9) --  Time is set after decoding GLO satellites
-      - eQMI_LOC_TIME_SRC_TIME_TRANSFORM (10) --  Time is set after transforming the GPS to GLO time
-      - eQMI_LOC_TIME_SRC_WCDMA_SLEEP_TIME_TAGGING (11) --  Time is set by the sleep time tag provided by the WCDMA network
-      - eQMI_LOC_TIME_SRC_GSM_SLEEP_TIME_TAGGING (12) --  Time is set by the sleep time tag provided by the GSM network
-      - eQMI_LOC_TIME_SRC_UNKNOWN (13) --  Source of the time is unknown
-      - eQMI_LOC_TIME_SRC_SYSTEM_TIMETICK (14) --  Time is derived from system clock (better known as slow clock).
-       GNSS time is maintained irrespective of the GNSS receiver state  */
+  /**<   Time source.
+
+        Valid values: \begin{itemize1}
+        \item    0x00000000 -- TIME_SRC_INVALID
+        \item    0x00000001 -- TIME_SRC_NETWORK_TIME_TRANSFER
+        \item    0x00000002 -- TIME_SRC_NETWORK_TIME_TAGGING
+        \item    0x00000003 -- TIME_SRC_EXTERNAL_INPUT
+        \item    0x00000004 -- TIME_SRC_TOW_DECODE
+        \item    0x00000005 -- TIME_SRC_TOW_CONFIRMED
+        \item    0x00000006 -- TIME_SRC_TOW_AND_WEEK_CONFIRMED
+        \item    0x00000007 -- TIME_SRC_NAV_SOLUTION
+        \item    0x00000008 -- TIME_SRC_SOLVE_FOR_TIME
+        \vspace{-0.18in} \end{itemize1} */
 
   /* Optional */
   /*  Sensor Data Usage */
@@ -1918,19 +1871,6 @@ typedef struct {
     @}
   */
 
-/** @addtogroup loc_qmi_aggregates
-    @{
-  */
-typedef struct {
-
-  char eslpUrl[QMI_LOC_MAX_SERVER_ADDR_LENGTH_V02 + 1];
-  /**<   The ESLP URL
-       Maximum length: 255 bytes */
-}qmiLocEmergencyNotificationStructT_v02;  /* Type */
-/**
-    @}
-  */
-
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -1982,14 +1922,6 @@ typedef struct {
   /**<   \n Optional NI SUPL Version 2 Extension payload. When present,
           this payload is to be used in conjunction with the SUPL
           indication payload. */
-
-  /* Optional */
-  /*  SUPL Emergency Notification */
-  uint8_t suplEmergencyNotification_valid;  /**< Must be set to true if suplEmergencyNotification is being passed */
-  qmiLocEmergencyNotificationStructT_v02 suplEmergencyNotification;
-  /**<    This specifies that the corresponding NI notification is an
-        emergency notification. Emergency notification
-        can be given even without an ESLP address */
 }qmiLocEventNiNotifyVerifyReqIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2344,23 +2276,7 @@ typedef struct {
   qmiLocSensorReadyStatusStructT_v02 gyroReady;
   /**<   \n Whether the GNSS location engine is ready to accept gyroscope sensor
          data.
-   */
-
-  /* Optional */
-  /*  Accelerometer Temperature Accept Ready */
-  uint8_t accelTemperatureReady_valid;  /**< Must be set to true if accelTemperatureReady is being passed */
-  qmiLocSensorReadyStatusStructT_v02 accelTemperatureReady;
-  /**<   \n Whether the GNSS location engine is ready to accept accelerometer
-         temperature data.
-   */
-
-  /* Optional */
-  /*  Gyroscope Temperature Accept Ready */
-  uint8_t gyroTemperatureReady_valid;  /**< Must be set to true if gyroTemperatureReady is being passed */
-  qmiLocSensorReadyStatusStructT_v02 gyroTemperatureReady;
-  /**<   \n Whether the GNSS location engine is ready to accept gyroscope
-         temperature data.
-   */
+  */
 }qmiLocEventSensorStreamingReadyStatusIndMsgT_v02;  /* Message */
 /**
     @}
@@ -2737,73 +2653,6 @@ typedef struct {
     @}
   */
 
-/** @addtogroup loc_qmi_messages
-    @{
-  */
-/** Indication Message; Recommends how pedometer reports should be
-                    sent to the location engine  */
-typedef struct {
-
-  /* Mandatory */
-  /*  Request Pedometer Data */
-  uint8_t requestPedometerData;
-  /**<   \n Whether GNSS location engine is requesting the client to
-          send pedometer data.
-       \begin{itemize1}
-       \item    0x01 (TRUE)  -- GNSS location engine is requesting
-                                pedometer data
-       \item    0x00 (FALSE) -- GNSS location engine is not requesting
-                                pedometer data
-       \vspace{-0.18in} \end{itemize1}
-  */
-
-  /* Optional */
-  /*  Reset Step Count */
-  uint8_t resetStepCount_valid;  /**< Must be set to true if resetStepCount is being passed */
-  uint8_t resetStepCount;
-  /**<   Whether location engine desires the step count to be reset.
-       \begin{itemize1}
-       \item    0x01 (TRUE)  -- Pedometer step count should be reset.
-       \item    0x00 (FALSE) -- Pedometer step count should not be reset.
-       \vspace{-0.18in} \end{itemize1} */
-
-  /* Optional */
-  /*  Step Count Threshold */
-  uint8_t stepCountThreshold_valid;  /**< Must be set to true if stepCountThreshold is being passed */
-  uint32_t stepCountThreshold;
-  /**<   Specifies the number of steps to be sampled in a pedometer report
-       as recommended by the the location engine. If the threshold is set to 0
-       then the location engine desires a pedometer report at every step event.
-  */
-}qmiLocEventPedometerControlIndMsgT_v02;  /* Message */
-/**
-    @}
-  */
-
-/** @addtogroup loc_qmi_messages
-    @{
-  */
-/** Indication Message; Recommends how motion data reports should be
-                    sent to the location engine   */
-typedef struct {
-
-  /* Mandatory */
-  /*  Request Motion Data */
-  uint8_t requestMotionData;
-  /**<   \n Whether GNSS location engine is requesting the client to
-          send motion data.
-       \begin{itemize1}
-       \item    0x01 (TRUE)  -- GNSS location engine is requesting
-                                motion data
-       \item    0x00 (FALSE) -- GNSS location engine is not requesting
-                                motion data
-       \vspace{-0.18in} \end{itemize1}
-  */
-}qmiLocEventMotionDataControlIndMsgT_v02;  /* Message */
-/**
-    @}
-  */
-
 /** @addtogroup loc_qmi_enums
     @{
   */
@@ -3056,14 +2905,7 @@ typedef struct {
   /*  Network Initiated SUPL Version 2 Extension */
   uint8_t NiSuplVer2ExtPayload_valid;  /**< Must be set to true if NiSuplVer2ExtPayload is being passed */
   qmiLocNiSuplVer2ExtStructT_v02 NiSuplVer2ExtPayload;
-  /**<   \n Optional SUPL Version 2 Extension payload.       */
-
-  /* Optional */
-  /*  SUPL Emergency Notification */
-  uint8_t suplEmergencyNotification_valid;  /**< Must be set to true if suplEmergencyNotification is being passed */
-  qmiLocEmergencyNotificationStructT_v02 suplEmergencyNotification;
-  /**<    SUPL Emergency notification payload. Emergency notification
-        can be given even without an ESLP address  */
+  /**<   \n Optional SUPL Version 2 Extension payload.        */
 }qmiLocNiUserRespReqMsgT_v02;  /* Message */
 /**
     @}
@@ -4806,55 +4648,24 @@ typedef struct {
   uint8_t eventRegMask_valid;  /**< Must be set to true if eventRegMask is being passed */
   qmiLocEventRegMaskT_v02 eventRegMask;
   /**<   Event registration mask.
- Valid bitmasks: \n
-      - QMI_LOC_EVENT_MASK_POSITION_REPORT (0x00000001) --  The control point must enable this mask to receive position report
-       event indications.
-      - QMI_LOC_EVENT_MASK_GNSS_SV_INFO (0x00000002) --  The control point must enable this mask to receive satellite report
-       event indications. These reports are sent at a 1 Hz rate.
-      - QMI_LOC_EVENT_MASK_NMEA (0x00000004) --  The control point must enable this mask to receive NMEA reports for
-       position and satellites in view. The report is at a 1 Hz rate.
-      - QMI_LOC_EVENT_MASK_NI_NOTIFY_VERIFY_REQ (0x00000008) --  The control point must enable this mask to receive NI notify verify request
-       event indications.
-      - QMI_LOC_EVENT_MASK_INJECT_TIME_REQ (0x00000010) --  The control point must enable this mask to receive time injection request
-       event indications.
-      - QMI_LOC_EVENT_MASK_INJECT_PREDICTED_ORBITS_REQ (0x00000020) --  The control point must enable this mask to receive predicted orbits request
-       event indications.
-      - QMI_LOC_EVENT_MASK_INJECT_POSITION_REQ (0x00000040) --  The control point must enable this mask to receive position injection request
-       event indications.
-      - QMI_LOC_EVENT_MASK_ENGINE_STATE (0x00000080) --  The control point must enable this mask to receive engine state report
-       event indications.
-      - QMI_LOC_EVENT_MASK_FIX_SESSION_STATE (0x00000100) --  The control point must enable this mask to receive fix session status report
-       event indications.
-      - QMI_LOC_EVENT_MASK_WIFI_REQ (0x00000200) --  The control point must enable this mask to receive WiFi position request
-       event indications.
-      - QMI_LOC_EVENT_MASK_SENSOR_STREAMING_READY_STATUS (0x00000400) --  The control point must enable this mask to receive notifications from the
-       GPS engine indicating its readiness to accept data from the
-       sensors (accelerometer, gyroscope, etc.).
-      - QMI_LOC_EVENT_MASK_TIME_SYNC_REQ (0x00000800) --  The control point must enable this mask to receive time-sync requests
-       from the GPS engine. Time sync enables the GPS engine to synchronize
-       its clock with the sensor processor's clock.
-      - QMI_LOC_EVENT_MASK_SET_SPI_STREAMING_REPORT (0x00001000) --  The control point must enable this mask to receive Stationary Position
-       Indicator (SPI) streaming report indications.
-      - QMI_LOC_EVENT_MASK_LOCATION_SERVER_CONNECTION_REQ (0x00002000) --  The control point must enable this mask to receive location server
-       requests. These requests are generated when the service wishes to
-       establish a connection with a location server.
-      - QMI_LOC_EVENT_MASK_NI_GEOFENCE_NOTIFICATION (0x00004000) --  The control point must enable this mask to receive notifications
-       related to network-initiated Geofences. These events notify the client
-       when a network-initiated Geofence is added, deleted, or edited.
-      - QMI_LOC_EVENT_MASK_GEOFENCE_GEN_ALERT (0x00008000) --  The control point must enable this mask to receive Geofence alerts.
-       These alerts are generated to inform the client of the changes that may
-       affect Geofence, e.g., if GPS is turned off or if the network is
-       unavailable.
-      - QMI_LOC_EVENT_MASK_GEOFENCE_BREACH_NOTIFICATION (0x00010000) --  The control point must enable this mask to receive notifications when
-       a Geofence is breached. These events are generated when the UE enters
-       or leaves the perimeter of a Geofence.
-      - QMI_LOC_EVENT_MASK_PEDOMETER_CONTROL (0x00020000) --  The control point must enable this mask to register for Pedometer
-       control requests from the location engine. Location engine sends
-       this event out to control the injection of pedometer reports.
-      - QMI_LOC_EVENT_MASK_MOTION_DATA_CONTROL (0x00040000) --  The control point must enable this mask to register for motion data
-       control requests from the location engine. Location engine sends
-       this event out to control the injection of motion data.
- */
+
+       Valid bitmasks: \begin{itemize1}
+       \item    0x00000001 -- POSITION_REPORT
+       \item    0x00000002 -- GNSS_SV_INFO
+       \item    0x00000004 -- NMEA
+       \item    0x00000008 -- NI_NOTIFY_VERIFY_REQ
+       \item    0x00000010 -- INJECT_TIME_REQ
+       \item    0x00000020 -- INJECT_PREDICTED_ORBITS_REQ
+       \item    0x00000040 -- INJECT_POSITION_REQ
+       \item    0x00000080 -- ENGINE_STATE
+       \item    0x00000100 -- FIX_SESSION_STATE
+       \item    0x00000200 -- WIFI_REQ
+       \item    0x00000400 -- SENSOR_STREAMING_READY_STATUS
+       \item    0x00000800 -- TIME_SYNC_REQ
+       \item    0x00001000 -- SET_SPI_STREAMING_REPORT
+       \item    0x00002000 -- LOCATION_SERVER_CONNECTION_REQ
+       \vspace{-0.18in} \end{itemize1}
+            */
 }qmiLocGetRegisteredEventsIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5039,23 +4850,9 @@ typedef struct {
 
 typedef uint8_t qmiLocSensorDataFlagMaskT_v02;
 #define QMI_LOC_SENSOR_DATA_FLAG_SIGN_REVERSAL_V02 ((qmiLocSensorDataFlagMaskT_v02)0x01) /**<  Bitmask to specify that a sign reversal is required while interpreting
-     the sensor data. Only applies to the accelerometer samples.  */
+     the sensor data.  */
 #define QMI_LOC_SENSOR_DATA_FLAG_SENSOR_TIME_IS_MODEM_TIME_V02 ((qmiLocSensorDataFlagMaskT_v02)0x02) /**<  Bitmask to specify that the sensor time stamp is the same as the modem
        time stamp.  */
-/** @addtogroup loc_qmi_enums
-    @{
-  */
-typedef enum {
-  QMILOCSENSORDATATIMESOURCEENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_SENSOR_TIME_SOURCE_UNSPECIFIED_V02 = 0, /**<  The sensor time source is unspecified */
-  eQMI_LOC_SENSOR_TIME_SOURCE_COMMON_V02 = 1, /**<  The time source is common between the sensors and
-       the location engine */
-  QMILOCSENSORDATATIMESOURCEENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
-}qmiLocSensorDataTimeSourceEnumT_v02;
-/**
-    @}
-  */
-
 /** @addtogroup loc_qmi_aggregates
     @{
   */
@@ -5063,7 +4860,7 @@ typedef struct {
 
   uint16_t timeOffset;
   /**<   Sample time offset. This time offset must be
-       relative to the timestamp of the first sensor data sample.\n
+       relative to the sensor time of the first sample.\n
        - Units: Milliseconds */
 
   float xAxis;
@@ -5091,9 +4888,8 @@ typedef struct {
 typedef struct {
 
   uint32_t timeOfFirstSample;
-  /**<   Denotes a full 32-bit timestamp of the first (oldest) sample in this
-       message.The timestamp is in the time reference scale that is
-       used by the sensor time source.\n
+  /**<   Denotes a full 32-bit time tag of the first (oldest) sample in this
+       message. \n
        - Units: Milliseconds */
 
   qmiLocSensorDataFlagMaskT_v02 flags;
@@ -5110,57 +4906,6 @@ typedef struct {
   /**<   Variable length array to specify sensor samples. \n
        - Maximum length of the array: 50                             */
 }qmiLoc3AxisSensorSampleListStructT_v02;  /* Type */
-/**
-    @}
-  */
-
-/** @addtogroup loc_qmi_aggregates
-    @{
-  */
-typedef struct {
-
-  uint16_t timeOffset;
-  /**<   Sample time offset. This time offset must be
-       relative to the timestamp of the first sensor sample.\n
-       - Type: Unsigned integer \n
-       - Units: Milliseconds */
-
-  float temperature;
-  /**<   Sensor temperature. \n
-       - Type: Floating point \n
-       - Units: Degree Celsius \n
-       - Range: -50 to +100.00 Degree Celsius */
-}qmiLocSensorTemperatureSampleStructT_v02;  /* Type */
-/**
-    @}
-  */
-
-/** @addtogroup loc_qmi_aggregates
-    @{
-  */
-typedef struct {
-
-  qmiLocSensorDataTimeSourceEnumT_v02 timeSource;
-  /**<   Denotes the time source of the sensor data. Location service will use
- this field to identify the time reference used in the
- sensor data timestamps. Values :\n
-      - eQMI_LOC_SENSOR_TIME_SOURCE_UNSPECIFIED (0) --  The sensor time source is unspecified
-      - eQMI_LOC_SENSOR_TIME_SOURCE_COMMON (1) --  The time source is common between the sensors and
-       the location engine
- */
-
-  uint32_t timeOfFirstSample;
-  /**<   Denotes a full 32-bit timestamp of the first (oldest) sample in this
-       message. The timestamp is in the time reference scale that is
-       used by the sensor time source.\n
-       - Type: Unsigned integer \n
-       - Units: Milliseconds */
-
-  uint32_t temperatureData_len;  /**< Must be set to # of elements in temperatureData */
-  qmiLocSensorTemperatureSampleStructT_v02 temperatureData[QMI_LOC_SENSOR_DATA_MAX_SAMPLES_V02];
-  /**<   Variable length array to specify sensor temperature samples. \n
-       - Maximum length of the array: 50             */
-}qmiLocSensorTemperatureSampleListStructT_v02;  /* Type */
 /**
     @}
   */
@@ -5191,46 +4936,6 @@ typedef struct {
   uint8_t threeAxisGyroData_valid;  /**< Must be set to true if threeAxisGyroData is being passed */
   qmiLoc3AxisSensorSampleListStructT_v02 threeAxisGyroData;
   /**<   \n Gyroscope sensor samples. */
-
-  /* Optional */
-  /*  3-Axis Accelerometer Data Time Source */
-  uint8_t threeAxisAccelDataTimeSource_valid;  /**< Must be set to true if threeAxisAccelDataTimeSource is being passed */
-  qmiLocSensorDataTimeSourceEnumT_v02 threeAxisAccelDataTimeSource;
-  /**<   Time source for the 3-axis accelerometer data. Location service will use
- this field to identify the time reference used in the accelerometer data
- timestamps. If not specified the location service will assume that the
- time source for the accelereometer data is unknown. Values: \n
-      - eQMI_LOC_SENSOR_TIME_SOURCE_UNSPECIFIED (0) --  The sensor time source is unspecified
-      - eQMI_LOC_SENSOR_TIME_SOURCE_COMMON (1) --  The time source is common between the sensors and
-       the location engine
- */
-
-  /* Optional */
-  /*  3-Axis Gyroscope Data Time Source */
-  uint8_t threeAxisGyroDataTimeSource_valid;  /**< Must be set to true if threeAxisGyroDataTimeSource is being passed */
-  qmiLocSensorDataTimeSourceEnumT_v02 threeAxisGyroDataTimeSource;
-  /**<   Time source for the 3-axis gyroscope data. Location service will use
- this field to identify the time reference used in the gyroscope data
- timestamps.If not specified the locations ervice will assume that the
- time source for the gyroscope data is unknown. Values: \n
-      - eQMI_LOC_SENSOR_TIME_SOURCE_UNSPECIFIED (0) --  The sensor time source is unspecified
-      - eQMI_LOC_SENSOR_TIME_SOURCE_COMMON (1) --  The time source is common between the sensors and
-       the location engine
- */
-
-  /* Optional */
-  /*  Accelerometer Temperature Data */
-  uint8_t accelTemperatureData_valid;  /**< Must be set to true if accelTemperatureData is being passed */
-  qmiLocSensorTemperatureSampleListStructT_v02 accelTemperatureData;
-  /**<   Accelerometer temperature samples. This data is optional and does not
-       have to be included in the message along with accelerometer data. */
-
-  /* Optional */
-  /*  Gyroscope Temperature Data */
-  uint8_t gyroTemperatureData_valid;  /**< Must be set to true if gyroTemperatureData is being passed */
-  qmiLocSensorTemperatureSampleListStructT_v02 gyroTemperatureData;
-  /**<   Gyroscope temperature samples. This data is optional and does not
-       have to be included in the message along with gyroscope data. */
 }qmiLocInjectSensorDataReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5271,32 +4976,14 @@ typedef struct {
   uint8_t threeAxisAccelSamplesAccepted_valid;  /**< Must be set to true if threeAxisAccelSamplesAccepted is being passed */
   uint8_t threeAxisAccelSamplesAccepted;
   /**<   Lets the client know how many 3-axis accelerometer samples
-       were accepted. This field is present only if the accelerometer
-       samples were sent in the request. */
+       were accepted. */
 
   /* Optional */
   /*  Gyroscope Samples Accepted */
   uint8_t threeAxisGyroSamplesAccepted_valid;  /**< Must be set to true if threeAxisGyroSamplesAccepted is being passed */
   uint8_t threeAxisGyroSamplesAccepted;
   /**<   Lets the client know how many 3-axis gyroscope samples were
-       accepted. This field is present only if the gyroscope
-       samples were sent in the request. */
-
-  /* Optional */
-  /*  Accelerometer Samples Accepted */
-  uint8_t accelTemperatureSamplesAccepted_valid;  /**< Must be set to true if accelTemperatureSamplesAccepted is being passed */
-  uint8_t accelTemperatureSamplesAccepted;
-  /**<   This field lets the client know how many accelerometer temperature
-       samples were accepted. This field is present only if the accelerometer
-       temperature samples were sent in the request. */
-
-  /* Optional */
-  /*  Gyroscope Temperature Samples Accepted */
-  uint8_t gyroTemperatureSamplesAccepted_valid;  /**< Must be set to true if gyroTemperatureSamplesAccepted is being passed */
-  uint8_t gyroTemperatureSamplesAccepted;
-  /**<   This field lets the client know how many gyroscope temperature samples
-       were accepted. This field is present only if the gyroscope
-       temperature samples were sent in the request. */
+       accepted. */
 }qmiLocInjectSensorDataIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5761,48 +5448,6 @@ typedef uint32_t qmiLocLppConfigMaskT_v02;
 typedef uint32_t qmiLocAssistedGlonassProtocolMaskT_v02;
 #define QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_RRC_CP_V02 ((qmiLocAssistedGlonassProtocolMaskT_v02)0x00000001) /**<  Assisted GLONASS is supported over RRC in the control plane.  */
 #define QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_RRLP_UP_V02 ((qmiLocAssistedGlonassProtocolMaskT_v02)0x00000002) /**<  Assisted GLONASS is supported over RRLP in the user plane.  */
-#define QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_LPP_UP_V02 ((qmiLocAssistedGlonassProtocolMaskT_v02)0x00000004) /**<  Assisted GLONASS is supported over LPP in the user plane.
-       The QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE should be set
-       in the LPP configuration for this to take effect.  */
-/** @addtogroup loc_qmi_enums
-    @{
-  */
-typedef enum {
-  QMILOCSUPLHASHALGOENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_SUPL_HASH_ALGO_SHA1_V02 = 0, /**<  SHA1 Hash Algorithm for SUPL Version 2.0 or higher  */
-  eQMI_LOC_SUPL_HASH_ALGO_SHA256_V02 = 1, /**<  SHA-256 Hash Algorithm for SUPL Version 2.0 or higher  */
-  QMILOCSUPLHASHALGOENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
-}qmiLocSuplHashAlgoEnumT_v02;
-/**
-    @}
-  */
-
-/** @addtogroup loc_qmi_enums
-    @{
-  */
-typedef enum {
-  QMILOCSUPLTLSVERSIONENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_SUPL_TLS_VERSION_1_0_V02 = 0, /**<  SUPL TLS Version 1.0  */
-  eQMI_LOC_SUPL_TLS_VERSION_1_1_V02 = 1, /**<  SUPL TLS Version 1.1  */
-  QMILOCSUPLTLSVERSIONENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
-}qmiLocSuplTlsVersionEnumT_v02;
-/**
-    @}
-  */
-
-/** @addtogroup loc_qmi_enums
-    @{
-  */
-typedef enum {
-  QMILOCEMERGENCYPROTOCOLENUMT_MIN_ENUM_VAL_V02 = -2147483647, /**< To force a 32 bit signed enum.  Do not change or use*/
-  eQMI_LOC_EMERGENCY_PROTOCOL_WCDMA_CP_V02 = 0, /**<  use Control plane protocol during emergency while on WCDMA  */
-  eQMI_LOC_EMERGENCY_PROTOCOL_WCDMA_UP_V02 = 1, /**<  use SUPL 2.0 emergency services during emergency while on WCDMA  */
-  QMILOCEMERGENCYPROTOCOLENUMT_MAX_ENUM_VAL_V02 = 2147483647 /**< To force a 32 bit signed enum.  Do not change or use*/
-}qmiLocEmergencyProtocolEnumT_v02;
-/**
-    @}
-  */
-
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5860,48 +5505,13 @@ typedef struct {
   uint8_t assistedGlonassProtocolMask_valid;  /**< Must be set to true if assistedGlonassProtocolMask is being passed */
   qmiLocAssistedGlonassProtocolMaskT_v02 assistedGlonassProtocolMask;
   /**<   Configures the protocols that the location service supports
- for assisted GLONASS.
+       for assisted GLONASS.
 
- Valid bitmasks: \n
-      - QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_RRC_CP (0x00000001) --  Assisted GLONASS is supported over RRC in the control plane.
-      - QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_RRLP_UP (0x00000002) --  Assisted GLONASS is supported over RRLP in the user plane.
-      - QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_LPP_UP (0x00000004) --  Assisted GLONASS is supported over LPP in the user plane.
-       The QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE should be set
-       in the LPP configuration for this to take effect.
- */
-
-  /* Optional */
-  /*  SUPL Hash Algorithm */
-  uint8_t suplHashAlgo_valid;  /**< Must be set to true if suplHashAlgo is being passed */
-  qmiLocSuplHashAlgoEnumT_v02 suplHashAlgo;
-  /**<   SUPL Hash Algorithm that needs to be used. Values: \n
-      - eQMI_LOC_SUPL_HASH_ALGO_SHA1 (0) --  SHA1 Hash Algorithm for SUPL Version 2.0 or higher
-      - eQMI_LOC_SUPL_HASH_ALGO_SHA256 (1) --  SHA-256 Hash Algorithm for SUPL Version 2.0 or higher
- */
-
-  /* Optional */
-  /*  SUPL TLS Version */
-  uint8_t suplTlsVersion_valid;  /**< Must be set to true if suplTlsVersion is being passed */
-  qmiLocSuplTlsVersionEnumT_v02 suplTlsVersion;
-  /**<   SUPL TLS (Transport Layer Security) Version. This configuration is only
- applicable to SUPL 2.0 or higher as SUPL 1.0 always uses TLS version 1.0.
- Values: \n
-      - eQMI_LOC_SUPL_TLS_VERSION_1_0 (0) --  SUPL TLS Version 1.0
-      - eQMI_LOC_SUPL_TLS_VERSION_1_1 (1) --  SUPL TLS Version 1.1
- */
-
-  /* Optional */
-  /*  Emergency Protocol */
-  uint8_t emergencyProtocol_valid;  /**< Must be set to true if emergencyProtocol is being passed */
-  qmiLocEmergencyProtocolEnumT_v02 emergencyProtocol;
-  /**<   Configures the protocol to be used during emergency.
- Note: Currently only can select on WCDMA. FOR GSM and 1x UE
- will always allow only Control plane NI trigger for positioning.
- For LTE, UE Can allow either SUPL or Control plane NI trigger.
- Values: \n
-      - eQMI_LOC_EMERGENCY_PROTOCOL_WCDMA_CP (0) --  use Control plane protocol during emergency while on WCDMA
-      - eQMI_LOC_EMERGENCY_PROTOCOL_WCDMA_UP (1) --  use SUPL 2.0 emergency services during emergency while on WCDMA
- */
+      Valid bitmasks: \begin{itemize1}
+      \item    0x00000001 -- ASSISTED_GLONASS_PROTOCOL_MASK_RRC_CP
+      \item    0x00000002 -- ASSISTED_GLONASS_PROTOCOL_MASK_RRLP_UP
+      \vspace{-0.18in} \end{itemize1}
+  */
 }qmiLocSetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
@@ -5912,10 +5522,7 @@ typedef uint64_t qmiLocProtocolConfigParamMaskT_v02;
 #define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_VX_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000002ull) /**<  Mask for the VX version configuration parameter.  */
 #define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000004ull) /**<  Mask for the SUPL version configuration parameter.       */
 #define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_LPP_CONFIG_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000008ull) /**<  Mask for the LPP configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_ASSISTED_GLONASS_PROTOCOL_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000010ull) /**<  Mask for the assisted glonass configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_HASH_ALGO_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000020ull) /**<  Mask for the SUPL Hash algorithm configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_TLS_VERSION_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000040ull) /**<  Mask for the SUPL TLS version configuration parameter.  */
-#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_EMERGENCY_PROTOCOL_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000080ull) /**<  Mask for the emergency protocol configuration parameter.  */
+#define QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_ASSISTED_GLONASS_PROTOCOL_V02 ((qmiLocProtocolConfigParamMaskT_v02)0x0000000000000010ull) /**<  Mask for the LPP configuration parameter.  */
 /** @addtogroup loc_qmi_messages
     @{
   */
@@ -5944,18 +5551,16 @@ typedef struct {
   uint8_t failedProtocolConfigParamMask_valid;  /**< Must be set to true if failedProtocolConfigParamMask is being passed */
   qmiLocProtocolConfigParamMaskT_v02 failedProtocolConfigParamMask;
   /**<   Identifies parameters that were not set successfully. This field
- is sent only if the status is not a success.
+       is sent only if the status is not a success.
 
- Valid bitmasks: \n
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_SECURITY (0x0000000000000001) --  Mask for the SUPL security configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_VX_VERSION (0x0000000000000002) --  Mask for the VX version configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_VERSION (0x0000000000000004) --  Mask for the SUPL version configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_LPP_CONFIG (0x0000000000000008) --  Mask for the LPP configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_ASSISTED_GLONASS_PROTOCOL (0x0000000000000010) --  Mask for the assisted glonass configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_HASH_ALGO (0x0000000000000020) --  Mask for the SUPL Hash algorithm configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_TLS_VERSION (0x0000000000000040) --  Mask for the SUPL TLS version configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_EMERGENCY_PROTOCOL (0x0000000000000080) --  Mask for the emergency protocol configuration parameter.
- */
+       Valid bitmasks: \begin{itemize1}
+       \item    0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY
+       \item    0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION
+       \item    0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
+       \item    0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+       \item    0x0000000000000010 -- CONFIG_PARAM_MASK_ASSISTED_GLONASS_PROTOCOL
+       \vspace{-0.18in} \end{itemize1}
+  */
 }qmiLocSetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -5973,16 +5578,14 @@ typedef struct {
   qmiLocProtocolConfigParamMaskT_v02 getProtocolConfigParamMask;
   /**<   Mask denoting the configuration parameters to be retrieved.
 
- Valid bitmasks: \n
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_SECURITY (0x0000000000000001) --  Mask for the SUPL security configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_VX_VERSION (0x0000000000000002) --  Mask for the VX version configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_VERSION (0x0000000000000004) --  Mask for the SUPL version configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_LPP_CONFIG (0x0000000000000008) --  Mask for the LPP configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_ASSISTED_GLONASS_PROTOCOL (0x0000000000000010) --  Mask for the assisted glonass configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_HASH_ALGO (0x0000000000000020) --  Mask for the SUPL Hash algorithm configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_SUPL_TLS_VERSION (0x0000000000000040) --  Mask for the SUPL TLS version configuration parameter.
-      - QMI_LOC_PROTOCOL_CONFIG_PARAM_MASK_EMERGENCY_PROTOCOL (0x0000000000000080) --  Mask for the emergency protocol configuration parameter.
- */
+       Valid bitmasks: \begin{itemize1}
+       \item    0x0000000000000001 -- CONFIG_PARAM_MASK_SUPL_SECURITY
+       \item    0x0000000000000002 -- CONFIG_PARAM_MASK_VX_VERSION
+       \item    0x0000000000000004 -- CONFIG_PARAM_MASK_SUPL_VERSION
+       \item    0x0000000000000008 -- CONFIG_PARAM_MASK_LPP_CONFIG
+       \item    0x0000000000000010 -- CONFIG_PARAM_MASK_ASSISTED_GLONASS_PROTOCOL
+       \vspace{-0.18in} \end{itemize1}
+  */
 }qmiLocGetProtocolConfigParametersReqMsgT_v02;  /* Message */
 /**
     @}
@@ -6062,43 +5665,11 @@ typedef struct {
   qmiLocAssistedGlonassProtocolMaskT_v02 assistedGlonassProtocolMask;
   /**<   Assisted GLONASS Protocol mask.
 
- Valid bitmasks: \n
-      - QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_RRC_CP (0x00000001) --  Assisted GLONASS is supported over RRC in the control plane.
-      - QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_RRLP_UP (0x00000002) --  Assisted GLONASS is supported over RRLP in the user plane.
-      - QMI_LOC_ASSISTED_GLONASS_PROTOCOL_MASK_LPP_UP (0x00000004) --  Assisted GLONASS is supported over LPP in the user plane.
-       The QMI_LOC_LPP_CONFIG_ENABLE_USER_PLANE should be set
-       in the LPP configuration for this to take effect.
- */
-
-  /* Optional */
-  /*  SUPL Hash Algorithm */
-  uint8_t suplHashAlgo_valid;  /**< Must be set to true if suplHashAlgo is being passed */
-  qmiLocSuplHashAlgoEnumT_v02 suplHashAlgo;
-  /**<   SUPL Hash Algorithm that needs to be used. Values: \n
-      - eQMI_LOC_SUPL_HASH_ALGO_SHA1 (0) --  SHA1 Hash Algorithm for SUPL Version 2.0 or higher
-      - eQMI_LOC_SUPL_HASH_ALGO_SHA256 (1) --  SHA-256 Hash Algorithm for SUPL Version 2.0 or higher
- */
-
-  /* Optional */
-  /*  SUPL TLS Version */
-  uint8_t suplTlsVersion_valid;  /**< Must be set to true if suplTlsVersion is being passed */
-  qmiLocSuplTlsVersionEnumT_v02 suplTlsVersion;
-  /**<   SUPL TLS (Transport Layer Security) Version. This configuration is only
- applicable to SUPL 2.0 or higher as SUPL 1.0 always uses TLS version 1.0.
- Values: \n
-      - eQMI_LOC_SUPL_TLS_VERSION_1_0 (0) --  SUPL TLS Version 1.0
-      - eQMI_LOC_SUPL_TLS_VERSION_1_1 (1) --  SUPL TLS Version 1.1
- */
-
-  /* Optional */
-  /*  Emergency Protocol  */
-  uint8_t emergencyProtocol_valid;  /**< Must be set to true if emergencyProtocol is being passed */
-  qmiLocEmergencyProtocolEnumT_v02 emergencyProtocol;
-  /**<   The protocol to be used during emergency.
- Values: \n
-      - eQMI_LOC_EMERGENCY_PROTOCOL_WCDMA_CP (0) --  use Control plane protocol during emergency while on WCDMA
-      - eQMI_LOC_EMERGENCY_PROTOCOL_WCDMA_UP (1) --  use SUPL 2.0 emergency services during emergency while on WCDMA
- */
+       Valid bitmasks: \begin{itemize1}
+      \item    0x00000001 -- ASSISTED_GLONASS_PROTOCOL_MASK_RRC_CP
+      \item    0x00000002 -- ASSISTED_GLONASS_PROTOCOL_MASK_RRLP_UP
+      \vspace{-0.18in} \end{itemize1}
+  */
 }qmiLocGetProtocolConfigParametersIndMsgT_v02;  /* Message */
 /**
     @}
@@ -7787,28 +7358,18 @@ typedef struct {
   uint8_t timeSrc_valid;  /**< Must be set to true if timeSrc is being passed */
   qmiLocTimeSourceEnumT_v02 timeSrc;
   /**<   Time source.
- Valid values: \n
-      - eQMI_LOC_TIME_SRC_INVALID (0) --  Invalid time.
-      - eQMI_LOC_TIME_SRC_NETWORK_TIME_TRANSFER (1) --  Time is set by the 1x system.
-      - eQMI_LOC_TIME_SRC_NETWORK_TIME_TAGGING (2) --  Time is set by WCDMA/GSM time tagging (i.e.,
-       associating network time with GPS time).
-      - eQMI_LOC_TIME_SRC_EXTERNAL_INPUT (3) --  Time is set by an external injection.
-      - eQMI_LOC_TIME_SRC_TOW_DECODE (4) --  Time is set after decoding over-the-air GPS navigation data
-       from one GPS satellite.
-      - eQMI_LOC_TIME_SRC_TOW_CONFIRMED (5) --  Time is set after decoding over-the-air GPS navigation data
-       from multiple satellites.
-      - eQMI_LOC_TIME_SRC_TOW_AND_WEEK_CONFIRMED (6) --  Both time of the week and the GPS week number are known.
-      - eQMI_LOC_TIME_SRC_NAV_SOLUTION (7) --  Time is set by the position engine after the fix is obtained.
-      - eQMI_LOC_TIME_SRC_SOLVE_FOR_TIME (8) --  Time is set by the position engine after performing SFT.
-       This is done when the clock time uncertainty is large.
-      - eQMI_LOC_TIME_SRC_GLO_TOW_DECODE (9) --  Time is set after decoding GLO satellites
-      - eQMI_LOC_TIME_SRC_TIME_TRANSFORM (10) --  Time is set after transforming the GPS to GLO time
-      - eQMI_LOC_TIME_SRC_WCDMA_SLEEP_TIME_TAGGING (11) --  Time is set by the sleep time tag provided by the WCDMA network
-      - eQMI_LOC_TIME_SRC_GSM_SLEEP_TIME_TAGGING (12) --  Time is set by the sleep time tag provided by the GSM network
-      - eQMI_LOC_TIME_SRC_UNKNOWN (13) --  Source of the time is unknown
-      - eQMI_LOC_TIME_SRC_SYSTEM_TIMETICK (14) --  Time is derived from system clock (better known as slow clock).
-       GNSS time is maintained irrespective of the GNSS receiver state
- */
+
+       Valid values: \begin{itemize1}
+       \item    0x00000000 -- TIME_SRC_INVALID
+       \item    0x00000001 -- TIME_SRC_NETWORK_TIME_TRANSFER
+       \item    0x00000002 -- TIME_SRC_NETWORK_TIME_TAGGING
+       \item    0x00000003 -- TIME_SRC_EXTERNAL_INPUT
+       \item    0x00000004 -- TIME_SRC_TOW_DECODE
+       \item    0x00000005 -- TIME_SRC_TOW_CONFIRMED
+       \item    0x00000006 -- TIME_SRC_TOW_AND_WEEK_CONFIRMED
+       \item    0x00000007 -- TIME_SRC_NAV_SOLUTION
+       \item    0x00000008 -- TIME_SRC_SOLVE_FOR_TIME
+       \vspace{-0.18in} \end{itemize1} */
 
   /* Optional */
   /*  Sensor Data Usage */
@@ -8209,100 +7770,6 @@ typedef struct {
     @}
   */
 
-/** @addtogroup loc_qmi_messages
-    @{
-  */
-/** Request Message; Used by the control point to inject pedometer data
-                    into the location engine. */
-typedef struct {
-
-  /* Mandatory */
-  /*  Time Source */
-  qmiLocSensorDataTimeSourceEnumT_v02 timeSource;
-  /**<   Time source for the pedometer. Location service will use
- this field to identify the time reference used in the
- pedometer data timestamp. Values: \n
-      - eQMI_LOC_SENSOR_TIME_SOURCE_UNSPECIFIED (0) --  The sensor time source is unspecified
-      - eQMI_LOC_SENSOR_TIME_SOURCE_COMMON (1) --  The time source is common between the sensors and
-       the location engine*/
-
-  /* Mandatory */
-  /*  Pedometer report timestamp */
-  uint32_t timestamp;
-  /**<   Timestamp of the last step event in this report, i.e timestamp
-       of the step event that caused this report to be generated.
-       The timestamp is in the time reference scale that is
-       used by the pedometer time source. \n
-       - Unit: Milliseconds */
-
-  /* Mandatory */
-  /*  Time Interval */
-  uint32_t timeInterval;
-  /**<   Time interval during which the step count was calculated. Subtracting
-       timeInterval from the timestamp field will yield the the time when
-       the step detection for the first step in this report started.
-       Unit : Milliseconds. */
-
-  /* Mandatory */
-  /*  Step Count */
-  uint32_t stepCount;
-  /**<   Number for steps counted during the time interval.*/
-
-  /* Optional */
-  /*  Step Confidence */
-  uint8_t stepConfidence_valid;  /**< Must be set to true if stepConfidence is being passed */
-  uint8_t stepConfidence;
-  /**<   Confidence associated with the step. This field is only applicable
-       for a single step report, i.e if the stepCount is one.
-       Range: 0 to 100.
-       Note: The report will be ignored if confidence is 0. */
-
-  /* Optional */
-  /*  Step Count Uncertainty */
-  uint8_t stepCountUncertainty_valid;  /**< Must be set to true if stepCountUncertainty is being passed */
-  float stepCountUncertainty;
-  /**<   Uncertainty (in steps) associated with the step count. */
-
-  /* Optional */
-  /*  Step Rate */
-  uint8_t stepRate_valid;  /**< Must be set to true if stepRate is being passed */
-  float stepRate;
-  /**<   Current estimate for the rate of steps per second.
-       Units: steps/second
-       Range: >= 0.0
-  */
-}qmiLocPedometerReportReqMsgT_v02;  /* Message */
-/**
-    @}
-  */
-
-/** @addtogroup loc_qmi_messages
-    @{
-  */
-/** Indication Message; Used by the control point to inject pedometer data
-                    into the location engine. */
-typedef struct {
-
-  /* Mandatory */
-  /*  Status of Pedometer report request */
-  qmiLocStatusEnumT_v02 status;
-  /**<   Status of the pedometer report request
-
-       Valid values: \begin{itemize1}
-        \item    0x00000000 -- SUCCESS
-        \item    0x00000001 -- GENERAL_FAILURE
-        \item    0x00000002 -- UNSUPPORTED
-        \item    0x00000003 -- INVALID_PARAMETER
-        \item    0x00000004 -- ENGINE_BUSY
-        \item    0x00000005 -- PHONE_OFFLINE
-        \item    0x00000006 -- TIMEOUT
-        \vspace{-0.18in} \end{itemize1}
-  */
-}qmiLocPedometerReportIndMsgT_v02;  /* Message */
-/**
-    @}
-  */
-
 /*Service Message Definition*/
 /** @addtogroup loc_qmi_msg_ids
     @{
@@ -8500,11 +7967,6 @@ typedef struct {
 #define QMI_LOC_WWAN_OUT_OF_SERVICE_NOTIFICATION_REQ_V02 0x006C
 #define QMI_LOC_WWAN_OUT_OF_SERVICE_NOTIFICATION_RESP_V02 0x006C
 #define QMI_LOC_WWAN_OUT_OF_SERVICE_NOTIFICATION_IND_V02 0x006C
-#define QMI_LOC_EVENT_PEDOMETER_CONTROL_IND_V02 0x006D
-#define QMI_LOC_EVENT_MOTION_DATA_CONTROL_IND_V02 0x006E
-#define QMI_LOC_PEDOMETER_REPORT_REQ_V02 0x006F
-#define QMI_LOC_PEDOMETER_REPORT_RESP_V02 0x006F
-#define QMI_LOC_PEDOMETER_REPORT_IND_V02 0x006F
 /**
     @}
   */
