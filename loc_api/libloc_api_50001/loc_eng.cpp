@@ -478,17 +478,8 @@ void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data)
         loc_eng_data.client_handle = NULL;
     }
 
-#ifdef FEATURE_GNSS_BIT_API
-    {
-        char baseband[PROPERTY_VALUE_MAX];
-        property_get("ro.baseband", baseband, "msm");
-        if ((strcmp(baseband,"svlte2a") == 0))
-        {
-            loc_eng_dmn_conn_loc_api_server_unblock();
-            loc_eng_dmn_conn_loc_api_server_join();
-        }
-    }
-#endif /* FEATURE_GNSS_BIT_API */
+    loc_eng_dmn_conn_loc_api_server_unblock();
+    loc_eng_dmn_conn_loc_api_server_join();
 
 #endif
 
@@ -882,22 +873,8 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsCallbacks* callbac
                                                  AGPS_TYPE_WIFI,
                                                  true);
 
-#ifdef FEATURE_GNSS_BIT_API
-    {
-        char baseband[PROPERTY_VALUE_MAX];
-        property_get("ro.baseband", baseband, "msm");
-        if ((strcmp(baseband,"svlte2a") == 0) ||
-            (strcmp(baseband,"sglte") == 0) ||
-            (strcmp(baseband,"msm") == 0))
-        {
-            loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb,
+    loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb,
                                                    NULL, NULL, &loc_eng_data);
-        } else {
-            LOC_LOGD("%s:%d] loc_eng_dmn_conn_loc_api_server was not initialized.baseband = %s\n",
-            __func__, __LINE__, baseband);
-        }
-    }
-#endif /* FEATURE_GNSS_BIT_API */
 
     loc_eng_agps_reinit(loc_eng_data);
     EXIT_LOG(%s, VOID_RET);
