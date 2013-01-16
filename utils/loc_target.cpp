@@ -107,3 +107,15 @@ targetEnumType get_target(void)
         target = TARGET_MSM8930;
     return target;
 }
+
+
+bool isGriffonTarget() {
+    int retVal = -1;
+    struct stat fsBuffer;
+    const char* evkFilePath = "/data/misc/location/atlas/exist";
+    retVal = stat(evkFilePath, &fsBuffer);
+    LOC_LOGV("stat the EVK exist file at %s, result %d, possible err %s",
+             evkFilePath, retVal, strerror(errno));
+
+    return retVal == 0;
+}
