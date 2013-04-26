@@ -63,6 +63,14 @@ int der2pem_load(const char *fname, X509 **cer)
     return -1;
   }
   *cer = d2i_X509_bio(in, NULL);
+
+  if( NULL == *cer)
+  {
+     BIO_free(in);
+     in = BIO_new_file(fname, "rb");
+     PEM_read_bio_X509(in, cer, 0, NULL);
+  }
+
   BIO_free(in);
   return *cer ? 0 : -1;
 }
