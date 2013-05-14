@@ -42,15 +42,20 @@ static int open_gps(const struct hw_module_t* module, char const* name,
         struct hw_device_t** device)
 {
     struct gps_device_t *dev = (struct gps_device_t *) malloc(sizeof(struct gps_device_t));
-    memset(dev, 0, sizeof(*dev));
+    if(dev != NULL) {
+        memset(dev, 0, sizeof(*dev));
 
-    dev->common.tag = HARDWARE_DEVICE_TAG;
-    dev->common.version = 0;
-    dev->common.module = (struct hw_module_t*)module;
-    dev->get_gps_interface = gps__get_gps_interface;
+        dev->common.tag = HARDWARE_DEVICE_TAG;
+        dev->common.version = 0;
+        dev->common.module = (struct hw_module_t*)module;
+        dev->get_gps_interface = gps__get_gps_interface;
 
-    *device = (struct hw_device_t*)dev;
-    return 0;
+        *device = (struct hw_device_t*)dev;
+        return 0;
+    }
+    else {
+        return -1;
+    }
 }
 
 static struct hw_module_methods_t gps_module_methods = {
