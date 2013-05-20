@@ -187,6 +187,7 @@ static const UlpPhoneContextInterface sLocEngUlpPhoneContextInterface =
 };
 
 static loc_eng_data_s_type loc_afw_data;
+static UlpCallbacks ulp_cb_data;
 static int gss_fd = 0;
 
 /*===========================================================================
@@ -323,6 +324,17 @@ static int loc_init(GpsCallbacks* callbacks)
         retVal = loc_eng_init(loc_afw_data, &clientCallbacks, event,
                               loc_ulp_msg_sender);
 
+    if (ulp_cb_data.phone_context_cb) {
+        //ULP initilization already occurred so redo intializations here
+        //to restore callback table
+        loc_eng_ulp_phone_context_init(loc_afw_data, ulp_cb_data.phone_context_cb);
+    }
+
+    if (ulp_cb_data.network_location_cb) {
+        loc_eng_ulp_network_init(loc_afw_data, ulp_cb_data.network_location_cb);
+    }
+
+
     int ret_val1 = loc_eng_ulp_init(loc_afw_data, loc_eng_ulp_inf);
     //Initialize the cached min_interval
     loc_afw_data.min_interval_cached = ULP_MIN_INTERVAL_INVALID;
@@ -419,7 +431,8 @@ static int loc_stop()
                                   ULP_CRITERIA_HAS_MIN_INTERVAL);
         native_criteria.provider_source = ULP_PROVIDER_SOURCE_GNSS;
         native_criteria.min_distance = 0; //This is not used by ULP engine so leaving it 0 for now
-        native_criteria.recurrence_type = ULP_LOC_RECURRENCE_PERIODIC; //We let LMS handle SingleShot
+        native_criteria.recurrence_type = loc_afw_data.recurrence_type_cached;
+        loc_afw_data.recurrence_type_cached = ULP_LOC_RECURRENCE_PERIODIC;
         //For a GPS client horizontal_accuracy & power_consumption are irrelevant
         native_criteria.preferred_horizontal_accuracy = ULP_HORZ_ACCURACY_DONT_CARE;
         native_criteria.preferred_power_consumption = ULP_POWER_REQ_DONT_CARE;
@@ -482,13 +495,19 @@ static int  loc_set_position_mode(GpsPositionMode mode,
                                   ULP_CRITERIA_HAS_MIN_INTERVAL);
         native_criteria.provider_source = ULP_PROVIDER_SOURCE_GNSS;
         native_criteria.min_distance = 0; //This is not used by ULP engine so leaving it 0 for now
-        native_criteria.recurrence_type = ULP_LOC_RECURRENCE_PERIODIC; //We let LMS handle SingleShot
+
+        if (LOC_POSITION_MODE_MS_ASSISTED == mode)
+            native_criteria.recurrence_type = ULP_LOC_RECURRENCE_SINGLE;
+        else
+            native_criteria.recurrence_type = ULP_LOC_RECURRENCE_PERIODIC;
+
         //For a GPS client horizontal_accuracy & power_consumption are irrelevant
         native_criteria.preferred_horizontal_accuracy = ULP_HORZ_ACCURACY_DONT_CARE;
         native_criteria.preferred_power_consumption = ULP_POWER_REQ_DONT_CARE;
         native_criteria.action = ULP_ADD_CRITERIA;
         native_criteria.min_interval = min_interval;
         loc_afw_data.min_interval_cached = min_interval; //cache a copy
+        loc_afw_data.recurrence_type_cached = native_criteria.recurrence_type; //cache a copy
         ret_val = loc_eng_update_criteria(loc_afw_data, native_criteria);
     }
 
@@ -1116,7 +1135,13 @@ SIDE EFFECTS
 static int loc_ulp_phone_context_init(UlpPhoneContextCallbacks *callbacks)
 {
     ENTRY_LOG();
-    int ret_val = loc_eng_ulp_phone_context_init(loc_afw_data, callbacks);
+    int ret_val = -1;
+    if (loc_afw_data.context) {
+        ret_val = loc_eng_ulp_phone_context_init(loc_afw_data, callbacks);
+    } else
+    {
+        ulp_cb_data.phone_context_cb = callbacks;
+    }
     EXIT_LOG(%d, ret_val);
     return ret_val;
 }
@@ -1165,7 +1190,14 @@ SIDE EFFECTS
 static int loc_ulp_network_init(UlpNetworkLocationCallbacks *callbacks)
 {
    ENTRY_LOG();
-   int ret_val = loc_eng_ulp_network_init(loc_afw_data, callbacks);
+   int ret_val = -1;
+   if (loc_afw_data.context) {
+       ret_val = loc_eng_ulp_network_init(loc_afw_data, callbacks);
+   } else
+   {
+       ulp_cb_data.network_location_cb = callbacks;
+   }
+
    EXIT_LOG(%d, ret_val);
    return ret_val;
 }
@@ -1220,6 +1252,8 @@ static int loc_ulp_engine_init(UlpEngineCallbacks* callbacks)
         EXIT_LOG(%d, retVal);
         return retVal;
     }
+    //Intilize the ulp call back cache at this point
+    memset(&ulp_cb_data, 0, sizeof(UlpCallbacks));
     ulp_loc_cb = callbacks->location_cb;
     retVal = 0;
     EXIT_LOG(%d, retVal);
