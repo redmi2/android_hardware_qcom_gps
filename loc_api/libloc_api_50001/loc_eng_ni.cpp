@@ -44,6 +44,11 @@
 
 #include "log_util.h"
 
+#ifndef _ANDROID_
+#define ALOGI(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGV(ftm, args...)  fprintf(stderr, ftm, ##args)
+#endif
+
 /*=============================================================================
  *
  *                             DATA DECLARATION
