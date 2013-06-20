@@ -47,8 +47,16 @@
 #include "LocApiAdapter.h"
 
 #include <cutils/sched_policy.h>
+#ifndef USE_GLIB
 #include <utils/SystemClock.h>
 #include <utils/Log.h>
+#endif /* USE_GLIB */
+
+#ifdef USE_GLIB
+#include <glib.h>
+#include <sys/syscall.h>
+#endif /* USE_GLIB */
+
 #include <string.h>
 
 #include <loc_eng.h>
@@ -63,6 +71,17 @@
 
 #include "log_util.h"
 #include "loc_eng_log.h"
+#ifndef _ANDROID_
+#include "platform_lib_includes.h"
+#endif
+
+#ifndef _ANDROID_
+#define ALOGE(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGD(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGI(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGV(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGW(ftm, args...)  fprintf(stderr, ftm, ##args)
+#endif
 
 #define SUCCESS TRUE
 #define FAILURE FALSE
@@ -170,9 +189,15 @@ LocEngContext::LocEngContext(gps_create_thread threadCreator) :
     deferred_action_thread(threadCreator("loc_eng",loc_eng_deferred_action_thread, this)),
     counter(0)
 {
+#ifdef _ANDROID_
     LOC_LOGV("LocEngContext %d : %d pthread_id %ld\n",
              getpid(), gettid(),
              deferred_action_thread);
+#else
+    LOC_LOGV("LocEngContext %d : %d pthread_id %ld\n",
+             getpid(), GETTID_PLATFORM_LIB_ABSTRACTION,
+             deferred_action_thread);
+#endif
 }
 
 LocEngContext* LocEngContext::get(gps_create_thread threadCreator)
@@ -1384,6 +1409,30 @@ void loc_eng_handle_engine_up(loc_eng_data_s_type &loc_eng_data)
     EXIT_LOG(%s, VOID_RET);
 }
 
+#ifdef USE_GLIB
+/*===========================================================================
+FUNCTION set_sched_policy
+
+DESCRIPTION
+   Local copy of this function which bypasses android set_sched_policy
+
+DEPENDENCIES
+   None
+
+RETURN VALUE
+   0
+
+SIDE EFFECTS
+   N/A
+
+===========================================================================*/
+static int set_sched_policy(int tid, SchedPolicy policy)
+{
+    return 0;
+}
+#endif /* USE_GLIB */
+
+
 /*===========================================================================
 FUNCTION loc_eng_deferred_action_thread
 
@@ -1408,7 +1457,11 @@ static void loc_eng_deferred_action_thread(void* arg)
     LocEngContext* context = (LocEngContext*)arg;
 
     // make sure we do not run in background scheduling group
+#ifdef _ANDROID_
     set_sched_policy(gettid(), SP_FOREGROUND);
+#else
+    set_sched_policy(GETTID_PLATFORM_LIB_ABSTRACTION, SP_FOREGROUND);
+#endif
 
     while (1)
     {

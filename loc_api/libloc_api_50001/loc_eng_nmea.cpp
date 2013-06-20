@@ -35,6 +35,11 @@
 #include <math.h>
 #include "log_util.h"
 
+#ifndef _ANDROID_
+#define ALOGE(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGV(ftm, args...)  fprintf(stderr, ftm, ##args)
+#endif
+
 /*===========================================================================
 FUNCTION    loc_eng_nmea_send
 

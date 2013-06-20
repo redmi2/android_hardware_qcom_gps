@@ -47,6 +47,18 @@
 extern "C" {
 #endif /* __cplusplus */
 
+#ifdef USE_GLIB
+#include <glib.h>
+#define strlcpy g_strlcpy
+#endif
+
+#ifndef _ANDROID_
+#define ALOGE(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGD(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGI(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGV(ftm, args...)  fprintf(stderr, ftm, ##args)
+#endif
+
 struct LocPosMode
 {
     LocPositionMode mode;

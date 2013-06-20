@@ -39,6 +39,15 @@
 #include "loc_log.h"
 #include "log_util.h"
 
+#ifdef USE_GLIB
+#include <glib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <string.h>
+#define strerror g_strerror
+#endif
+
 #define APQ8064_ID_1 "109"
 #define APQ8064_ID_2 "153"
 #define MPQ8064_ID_1 "130"

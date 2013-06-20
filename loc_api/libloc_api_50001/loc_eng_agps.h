@@ -39,6 +39,11 @@
 #include <LocApiAdapter.h>
 #include "loc_eng_msg.h"
 
+#ifdef USE_GLIB
+#include <glib.h>
+#define strlcpy g_strlcpy
+#endif
+
 // forward declaration
 class AgpsStateMachine;
 class Subscriber;

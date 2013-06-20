@@ -40,6 +40,11 @@
 #define MAX_URL_LEN 256
 #define smaller_of(a, b) (((a) > (b)) ? (b) : (a))
 
+#ifndef _ANDROID_
+#define ALOGE(ftm, args...)  fprintf(stderr, ftm, ##args)
+#define ALOGW(ftm, args...)  fprintf(stderr, ftm, ##args)
+#endif
+
 enum loc_api_adapter_err {
     LOC_API_ADAPTER_ERR_SUCCESS             = 0,
     LOC_API_ADAPTER_ERR_GENERAL_FAILURE     = 1,

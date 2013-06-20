@@ -39,6 +39,12 @@
 #include <time.h>
 #include <loc_cfg.h>
 #include <log_util.h>
+#ifdef USE_GLIB
+#include <glib.h>
+#define strlcpy g_strlcpy
+#define strerror g_strerror
+#endif
+#include "platform_lib_includes.h"
 
 /*=============================================================================
  *
