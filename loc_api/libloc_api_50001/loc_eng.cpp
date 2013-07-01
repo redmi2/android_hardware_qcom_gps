@@ -1742,7 +1742,11 @@ static void loc_eng_deferred_action_thread(void* arg)
                                  loc_eng_data_p->client_handle,
                                  false);
                 // if unsuccessful, try internet_nif
-                loc_eng_data_p->internet_nif->unsubscribeRsrc((Subscriber*)&s2);
+                if (!loc_eng_data_p->internet_nif->unsubscribeRsrc((Subscriber*)&s2)) {
+                    LOC_LOGE("%s:%d]: Could not release ATL. No subscribers found\n",
+                             __func__, __LINE__);
+                    loc_eng_data_p->client_handle->atlCloseStatus(arlMsg->handle, 0);
+                }
 #endif
             }
         }
