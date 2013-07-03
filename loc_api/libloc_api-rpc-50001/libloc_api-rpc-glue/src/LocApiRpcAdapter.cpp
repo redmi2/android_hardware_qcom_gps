@@ -303,7 +303,8 @@ enum loc_api_adapter_err
 LocApiRpcAdapter::setPositionMode(const LocPosMode *posMode)
 {
     rpc_loc_ioctl_data_u_type    ioctl_data;
-    rpc_loc_fix_criteria_s_type *fix_criteria_ptr;
+    rpc_loc_fix_criteria_s_type *fix_criteria_ptr =
+            &ioctl_data.rpc_loc_ioctl_data_u_type_u.fix_criteria;
     rpc_loc_ioctl_e_type         ioctl_type = RPC_LOC_IOCTL_SET_FIX_CRITERIA;
     rpc_loc_operation_mode_e_type op_mode;
     int                          ret_val;
@@ -340,7 +341,6 @@ LocApiRpcAdapter::setPositionMode(const LocPosMode *posMode)
         op_mode = RPC_LOC_OPER_MODE_STANDALONE;
     }
 
-    fix_criteria_ptr = &ioctl_data.rpc_loc_ioctl_data_u_type_u.fix_criteria;
     fix_criteria_ptr->valid_mask = RPC_LOC_FIX_CRIT_VALID_PREFERRED_OPERATION_MODE |
                                    RPC_LOC_FIX_CRIT_VALID_RECURRENCE_TYPE;
     fix_criteria_ptr->min_interval = fixCriteria.min_interval;
