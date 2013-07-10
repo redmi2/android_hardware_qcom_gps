@@ -33,7 +33,7 @@
 #include <loc_eng.h>
 #include <loc_eng_msg.h>
 #include "log_util.h"
-
+#include "platform_lib_includes.h"
 
 /*===========================================================================
 FUNCTION    loc_eng_xtra_init
@@ -59,8 +59,7 @@ int loc_eng_xtra_init (loc_eng_data_s_type &loc_eng_data,
 
     if(callbacks == NULL) {
         LOC_LOGE("loc_eng_xtra_init: failed, cb is NULL");
-    }
-    else {
+    } else {
         xtra_module_data_ptr = &loc_eng_data.xtra_module_data;
         xtra_module_data_ptr->download_request_cb = callbacks->download_request_cb;
         ret_val = 0;
