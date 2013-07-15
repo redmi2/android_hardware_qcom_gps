@@ -60,7 +60,6 @@
 #include <loc_eng_nmea.h>
 #include <msg_q.h>
 #include <loc.h>
-
 #include "log_util.h"
 #include "loc_eng_log.h"
 
@@ -290,11 +289,12 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
                   void (*loc_external_msg_sender) (void*, void*))
 
 {
-    int ret_val =-1;
+    int ret_val = 0;
 
     ENTRY_LOG_CALLFLOW();
     if (NULL == callbacks || 0 == event) {
         LOC_LOGE("loc_eng_init: bad parameters cb %p eMask %d", callbacks, event);
+        ret_val = -1;
         EXIT_LOG(%d, ret_val);
         return ret_val;
     }
@@ -307,9 +307,6 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
     // Create context (msg q + thread) (if not yet created)
     // This will also parse gps.conf, if not done.
     loc_eng_data.context = (void*)LocEngContext::get(callbacks->create_thread_cb);
-    if (NULL != callbacks->set_capabilities_cb) {
-        callbacks->set_capabilities_cb(gps_conf.CAPABILITIES);
-    }
 
     // Save callbacks
     loc_eng_data.location_cb  = callbacks->location_cb;
@@ -348,14 +345,9 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
     } else {
         LOC_LOGD("loc_eng_init created client, id = %p\n", loc_eng_data.client_handle);
 
-        // call reinit to send initialization messages
-       int tries = 30;
-       while (tries > 0 &&
-              LOC_API_ADAPTER_ERR_SUCCESS != (ret_val = loc_eng_reinit(loc_eng_data))) {
-           tries--;
-           LOC_LOGD("loc_eng_init client open failed, %d more tries", tries);
-           sleep(1);
-       }
+        /*send reinit event to QMI instead of call reinit directly*/
+        loc_eng_msg *msg(new loc_eng_msg(locEngHandle.owner, LOC_ENG_MSG_LOC_INIT));
+        locEngHandle.sendMsge(locEngHandle.owner, msg);
     }
 
     EXIT_LOG(%d, ret_val);
@@ -817,6 +809,38 @@ static void loc_inform_gps_status(loc_eng_data_s_type &loc_eng_data, GpsStatusVa
     EXIT_LOG(%s, VOID_RET);
 }
 
+/*
+  Callback function passed to Data Services State Machine
+  This becomes part of the state machine's servicer and
+  is used to send requests to the data services client
+*/
+static int dataCallCb(void *cb_data)
+{
+    LOC_LOGD("Enter dataCallCb\n");
+    int ret=0;
+    if(cb_data != NULL) {
+        dsCbData *cbData = (dsCbData *)cb_data;
+        LocApiAdapter *locAdapter = (LocApiAdapter *)cbData->mAdapter;
+        if(cbData->action == GPS_REQUEST_AGPS_DATA_CONN) {
+            LOC_LOGD("dataCallCb GPS_REQUEST_AGPS_DATA_CONN\n");
+            ret =  locAdapter->openAndStartDataCall();
+        }
+        else if(cbData->action == GPS_RELEASE_AGPS_DATA_CONN) {
+            LOC_LOGD("dataCallCb GPS_RELEASE_AGPS_DATA_CONN\n");
+            locAdapter->stopDataCall();
+        }
+    }
+    else {
+        LOC_LOGE("NULL argument received. Failing.\n");
+        ret = -1;
+        goto err;
+    }
+
+err:
+    LOC_LOGD("Exit dataCallCb ret = %d\n", ret);
+    return ret;
+}
+
 /*===========================================================================
 FUNCTION    loc_eng_agps_reinit
 
@@ -883,17 +907,27 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsCallbacks* callbac
     }
     loc_eng_data.agps_status_cb = callbacks->status_cb;
 
-    loc_eng_data.agnss_nif = new AgpsStateMachine(loc_eng_data.agps_status_cb,
+    loc_eng_data.agnss_nif = new AgpsStateMachine(servicerTypeAgps,
+                                                  (void *)loc_eng_data.agps_status_cb,
                                                   AGPS_TYPE_SUPL,
                                                   false);
 #ifdef FEATURE_IPV6
-    loc_eng_data.internet_nif = new AgpsStateMachine(loc_eng_data.agps_status_cb,
+    loc_eng_data.internet_nif = new AgpsStateMachine(servicerTypeAgps,
+                                                     (void *)loc_eng_data.agps_status_cb,
                                                      AGPS_TYPE_WWAN_ANY,
                                                      false);
-    loc_eng_data.wifi_nif = new AgpsStateMachine(loc_eng_data.agps_status_cb,
+    loc_eng_data.wifi_nif = new AgpsStateMachine(servicerTypeAgps,
+                                                 (void *)loc_eng_data.agps_status_cb,
                                                  AGPS_TYPE_WIFI,
                                                  true);
 #endif
+    if(!loc_eng_data.client_handle->initDataServiceClient()) {
+        LOC_LOGD("%s:%d]: Creating new ds state machine\n", __func__, __LINE__);
+        loc_eng_data.ds_nif = new DSStateMachine(servicerTypeExt,
+                                                 (void *)dataCallCb,
+                                                 loc_eng_data.client_handle);
+        LOC_LOGD("%s:%d]: Created new ds state machine\n", __func__, __LINE__);
+    }
 
     loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb,
                                                    NULL, NULL, &loc_eng_data);
@@ -1600,7 +1634,8 @@ static void loc_eng_deferred_action_thread(void* arg)
                                ((LOCATION_HAS_SOURCE_INFO & rpMsg->location.gpsLocation.flags) &&
                                 ULP_LOCATION_IS_FROM_HYBRID == rpMsg->location.position_source) ||
                                ((LOC_POS_TECH_MASK_SATELLITE & rpMsg->technology_mask) ||
-                                (LOC_POS_TECH_MASK_SENSORS & rpMsg->technology_mask)))) ||
+                                (LOC_POS_TECH_MASK_SENSORS & rpMsg->technology_mask)   ||
+                                (LOC_POS_TECH_MASK_HYBRID & rpMsg->technology_mask)))) ||
                              (LOC_SESS_INTERMEDIATE == loc_eng_data_p->intermediateFix &&
                               !((rpMsg->location.gpsLocation.flags & GPS_LOCATION_HAS_ACCURACY) &&
                                 (gps_conf.ACCURACY_THRES != 0) &&
@@ -1627,7 +1662,10 @@ static void loc_eng_deferred_action_thread(void* arg)
 
                 if (loc_eng_data_p->generateNmea && rpMsg->location.position_source == ULP_LOCATION_IS_FROM_GNSS)
                 {
-                    loc_eng_nmea_generate_pos(loc_eng_data_p, rpMsg->location, rpMsg->locationExtended);
+                    unsigned char generate_nmea = reported && (rpMsg->status != LOC_SESS_FAILURE);
+                    loc_eng_nmea_generate_pos(loc_eng_data_p, rpMsg->location,
+                                              rpMsg->locationExtended,
+                                              generate_nmea);
                 }
 
                 // Free the allocated memory for rawData
@@ -1744,14 +1782,27 @@ static void loc_eng_deferred_action_thread(void* arg)
                              loc_eng_data_p->client_handle,
                              false);
             // attempt to unsubscribe from agnss_nif first
-            if (! loc_eng_data_p->agnss_nif->unsubscribeRsrc((Subscriber*)&s1)) {
+            if (loc_eng_data_p->agnss_nif->unsubscribeRsrc((Subscriber*)&s1)) {
 #ifdef FEATURE_IPV6
+                LOC_LOGD("%s:%d]: Unsubscribed from agnss_nif", __func__, __LINE__);
+            }
+            else {
                 ATLSubscriber s2(arlMsg->handle,
                                  loc_eng_data_p->internet_nif,
                                  loc_eng_data_p->client_handle,
                                  false);
                 // if unsuccessful, try internet_nif
-                loc_eng_data_p->internet_nif->unsubscribeRsrc((Subscriber*)&s2);
+                if(loc_eng_data_p->internet_nif->unsubscribeRsrc((Subscriber*)&s2)) {
+                    LOC_LOGD("%s:%d]: Unsubscribed from internet_nif", __func__, __LINE__);
+                }
+                else {
+                    DSSubscriber s3(loc_eng_data_p->ds_nif,
+                                     arlMsg->handle);
+                    LOC_LOGD("%s:%d]: Request to stop Emergency call. Handle: %d\n",
+                             __func__, __LINE__, arlMsg->handle);
+                    loc_eng_data_p->ds_nif->unsubscribeRsrc((Subscriber*)&s3);
+                    LOC_LOGD("%s:%d]: Unsubscribed from ds_nif", __func__, __LINE__);
+                }
 #endif
             }
         }
@@ -1830,16 +1881,25 @@ static void loc_eng_deferred_action_thread(void* arg)
             loc_eng_msg_atl_open_success *aosMsg = (loc_eng_msg_atl_open_success*)msg;
             AgpsStateMachine* stateMachine;
 #ifdef FEATURE_IPV6
+            LOC_LOGD("%s:%d]: AGPS_TYPE: %d\n", __func__, __LINE__, (int)aosMsg->agpsType);
             switch (aosMsg->agpsType) {
               case AGPS_TYPE_WIFI: {
+                LOC_LOGD("%s:%d]: AGPS Type wifi\n", __func__, __LINE__);
                 stateMachine = loc_eng_data_p->wifi_nif;
                 break;
               }
               case AGPS_TYPE_SUPL: {
+                LOC_LOGD("%s:%d]: AGPS Type supl\n", __func__, __LINE__);
                 stateMachine = loc_eng_data_p->agnss_nif;
                 break;
               }
+              case AGPS_TYPE_INVALID: {
+                stateMachine = loc_eng_data_p->ds_nif;
+                LOC_LOGD("%s:%d]: AGPS Type invalid\n", __func__, __LINE__);
+              }
+                break;
               default: {
+                LOC_LOGD("%s:%d]: AGPS Type default internet\n", __func__, __LINE__);
                 stateMachine  = loc_eng_data_p->internet_nif;
               }
             }
@@ -1865,6 +1925,10 @@ static void loc_eng_deferred_action_thread(void* arg)
               }
               case AGPS_TYPE_SUPL: {
                 stateMachine = loc_eng_data_p->agnss_nif;
+                break;
+              }
+            case AGPS_TYPE_INVALID: {
+                stateMachine = loc_eng_data_p->ds_nif;
                 break;
               }
               default: {
@@ -1931,14 +1995,39 @@ static void loc_eng_deferred_action_thread(void* arg)
         {
             loc_eng_msg_request_phone_context *contextReqMsg = (loc_eng_msg_request_phone_context*)msg;
             LOC_LOGD("Received phone context request from ULP.context_type 0x%x,request_type 0x%x  ",
-                     contextReqMsg->contextRequest.context_type,contextReqMsg->contextRequest.request_type)
+                     contextReqMsg->contextRequest.context_type,contextReqMsg->contextRequest.request_type);
             if(loc_eng_data_p->ulp_phone_context_req_cb != NULL)
             {
                 loc_eng_data_p->ulp_phone_context_req_cb((UlpPhoneContextRequest*)&(contextReqMsg->contextRequest));
             }
             else
                 LOC_LOGE("Ulp Phone context request call back not initialized");
-            }
+        }
+        break;
+
+        case LOC_ENG_MSG_LOC_INIT:
+        {
+            loc_eng_reinit(*loc_eng_data_p);
+        }
+        break;
+
+        case LOC_ENG_MSG_REQUEST_SUPL_ES:
+        {
+            loc_eng_msg_request_supl_es *reqMsg =
+                (loc_eng_msg_request_supl_es *)msg;
+            AgpsStateMachine *stateMachine = loc_eng_data_p->ds_nif;
+            DSSubscriber subscriber(stateMachine, reqMsg->handle);
+            LOC_LOGD("%s:%d]: Starting data call\n", __func__, __LINE__);
+            stateMachine->subscribeRsrc((Subscriber *)&subscriber);
+        }
+        break;
+
+        case LOC_ENG_MSG_CLOSE_DATA_CALL:
+        {
+            loc_eng_data_p->client_handle->closeDataCall();
+            LOC_LOGD("%s:%d]: Request to close data call\n",
+                     __func__, __LINE__);
+        }
         break;
 
         default:
@@ -2270,4 +2359,3 @@ int loc_eng_read_config(void)
     EXIT_LOG(%d, 0);
     return 0;
 }
-
