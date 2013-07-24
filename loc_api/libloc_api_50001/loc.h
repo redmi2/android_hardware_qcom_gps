@@ -35,7 +35,6 @@ extern "C" {
 #endif /* __cplusplus */
 
 #include <ctype.h>
-#include <cutils/properties.h>
 #include <hardware/gps.h>
 
 #define MIN_POSSIBLE_FIX_INTERVAL 1000 /* msec */

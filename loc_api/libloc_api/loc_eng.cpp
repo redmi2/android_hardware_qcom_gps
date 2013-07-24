@@ -42,9 +42,15 @@
 #include "loc_api_rpc_glue.h"
 #include "loc_apicb_appinit.h"
 
+#ifdef _ANDROID
 #include <cutils/properties.h>
 #include <cutils/sched_policy.h>
 #include <utils/SystemClock.h>
+#else
+#include "fake_property_service.h"
+#endif
+
+#include <hardware/gps.h>
 
 #include <loc_eng.h>
 #include <loc_eng_ni.h>
@@ -143,7 +149,9 @@ const GpsInterface* gps_get_hardware_interface ()
     char propBuf[PROPERTY_VALUE_MAX];
 
     // check to see if GPS should be disabled
+    memset(propBuf, 0, sizeof(propBuf));
     property_get("gps.disable", propBuf, "");
+
     if (propBuf[0] == '1')
     {
         LOGD("gps_get_interface returning NULL because gps.disable=1\n");
