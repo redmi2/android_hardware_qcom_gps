@@ -2,10 +2,11 @@ AM_CFLAGS = \
      -I../../utils \
      -I../../platform_lib_abstractions \
      -I../ulp/inc \
+     -I../ \
      -fno-short-enums \
      -DFEATURE_GNSS_BIT_API
 
-libloc_adapter_so_la_SOURCES = loc_eng_log.cpp LocApiAdapter.cpp
+libloc_adapter_so_la_SOURCES = loc_eng_log.cpp LocApiAdapter.cpp ../fake_property_service.c
 
 if USE_GLIB
 libloc_adapter_so_la_CFLAGS = -DUSE_GLIB $(AM_CFLAGS) @GLIB_CFLAGS@
@@ -16,7 +17,7 @@ libloc_adapter_so_la_CFLAGS = $(AM_CFLAGS)
 libloc_adapter_so_la_LDFLAGS = -lpthread -shared -version-info 1:0:0
 libloc_adapter_so_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS)
 endif
-libloc_adapter_so_la_LIBADD = -lstdc++ -lcutils ../../utils/libgps_utils_so.la
+libloc_adapter_so_la_LIBADD = -lstdc++ ../../utils/libgps_utils_so.la
 
 
 libloc_eng_so_la_SOURCES = \
@@ -29,7 +30,8 @@ libloc_eng_so_la_SOURCES = \
     loc_eng_dmn_conn_handler.cpp \
     loc_eng_dmn_conn_thread_helper.c \
     loc_eng_dmn_conn_glue_msg.c \
-    loc_eng_dmn_conn_glue_pipe.c
+    loc_eng_dmn_conn_glue_pipe.c \
+    ../fake_property_service.c
 
 
 if USE_GLIB
@@ -42,12 +44,13 @@ libloc_eng_so_la_LDFLAGS = -lpthread -shared -version-info 1:0:0
 libloc_eng_so_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS)
 endif
 
-libloc_eng_so_la_LIBADD = -lstdc++ -lcutils -ldl ../../utils/libgps_utils_so.la libloc_adapter_so.la
+libloc_eng_so_la_LIBADD = -lstdc++ -ldl ../../utils/libgps_utils_so.la libloc_adapter_so.la
 
 
 libgps_default_so_la_SOURCES = \
       loc.cpp \
-      gps.c
+      gps.c \
+      ../fake_property_service.c
 
 if USE_GLIB
 libgps_default_so_la_CFLAGS = -DUSE_GLIB $(AM_CFLAGS) @GLIB_CFLAGS@
@@ -59,7 +62,7 @@ libgps_default_so_la_LDFLAGS = -lpthread -shared -version-info 1:0:0
 libgps_default_so_la_CPPFLAGS = $(AM_CFLAGS) $(AM_CPPFLAGS)
 endif
 
-libgps_default_so_la_LIBADD = -lstdc++ -lcutils ../../utils/libgps_utils_so.la -ldl libloc_eng_so.la
+libgps_default_so_la_LIBADD = -lstdc++ ../../utils/libgps_utils_so.la -ldl libloc_eng_so.la
 
 library_include_HEADERS = \
    LocApiAdapter.h \
@@ -71,7 +74,8 @@ library_include_HEADERS = \
    loc_eng_msg.h \
    loc_eng_msg_id.h \
    loc_eng_log.h \
-   ../ulp/inc/ulp.h
+   ../ulp/inc/ulp.h \
+   ../fake_property_service.h
 
 library_includedir = $(pkgincludedir)/libloc_api_50001
 
