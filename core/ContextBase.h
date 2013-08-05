@@ -1,4 +1,4 @@
-/* Copyright (c) 2012, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -9,7 +9,7 @@
  *       copyright notice, this list of conditions and the following
  *       disclaimer in the documentation and/or other materials provided
  *       with the distribution.
- *     * Neither the name of The Linux Foundation nor the names of its
+ *     * Neither the name of The Linux Foundation, nor the names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -26,39 +26,36 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-#ifndef LOC_TARGET_H
-#define LOC_TARGET_H
-#define TARGET_SET(gnss,ssc) ( (gnss<<1)|ssc )
-#define TARGET_DEFAULT       TARGET_SET(GNSS_MSM, HAS_SSC)
-#define TARGET_MDM           TARGET_SET(GNSS_MDM, HAS_SSC)
-#define TARGET_APQ_SA        TARGET_SET(GNSS_GSS, NO_SSC)
-#define TARGET_MPQ           TARGET_SET(GNSS_NONE,NO_SSC)
-#define TARGET_MSM_NO_SSC    TARGET_SET(GNSS_MSM, NO_SSC)
-#define getTargetGnssType(target)  (target>>1)
+#ifndef __LOC_CONTEXT_BASE__
+#define __LOC_CONTEXT_BASE__
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
+#include <stdbool.h>
+#include <ctype.h>
+#include <MsgTask.h>
+#include <LocApiBase.h>
 
-unsigned int get_target(void);
+namespace loc_core {
 
-typedef enum {
-    GNSS_NONE = 0,
-    GNSS_MSM,
-    GNSS_GSS,
-    GNSS_MDM,
-    GNSS_GRIFFON,
-    GNSS_UNKNOWN
-}GNSS_TARGET;
+class LocAdapterBase;
 
-typedef enum {
-    NO_SSC = 0,
-    HAS_SSC
-}SSC_TYPE;
+class ContextBase {
+    static const char* mIzatLibName;
+    static void* mIzatLibHandle;
+protected:
+    const MsgTask* mMsgTask;
+    LocApiBase* mLocApi;
 
-#ifdef __cplusplus
-}
-#endif
+protected:
+    ContextBase(const MsgTask* msgTask,
+                LOC_API_ADAPTER_EVENT_MASK_T exMask);
+    inline virtual ~ContextBase() { delete mLocApi; }
 
-#endif /*LOC_TARGET_H*/
+public:
+    static void* getIzatLibHandle();
+    inline const MsgTask* getMsgTask() { return mMsgTask; }
+    inline LocApiBase* getLocApi() { return mLocApi; }
+};
+
+} // namespace loc_core
+
+#endif //__LOC_CONTEXT_BASE__
