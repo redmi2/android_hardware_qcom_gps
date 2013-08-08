@@ -1675,20 +1675,29 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_REQUEST_BIT:
         {
             AgpsStateMachine* stateMachine;
-            loc_eng_msg_request_bit* brqMsg = (loc_eng_msg_request_bit*)msg;
-            if (brqMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_SUPL) {
-                stateMachine = loc_eng_data_p->agnss_nif;
-#ifdef FEATURE_IPV6
-            } else if (brqMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_ANY) {
-                stateMachine = loc_eng_data_p->internet_nif;
-#endif
-            } else {
-                LOC_LOGD("%s]%d: unknown I/F request type = 0x%x\n", __func__, __LINE__, brqMsg->ifType);
-                break;
+            //Assuming that if agnss_nif is initialized, then other
+            //state machines are initialized as well since they are initialized
+            //sequentially without any conditions
+            if(!(loc_eng_data_p->agnss_nif)) {
+                LOC_LOGE("%s:%d]: AGPS not initialized yet. Cannot request ATL\n",
+                         __func__, __LINE__);
             }
-            BITSubscriber subscriber(stateMachine, brqMsg->ipv4Addr, brqMsg->ipv6Addr);
+            else {
+                loc_eng_msg_request_bit* brqMsg = (loc_eng_msg_request_bit*)msg;
+                if (brqMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_SUPL) {
+                    stateMachine = loc_eng_data_p->agnss_nif;
+#ifdef FEATURE_IPV6
+                } else if (brqMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_ANY) {
+                    stateMachine = loc_eng_data_p->internet_nif;
+#endif
+                } else {
+                    LOC_LOGD("%s]%d: unknown I/F request type = 0x%x\n", __func__, __LINE__, brqMsg->ifType);
+                    break;
+                }
+                BITSubscriber subscriber(stateMachine, brqMsg->ipv4Addr, brqMsg->ipv6Addr);
 
-            stateMachine->subscribeRsrc((Subscriber*)&subscriber);
+                stateMachine->subscribeRsrc((Subscriber*)&subscriber);
+            }
         }
         break;
 
@@ -1715,42 +1724,68 @@ static void loc_eng_deferred_action_thread(void* arg)
         case LOC_ENG_MSG_REQUEST_ATL:
         {
             loc_eng_msg_request_atl* arqMsg = (loc_eng_msg_request_atl*)msg;
+            //Assuming that if agnss_nif is initialized, then other
+            //state machines are initialized as well since they are initialized
+            //sequentially without any conditions
+            if(!(loc_eng_data_p->agnss_nif)) {
+                LOC_LOGE("%s:%d]: AGPS not initialized yet. Cannot request ATL\n",
+                         __func__, __LINE__);
 #ifdef FEATURE_IPV6
-            boolean backwardCompatibleMode = AGPS_TYPE_INVALID == arqMsg->type;
-            AgpsStateMachine* stateMachine = (AGPS_TYPE_SUPL == arqMsg->type ||
-                                              backwardCompatibleMode) ?
-                                             loc_eng_data_p->agnss_nif :
-                                             loc_eng_data_p->internet_nif;
+                loc_eng_data_p->client_handle->atlOpenStatus(arqMsg->handle,
+                                                             0, NULL,
+                                                             AGPS_APN_BEARER_INVALID,
+                                                             arqMsg->type);
 #else
-            boolean backwardCompatibleMode = false;
-            AgpsStateMachine* stateMachine = loc_eng_data_p->agnss_nif;
+                loc_eng_data_p->client_handle->atlOpenStatus(arqMsg->handle,
+                                                             0, NULL,arqMsg->type);
 #endif
-            ATLSubscriber subscriber(arqMsg->handle,
-                                     stateMachine,
-                                     loc_eng_data_p->client_handle,
-                                     backwardCompatibleMode);
+            }
+            else {
+#ifdef FEATURE_IPV6
+                boolean backwardCompatibleMode = AGPS_TYPE_INVALID == arqMsg->type;
+                AgpsStateMachine* stateMachine = (AGPS_TYPE_SUPL == arqMsg->type ||
+                                                  backwardCompatibleMode) ?
+                                                  loc_eng_data_p->agnss_nif :
+                                                  loc_eng_data_p->internet_nif;
+#else
+                boolean backwardCompatibleMode = false;
+                AgpsStateMachine* stateMachine = loc_eng_data_p->agnss_nif;
+#endif
+                ATLSubscriber subscriber(arqMsg->handle,
+                                         stateMachine,
+                                         loc_eng_data_p->client_handle,
+                                         backwardCompatibleMode);
 
-            stateMachine->subscribeRsrc((Subscriber*)&subscriber);
+                stateMachine->subscribeRsrc((Subscriber*)&subscriber);
+            }
         }
         break;
 
         case LOC_ENG_MSG_RELEASE_ATL:
         {
             loc_eng_msg_release_atl* arlMsg = (loc_eng_msg_release_atl*)msg;
-            ATLSubscriber s1(arlMsg->handle,
-                             loc_eng_data_p->agnss_nif,
-                             loc_eng_data_p->client_handle,
-                             false);
-            // attempt to unsubscribe from agnss_nif first
-            if (! loc_eng_data_p->agnss_nif->unsubscribeRsrc((Subscriber*)&s1)) {
-#ifdef FEATURE_IPV6
-                ATLSubscriber s2(arlMsg->handle,
-                                 loc_eng_data_p->internet_nif,
+
+            if(!(loc_eng_data_p->agnss_nif)) {
+                LOC_LOGE("%s:%d]: AGPS not initialized yet. Cannot release ATL\n",
+                         __func__, __LINE__);
+                loc_eng_data_p->client_handle->atlCloseStatus(arlMsg->handle, 0);
+            }
+            else {
+                ATLSubscriber s1(arlMsg->handle,
+                                 loc_eng_data_p->agnss_nif,
                                  loc_eng_data_p->client_handle,
                                  false);
-                // if unsuccessful, try internet_nif
-                loc_eng_data_p->internet_nif->unsubscribeRsrc((Subscriber*)&s2);
+                // attempt to unsubscribe from agnss_nif first
+                if (! loc_eng_data_p->agnss_nif->unsubscribeRsrc((Subscriber*)&s1)) {
+#ifdef FEATURE_IPV6
+                    ATLSubscriber s2(arlMsg->handle,
+                                     loc_eng_data_p->internet_nif,
+                                     loc_eng_data_p->client_handle,
+                                     false);
+                    // if unsuccessful, try internet_nif
+                    loc_eng_data_p->internet_nif->unsubscribeRsrc((Subscriber*)&s2);
 #endif
+                }
             }
         }
         break;
@@ -1762,12 +1797,17 @@ static void loc_eng_deferred_action_thread(void* arg)
             if (wrqMsg->senderId == LOC_ENG_IF_REQUEST_SENDER_ID_QUIPC ||
                 wrqMsg->senderId == LOC_ENG_IF_REQUEST_SENDER_ID_MSAPM ||
                 wrqMsg->senderId == LOC_ENG_IF_REQUEST_SENDER_ID_MSAPU) {
-              AgpsStateMachine* stateMachine = loc_eng_data_p->wifi_nif;
-              WIFISubscriber subscriber(stateMachine, wrqMsg->ssid, wrqMsg->password, wrqMsg->senderId);
-              stateMachine->subscribeRsrc((Subscriber*)&subscriber);
+                if(loc_eng_data_p->wifi_nif) {
+                    AgpsStateMachine* stateMachine = loc_eng_data_p->wifi_nif;
+                    WIFISubscriber subscriber(stateMachine, wrqMsg->ssid, wrqMsg->password, wrqMsg->senderId);
+                    stateMachine->subscribeRsrc((Subscriber*)&subscriber);
+                }
+                else {
+                    LOC_LOGE("%s:%d]: AGPS not initialized", __func__, __LINE__);
+                }
             } else {
-              LOC_LOGE("%s]%d ERROR: unknown sender ID", __func__, __LINE__);
-              break;
+                LOC_LOGE("%s]%d ERROR: unknown sender ID", __func__, __LINE__);
+                break;
             }
         }
         break;
@@ -2268,4 +2308,3 @@ int loc_eng_read_config(void)
     EXIT_LOG(%d, 0);
     return 0;
 }
-
