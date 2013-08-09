@@ -4,7 +4,7 @@ LOCAL_PATH := $(call my-dir)
 
 GPS_DIR_LIST :=
 
-FEATURE_IPV6 := true
+FEATURE_IPV6 := false
 FEATURE_DELEXT := true
 FEATURE_ULP := true
 
