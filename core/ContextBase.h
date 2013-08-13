@@ -26,10 +26,42 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef __LOC_CONTEXT_BASE__
+#define __LOC_CONTEXT_BASE__
 
-#define LOG_NDDEBUG 0
-#define LOG_TAG "LocSvc_eng"
+#include <stdbool.h>
+#include <ctype.h>
+#include <MsgTask.h>
+#include <LocApiBase.h>
+#include <IzatProxyBase.h>
 
-#include "loc_log.h"
-#include "loc_eng_log.h"
+namespace loc_core {
 
+class LocAdapterBase;
+
+class ContextBase {
+    static IzatProxyBase* getIzatProxy(const char* libName);
+    LocApiBase* createLocApi(LOC_API_ADAPTER_EVENT_MASK_T excludedMask);
+protected:
+    const IzatProxyBase* mIzatProxy;
+    const MsgTask* mMsgTask;
+    LocApiBase* mLocApi;
+
+public:
+    ContextBase(const MsgTask* msgTask,
+                LOC_API_ADAPTER_EVENT_MASK_T exMask,
+                const char* libName);
+    inline virtual ~ContextBase() { delete mLocApi; delete mIzatProxy; }
+
+    inline const MsgTask* getMsgTask() { return mMsgTask; }
+    inline LocApiBase* getLocApi() { return mLocApi; }
+    inline bool hasAgpsExt() { return mIzatProxy->hasAgpsExt(); }
+    inline void requestUlp(LocAdapterBase* adapter,
+                           unsigned long capabilities) {
+        mIzatProxy->requestUlp(adapter, capabilities);
+    }
+};
+
+} // namespace loc_core
+
+#endif //__LOC_CONTEXT_BASE__

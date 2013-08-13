@@ -26,10 +26,41 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef __MSG_TASK__
+#define __MSG_TASK__
 
-#define LOG_NDDEBUG 0
-#define LOG_TAG "LocSvc_eng"
+#include <stdbool.h>
+#include <ctype.h>
+#include <string.h>
+#include <pthread.h>
 
-#include "loc_log.h"
-#include "loc_eng_log.h"
+namespace loc_core {
 
+struct LocMsg {
+    inline LocMsg() {}
+    inline virtual ~LocMsg() {}
+    virtual void proc() const = 0;
+    inline virtual void log() const {}
+};
+
+class MsgTask {
+public:
+    typedef void* (*tStart)(void*);
+    typedef pthread_t (*tCreate)(const char* name, tStart start, void* arg);
+    typedef int (*tAssociate)();
+    MsgTask(tCreate tCreator, const char* threadName);
+    MsgTask(tAssociate tAssociator, const char* threadName);
+    ~MsgTask();
+    void sendMsg(const LocMsg* msg) const;
+
+private:
+    const void* mQ;
+    tAssociate mAssociator;
+    MsgTask(const void* q, tAssociate associator);
+    static void* loopMain(void* copy);
+    void createPThread(const char* name);
+};
+
+} // namespace loc_core
+
+#endif //__MSG_TASK__

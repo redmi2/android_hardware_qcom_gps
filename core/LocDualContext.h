@@ -26,10 +26,47 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef __LOC_ENG_CONTEXT__
+#define __LOC_ENG_CONTEXT__
 
-#define LOG_NDDEBUG 0
-#define LOG_TAG "LocSvc_eng"
+#include <stdbool.h>
+#include <ctype.h>
+#include <dlfcn.h>
+#include <ContextBase.h>
 
-#include "loc_log.h"
-#include "loc_eng_log.h"
+namespace loc_core {
 
+class LocDualContext : public ContextBase {
+    static const MsgTask* mMsgTask;
+    static ContextBase* mFgContext;
+    static ContextBase* mBgContext;
+
+    static const MsgTask* getMsgTask(MsgTask::tCreate tCreator,
+                                     const char* name);
+    static const MsgTask* getMsgTask(MsgTask::tAssociate tAssociate,
+                                     const char* name);
+
+protected:
+    LocDualContext(const MsgTask* msgTask,
+                   LOC_API_ADAPTER_EVENT_MASK_T exMask);
+    inline virtual ~LocDualContext() {}
+
+public:
+    static const char* mIzatLibName;
+    static const LOC_API_ADAPTER_EVENT_MASK_T mFgExclMask;
+    static const LOC_API_ADAPTER_EVENT_MASK_T mBgExclMask;
+    static const char* mLocationHalName;
+
+    static ContextBase* getLocFgContext(MsgTask::tCreate tCreator,
+                                        const char* name);
+    static ContextBase* getLocFgContext(MsgTask::tAssociate tAssociate,
+                                        const char* name);
+    static ContextBase* getLocBgContext(MsgTask::tCreate tCreator,
+                                        const char* name);
+    static ContextBase* getLocBgContext(MsgTask::tAssociate tAssociate,
+                                        const char* name);
+};
+
+}
+
+#endif //__LOC_ENG_CONTEXT__
