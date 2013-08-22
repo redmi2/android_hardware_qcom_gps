@@ -27,58 +27,28 @@
  *
  */
 
-#ifndef __LOC_ULP_H__
-#define __LOC_ULP_H__
+#ifndef __LOC_DELAY_H__
+#define __LOC_DELAY_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif /* __cplusplus */
+#include<pthread.h>
+#include "log_util.h"
 
-#include <ctype.h>
-#include <stdbool.h>
-#include <hardware/gps.h>
+/*
+  Return values:
+  Success = 0
+  Failure = Non zero
+*/
+typedef void(*loc_timer_callback)(void *user_data, int result);
 
-/** Location has valid source information. */
-#define LOCATION_HAS_SOURCE_INFO   0x0020
-/** GpsLocation has valid "is indoor?" flag */
-#define GPS_LOCATION_HAS_IS_INDOOR   0x0040
-/** GpsLocation has valid floor number */
-#define GPS_LOCATION_HAS_FLOOR_NUMBER   0x0080
-/** GpsLocation has valid map URL*/
-#define GPS_LOCATION_HAS_MAP_URL   0x0100
-/** GpsLocation has valid map index */
-#define GPS_LOCATION_HAS_MAP_INDEX   0x0200
-
-/** Sizes for indoor fields */
-#define GPS_LOCATION_MAP_URL_SIZE 400
-#define GPS_LOCATION_MAP_INDEX_SIZE 16
-
-/** Position source is ULP */
-#define ULP_LOCATION_IS_FROM_HYBRID   0x0001
-/** Position source is GNSS only */
-#define ULP_LOCATION_IS_FROM_GNSS   0x0002
-
-#define ULP_MIN_INTERVAL_INVALID 0xffffffff
-
-
-typedef struct {
-    /** set to sizeof(UlpLocation) */
-    size_t          size;
-    GpsLocation     gpsLocation;
-    /* Provider indicator for HYBRID or GPS */
-    uint16_t        position_source;
-    /*allows HAL to pass additional information related to the location */
-    int             rawDataSize;         /* in # of bytes */
-    void            * rawData;
-    bool            is_indoor;
-    float           floor_number;
-    char            map_url[GPS_LOCATION_MAP_URL_SIZE];
-    unsigned char   map_index[GPS_LOCATION_MAP_INDEX_SIZE];
-} UlpLocation;
-
-
+//int loc_timer_start(loc_timer_client_data *p_thread);
+int loc_timer_start(unsigned int delay_msec,
+                    loc_timer_callback,
+                    void* user_data);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */
 
-#endif //__LOC_ULP_H__
+#endif //__LOC_DELAY_H__
