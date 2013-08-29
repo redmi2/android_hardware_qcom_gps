@@ -171,7 +171,14 @@ void LocApiAdapter::reportSv(GpsSvStatus &svStatus, GpsLocationExtended &locatio
 void LocApiAdapter::reportStatus(GpsStatusValue status)
 {
     loc_eng_msg_report_status *msg(new loc_eng_msg_report_status(locEngHandle.owner, status));
-    locEngHandle.sendMsge(locEngHandle.owner, msg);
+
+    //The status msg is sent through ULP only to maintain the order of msgs
+    //ULP does not do anything with this msg
+    if(locEngHandle.sendUlpMsg) {
+        locEngHandle.sendUlpMsg(locEngHandle.owner, msg);
+    } else {
+        locEngHandle.sendMsge(locEngHandle.owner, msg);
+    }
 }
 
 void LocApiAdapter::reportNmea(const char* nmea, int length)
