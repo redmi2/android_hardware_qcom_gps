@@ -30,6 +30,7 @@
 #include <hardware/gps.h>
 
 #include <stdlib.h>
+#include <string.h>
 
 extern const GpsInterface* get_gps_interface();
 
@@ -43,7 +44,7 @@ static int open_gps(const struct hw_module_t* module, char const* name,
 {
     struct gps_device_t *dev = (struct gps_device_t *) malloc(sizeof(struct gps_device_t));
     if(dev != NULL) {
-        memset(dev, 0, sizeof(*dev));
+        memset((void*)dev, 0, sizeof(*dev));
 
         dev->common.tag = HARDWARE_DEVICE_TAG;
         dev->common.version = 0;
