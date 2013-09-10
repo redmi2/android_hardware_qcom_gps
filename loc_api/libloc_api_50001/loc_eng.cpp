@@ -929,10 +929,10 @@ void LocEngReqRelBIT::proc() const {
 }
 inline void LocEngReqRelBIT::locallog() const {
     LOC_LOGV("LocEngRequestBIT - ipv4: %d.%d.%d.%d, ipv6: %s",
-             (unsigned char)(mIPv4Addr>>24),
-             (unsigned char)(mIPv4Addr>>16),
-             (unsigned char)(mIPv4Addr>>8),
              (unsigned char)mIPv4Addr,
+             (unsigned char)(mIPv4Addr>>8),
+             (unsigned char)(mIPv4Addr>>16),
+             (unsigned char)(mIPv4Addr>>24),
              NULL != mIPv6Addr ? mIPv6Addr : "");
 }
 inline void LocEngReqRelBIT::log() const {
@@ -1163,10 +1163,12 @@ LocEngRequestTime::LocEngRequestTime(void* locEng) :
 }
 void LocEngRequestTime::proc() const {
     loc_eng_data_s_type* locEng = (loc_eng_data_s_type*)mLocEng;
-    if (locEng->request_utc_time_cb != NULL) {
-        locEng->request_utc_time_cb();
-    } else {
-        LOC_LOGE("Callback function for request time is NULL");
+    if (gps_conf.CAPABILITIES & GPS_CAPABILITY_ON_DEMAND_TIME) {
+        if (locEng->request_utc_time_cb != NULL) {
+            locEng->request_utc_time_cb();
+        } else {
+            LOC_LOGE("Callback function for request time is NULL");
+        }
     }
 }
 inline void LocEngRequestTime::locallog() const {
@@ -1477,7 +1479,7 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
 
     //Disable AGPS if capabilities are not present
     if(!(gps_conf.CAPABILITIES & GPS_CAPABILITY_MSA) &&
-       !(gps_conf.CAPABILITIES & GPS_CAPABILITY_MSA)) {
+       !(gps_conf.CAPABILITIES & GPS_CAPABILITY_MSB)) {
         event &= ~(LOC_API_ADAPTER_BIT_LOCATION_SERVER_REQUEST |
                    LOC_API_ADAPTER_BIT_NI_NOTIFY_VERIFY_REQUEST);
     }
@@ -1781,10 +1783,10 @@ int loc_eng_inject_time(loc_eng_data_s_type &loc_eng_data, GpsUtcTime time,
     ENTRY_LOG_CALLFLOW();
     INIT_CHECK(loc_eng_data.adapter, return -1);
     LocEngAdapter* adapter = loc_eng_data.adapter;
-    if (adapter->mAgpsEnabled) {
-        adapter->sendMsg(new LocEngSetTime(adapter, time, timeReference,
-                                           uncertainty));
-    }
+
+    adapter->sendMsg(new LocEngSetTime(adapter, time, timeReference,
+                                       uncertainty));
+
     EXIT_LOG(%d, 0);
     return 0;
 }
@@ -1988,7 +1990,7 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsExtCallbacks* call
                  __func__, __LINE__);
         return;
     }
-
+    LocEngAdapter* adapter = loc_eng_data.adapter;
     loc_eng_data.agps_status_cb = callbacks->status_cb;
 
     loc_eng_data.agnss_nif = new AgpsStateMachine(servicerTypeAgps,
@@ -2005,9 +2007,10 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsExtCallbacks* call
                                                  true);
     loc_eng_data.adapter->sendMsg(new LocEngDataClientInit(&loc_eng_data));
 
-    loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb,
-                                                   NULL, NULL, &loc_eng_data);
-
+    if (adapter->mAgpsEnabled) {
+        loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb,
+                                               NULL, NULL, &loc_eng_data);
+    }
     loc_eng_agps_reinit(loc_eng_data);
     EXIT_LOG(%s, VOID_RET);
 }
