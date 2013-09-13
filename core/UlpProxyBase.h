@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -9,7 +9,7 @@
  *       copyright notice, this list of conditions and the following
  *       disclaimer in the documentation and/or other materials provided
  *       with the distribution.
- *     * Neither the name of The Linux Foundation nor the names of its
+ *     * Neither the name of The Linux Foundation, nor the names of its
  *       contributors may be used to endorse or promote products derived
  *       from this software without specific prior written permission.
  *
@@ -24,45 +24,40 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
+#ifndef ULP_PROXY_BASE_H
+#define ULP_PROXY_BASE_H
 
-#ifndef LOC_SYNC_REQ_H
-#define LOC_SYNC_REQ_H
+#include <gps_extended.h>
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-#include <stdbool.h>
-#include <stdint.h>
-#include "loc_api_v02_client.h"
+namespace loc_core {
 
-#define LOC_ENGINE_SYNC_REQUEST_TIMEOUT  (1000) // 1 second
+class LocAdapterBase;
 
-/* Init function */
-extern void loc_sync_req_init();
+class UlpProxyBase {
+public:
+    inline UlpProxyBase() {}
+    inline virtual ~UlpProxyBase() {}
+    inline virtual bool sendStartFix() { return false;}
+    inline virtual bool sendStopFix() { return false;}
+    inline virtual bool sendFixMode(LocPosMode &params) { return false;}
+    inline virtual bool reportPosition(UlpLocation &location,
+                                       GpsLocationExtended &locationExtended,
+                                       void* locationExt,
+                                       enum loc_sess_status status,
+                                       LocPosTechMask loc_technology_mask) {
+        return false;
+    }
+    inline virtual bool reportSv(GpsSvStatus &svStatus,
+                                 GpsLocationExtended &locationExtended,
+                                 void* svExt) {
+        return false;
+    }
+    inline virtual void setAdapter(LocAdapterBase* adapter) {}
+    inline virtual void setCapabilities(unsigned long capabilities) {}
+};
 
+} // namespace loc_core
 
-/* Process Loc API indications to wake up blocked user threads */
-extern void loc_sync_process_ind(
-      locClientHandleType     client_handle,     /* handle of the client */
-      uint32_t                ind_id ,      /* respInd id */
-      void                    *ind_payload_ptr /* payload              */
-);
-
-/* Thread safe synchronous request,  using Loc API status return code */
-extern locClientStatusEnumType loc_sync_send_req
-(
-      locClientHandleType       client_handle,
-      uint32_t                  req_id,        /* req id */
-      locClientReqUnionType     req_payload,
-      uint32_t                  timeout_msec,
-      uint32_t                  ind_id,  //ind ID to block for, usually the same as req_id */
-      void                      *ind_payload_ptr /* can be NULL*/
-);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* LOC_SYNC_REQ_H */
+#endif // ULP_PROXY_BASE_H

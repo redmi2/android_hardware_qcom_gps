@@ -1,4 +1,4 @@
-/* Copyright (c) 2011-2012, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -24,52 +24,31 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
  * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
  */
-#ifndef LOC_UTIL_LOG_H
-#define LOC_UTIL_LOG_H
 
-#if defined(_ANDROID_)
-#include "loc_api_v02_log.h"
-#include <log_util.h>
+#ifndef __LOC_DELAY_H__
+#define __LOC_DELAY_H__
 
-#else // no _ANDROID_
+#ifdef __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+#include<pthread.h>
+#include "log_util.h"
 
-// common for QNX and Griffon
+/*
+  Return values:
+  Success = 0
+  Failure = Non zero
+*/
+typedef void(*loc_timer_callback)(void *user_data, int result);
 
-//error logs
-#define LOC_LOGE(...) printf(__VA_ARGS__)
-//warning logs
-#define LOC_LOGW(...) printf(__VA_ARGS__)
-// debug logs
-#define LOC_LOGD(...) printf(__VA_ARGS__)
-//info logs
-#define LOC_LOGI(...) printf(__VA_ARGS__)
-//verbose logs
-#define LOC_LOGV(...) printf(__VA_ARGS__)
+//int loc_timer_start(loc_timer_client_data *p_thread);
+int loc_timer_start(unsigned int delay_msec,
+                    loc_timer_callback,
+                    void* user_data);
+#ifdef __cplusplus
+}
+#endif /* __cplusplus */
 
-#define MODEM_LOG_CALLFLOW(SPEC, VAL)
-#define EXIT_LOG_CALLFLOW(SPEC, VAL)
-
-#define loc_get_v02_event_name(X) #X
-#define loc_get_v02_client_status_name(X) #X
-
-#define loc_get_v02_qmi_status_name(X)  #X
-
-//specific to OFF TARGET
-#ifdef LOC_UTIL_TARGET_OFF_TARGET
-
-#include <stdio.h>
-# include <asm/errno.h>
-# include <sys/time.h>
-
-// get around strl*: not found in glibc
-// TBD:look for presence of eglibc other libraries
-// with strlcpy supported.
-#define strlcpy(X,Y,Z) strcpy(X,Y)
-#define strlcat(X,Y,Z) strcat(X,Y)
-
-#endif //LOC_UTIL_TARGET_OFF_TARGET
-
-#endif //_ANDROID_
-
-#endif //LOC_UTIL_LOG_H
+#endif //__LOC_DELAY_H__
