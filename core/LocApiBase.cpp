@@ -123,7 +123,11 @@ bool LocApiBase::isInSession()
 {
     bool inSession = false;
 
-    TO_ALL_LOCADAPTERS(inSession = mLocAdapters[i]->isInSession());
+    for (int i = 0;
+         !inSession && i < MAX_ADAPTERS && NULL != mLocAdapters[i];
+         i++) {
+        inSession = mLocAdapters[i]->isInSession();
+    }
 
     return inSession;
 }
@@ -425,5 +429,11 @@ void LocApiBase::
     closeDataCall()
 DEFAULT_IMPL()
 
+int LocApiBase::
+    setGpsLock(unsigned int lock)
+DEFAULT_IMPL(-1)
 
+int LocApiBase::
+    getGpsLock()
+DEFAULT_IMPL(-1)
 } // namespace loc_core
