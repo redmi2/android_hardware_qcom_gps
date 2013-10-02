@@ -140,6 +140,9 @@ enum loc_eng_msg_ids_t {
 
     /*Ask the DS client to close the data call by releasing the handle*/
     LOC_ENG_MSG_CLOSE_DATA_CALL,
+
+    LOC_ENG_DANGLING_PHONE_CONTEXT_REQUEST
+
 };
 
 #ifdef __cplusplus
