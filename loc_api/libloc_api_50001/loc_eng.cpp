@@ -83,6 +83,7 @@ pthread_cond_t LocEngContext::cond = PTHREAD_COND_INITIALIZER;
 LocEngContext* LocEngContext::me = NULL;
 boolean configAlreadyRead = false;
 unsigned int agpsStatus = 0;
+static UlpPhoneContextRequest *gDanglingContextRequestPtr = NULL;
 
 loc_gps_cfg_s_type gps_conf;
 loc_sap_cfg_s_type sap_conf;
@@ -2006,8 +2007,12 @@ static void loc_eng_deferred_action_thread(void* arg)
             {
                 loc_eng_data_p->ulp_phone_context_req_cb((UlpPhoneContextRequest*)&(contextReqMsg->contextRequest));
             }
-            else
-                LOC_LOGE("Ulp Phone context request call back not initialized");
+            else {
+                gDanglingContextRequestPtr = (UlpPhoneContextRequest*)
+                                             malloc(sizeof(*gDanglingContextRequestPtr));
+                *gDanglingContextRequestPtr = contextReqMsg->contextRequest;
+                LOC_LOGW("Ulp Phone context request call back not initialized");
+            }
         }
         break;
 
@@ -2034,6 +2039,14 @@ static void loc_eng_deferred_action_thread(void* arg)
             LOC_LOGD("%s:%d]: Request to close data call\n",
                      __func__, __LINE__);
         }
+        break;
+
+        case LOC_ENG_DANGLING_PHONE_CONTEXT_REQUEST:
+            if (gDanglingContextRequestPtr) {
+                loc_eng_data_p->ulp_phone_context_req_cb(gDanglingContextRequestPtr);
+                free(gDanglingContextRequestPtr);
+                gDanglingContextRequestPtr = NULL;
+            }
         break;
 
         default:
@@ -2254,6 +2267,10 @@ int loc_eng_ulp_phone_context_init(loc_eng_data_s_type &loc_eng_data,UlpPhoneCon
     ENTRY_LOG();
     if(callback != NULL) {
         loc_eng_data.ulp_phone_context_req_cb = callback->ulp_request_phone_context_cb ;
+        loc_eng_msg *msg(new loc_eng_msg(&loc_eng_data,
+                                         LOC_ENG_DANGLING_PHONE_CONTEXT_REQUEST));
+        msg_q_snd((void*)((LocEngContext*)(loc_eng_data.context))->deferred_q,
+                  msg, loc_eng_free_msg);
         ret_val = 0;
     }
     else
