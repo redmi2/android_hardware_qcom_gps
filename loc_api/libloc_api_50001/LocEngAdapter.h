@@ -58,6 +58,7 @@ public:
     virtual void reportSv(GpsSvStatus &svStatus,
                           GpsLocationExtended &locationExtended,
                           void* svExt);
+    virtual void reportStatus(GpsStatusValue status);
     virtual void setPositionModeInt(LocPosMode& posMode);
     virtual void startFixInt();
     virtual void stopFixInt();
@@ -264,8 +265,7 @@ public:
     {return mFixCriteria;}
     inline virtual bool isInSession()
     { return mNavigating; }
-    inline void setInSession(bool inSession)
-    { mNavigating = inSession; mLocApi->setInSession(inSession); }
+    void setInSession(bool inSession);
 
     /*Values for lock
       1 = Do not lock any position sessions
