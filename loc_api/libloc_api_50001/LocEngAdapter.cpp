@@ -78,6 +78,7 @@ LocEngAdapter::LocEngAdapter(LOC_API_ADAPTER_EVENT_MASK_T mask,
     mAgpsEnabled(false)
 {
     memset(&mFixCriteria, 0, sizeof(mFixCriteria));
+    mFixCriteria.mode = LOC_POSITION_MODE_INVALID;
     LOC_LOGD("LocEngAdapter created");
 }
 
@@ -101,6 +102,12 @@ void LocEngAdapter::setUlpProxy(UlpProxyBase* ulp)
         ulp = new UlpProxyBase();
     }
     mUlp = ulp;
+
+    if (LOC_POSITION_MODE_INVALID != mFixCriteria.mode) {
+        // need to send this mode and start msg to ULP
+        mUlp->sendFixMode(mFixCriteria);
+        mUlp->sendStartFix();
+    }
 }
 
 void LocInternalAdapter::reportPosition(UlpLocation &location,
@@ -157,10 +164,25 @@ void LocEngAdapter::reportSv(GpsSvStatus &svStatus,
     }
 }
 
-inline
+void LocEngAdapter::setInSession(bool inSession)
+{
+    mNavigating = inSession;
+    mLocApi->setInSession(inSession);
+    if (!mNavigating) {
+        mFixCriteria.mode = LOC_POSITION_MODE_INVALID;
+    }
+}
+
+void LocInternalAdapter::reportStatus(GpsStatusValue status)
+{
+    sendMsg(new LocEngReportStatus(mLocEngAdapter, status));
+}
+
 void LocEngAdapter::reportStatus(GpsStatusValue status)
 {
-    sendMsg(new LocEngReportStatus(mOwner, status));
+    if (!mUlp->reportStatus(status)) {
+        mInternalAdapter->reportStatus(status);
+    }
 }
 
 inline
@@ -242,15 +264,17 @@ bool LocEngAdapter::requestSuplES(int connHandle)
 inline
 bool LocEngAdapter::reportDataCallOpened()
 {
-    sendMsg(new LocEngSuplEsOpened(mOwner));
-    return true;
+    if(mAgpsEnabled)
+        sendMsg(new LocEngSuplEsOpened(mOwner));
+    return mAgpsEnabled;
 }
 
 inline
 bool LocEngAdapter::reportDataCallClosed()
 {
-    sendMsg(new LocEngSuplEsClosed(mOwner));
-    return true;
+    if(mAgpsEnabled)
+        sendMsg(new LocEngSuplEsClosed(mOwner));
+    return mAgpsEnabled;
 }
 
 inline
