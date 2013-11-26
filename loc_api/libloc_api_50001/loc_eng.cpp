@@ -857,7 +857,9 @@ void LocEngReportNmea::proc() const {
     gettimeofday(&tv, (struct timezone *) NULL);
     int64_t now = tv.tv_sec * 1000LL + tv.tv_usec / 1000;
     CALLBACK_LOG_CALLFLOW("nmea_cb", %d, mLen);
-    locEng->nmea_cb(now, mNmea, mLen);
+
+    if (locEng->nmea_cb != NULL)
+        locEng->nmea_cb(now, mNmea, mLen);
 }
 inline void LocEngReportNmea::locallog() const {
     LOC_LOGV("LocEngReportNmea");
@@ -1845,8 +1847,11 @@ int loc_eng_inject_location(loc_eng_data_s_type &loc_eng_data, double latitude,
     ENTRY_LOG_CALLFLOW();
     INIT_CHECK(loc_eng_data.adapter, return -1);
     LocEngAdapter* adapter = loc_eng_data.adapter;
-    adapter->sendMsg(new LocEngInjectLocation(adapter, latitude, longitude,
-                                              accuracy));
+    if(!adapter->mCPIEnabled)
+    {
+        adapter->sendMsg(new LocEngInjectLocation(adapter, latitude, longitude,
+                                                  accuracy));
+    }
 
     EXIT_LOG(%d, 0);
     return 0;
