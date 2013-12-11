@@ -875,6 +875,7 @@ LocEngReportXtraServer::LocEngReportXtraServer(void* locEng,
     LocMsg(), mLocEng(locEng), mMaxLen(maxlength),
     mServers(new char[3*(mMaxLen+1)])
 {
+    memset(mServers, 0, 3*(mMaxLen+1));
     strlcpy(mServers, url1, mMaxLen);
     strlcpy(&(mServers[mMaxLen+1]), url2, mMaxLen);
     strlcpy(&(mServers[(mMaxLen+1)<<1]), url3, mMaxLen);
@@ -896,7 +897,7 @@ void LocEngReportXtraServer::proc() const {
 inline void LocEngReportXtraServer::locallog() const {
     LOC_LOGV("LocEngReportXtraServers: server1: %s\n  server2: %s\n"
              "  server3: %s\n",
-             mServers, &mServers[mMaxLen], &mServers[mMaxLen<<1]);
+             mServers, &mServers[mMaxLen+1], &mServers[(mMaxLen+1)<<1]);
 }
 inline void LocEngReportXtraServer::log() const {
     locallog();
@@ -1454,7 +1455,7 @@ SIDE EFFECTS
 
 ===========================================================================*/
 int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
-                 LOC_API_ADAPTER_EVENT_MASK_T event)
+                 LOC_API_ADAPTER_EVENT_MASK_T event, ContextBase* context)
 
 {
     int ret_val = 0;
@@ -1506,12 +1507,11 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
     }
 
     loc_eng_data.adapter =
-        new LocEngAdapter(event, &loc_eng_data,
+        new LocEngAdapter(event, &loc_eng_data, context,
                           (MsgTask::tCreate)callbacks->create_thread_cb);
 
     LOC_LOGD("loc_eng_init created client, id = %p\n",
              loc_eng_data.adapter);
-
     loc_eng_data.adapter->sendMsg(new LocEngInit(&loc_eng_data));
 
     EXIT_LOG(%d, ret_val);
