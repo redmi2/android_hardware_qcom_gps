@@ -55,9 +55,8 @@ typedef unsigned char boolean;
 #include <loc_cfg.h>
 #include <loc_log.h>
 #include <log_util.h>
-#include <loc_eng_msg.h>
 #include <loc_eng_agps.h>
-#include <LocApiAdapter.h>
+#include <LocEngAdapter.h>
 
 // The data connection minimal open time
 #define DATA_OPEN_MIN_TIME        1  /* sec */
@@ -79,25 +78,10 @@ enum loc_mute_session_e_type {
    LOC_MUTE_SESS_IN_SESSION
 };
 
-struct LocEngContext {
-    // Data variables used by deferred action thread
-    const void* deferred_q;
-    const void* ulp_q;
-    const pthread_t deferred_action_thread;
-    static LocEngContext* get(gps_create_thread threadCreator);
-    void drop();
-    static pthread_mutex_t lock;
-    static pthread_cond_t cond;
-private:
-    int counter;
-    static LocEngContext *me;
-    LocEngContext(gps_create_thread threadCreator);
-};
-
 // Module data
 typedef struct loc_eng_data_s
 {
-    LocApiAdapter                 *client_handle;
+    LocEngAdapter                  *adapter;
     loc_location_cb_ext            location_cb;
     gps_status_callback            status_cb;
     loc_sv_status_cb_ext           sv_status_cb;
@@ -109,9 +93,6 @@ typedef struct loc_eng_data_s
     gps_request_utc_time           request_utc_time_cb;
     boolean                        intermediateFix;
     AGpsStatusValue                agps_status;
-    // used to defer stopping the GPS engine until AGPS data calls are done
-    boolean                        agps_request_pending;
-    boolean                        stop_request_pending;
     loc_eng_xtra_data_s_type       xtra_module_data;
     loc_eng_ni_data_s_type         loc_eng_ni_data;
 
@@ -128,8 +109,6 @@ typedef struct loc_eng_data_s
 
     // Aiding data information to be deleted, aiding data can only be deleted when GPS engine is off
     GpsAidingData                  aiding_data_for_deletion;
-
-    void*                          context;
 
     // For muting session broadcast
     loc_mute_session_e_type        mute_session_state;
@@ -151,17 +130,16 @@ typedef struct loc_eng_data_s
     int    mpc_host_set;
     char   mpc_host_buf[101];
     int    mpc_port_buf;
-    bool   ulp_initialized;
-} loc_eng_data_s_type;
 
-#include "ulp.h"
+    loc_ext_parser location_ext_parser;
+    loc_ext_parser sv_ext_parser;
+} loc_eng_data_s_type;
 
 /* GPS.conf support */
 typedef struct loc_gps_cfg_s
 {
     unsigned long  INTERMEDIATE_POS;
     unsigned long  ACCURACY_THRES;
-    unsigned long  ENABLE_WIPER;
     unsigned long  SUPL_VER;
     unsigned long  CAPABILITIES;
     unsigned long  QUIPC_ENABLED;
@@ -201,8 +179,7 @@ extern loc_sap_cfg_s_type sap_conf;
 int  loc_eng_init(loc_eng_data_s_type &loc_eng_data,
                   LocCallbacks* callbacks,
                   LOC_API_ADAPTER_EVENT_MASK_T event,
-                  void (*loc_external_msg_sender) (void*, void*));
-int loc_eng_ulp_init(loc_eng_data_s_type &loc_eng_data, const ulpInterface * loc_eng_ulpInf);
+                  ContextBase* context);
 int  loc_eng_start(loc_eng_data_s_type &loc_eng_data);
 int  loc_eng_stop(loc_eng_data_s_type &loc_eng_data);
 void loc_eng_cleanup(loc_eng_data_s_type &loc_eng_data);
@@ -256,6 +233,7 @@ extern void loc_eng_ni_request_handler(loc_eng_data_s_type &loc_eng_data,
                                    const void* passThrough);
 extern void loc_eng_ni_reset_on_engine_restart(loc_eng_data_s_type &loc_eng_data);
 int loc_eng_read_config(void);
+
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

@@ -1,4 +1,4 @@
-/* Copyright (c) 2011-2013, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -26,10 +26,35 @@
  * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
+#ifndef IZAT_PROXY_BASE_H
+#define IZAT_PROXY_BASE_H
+#include <gps_extended.h>
+#include <MsgTask.h>
 
-#define LOG_NDDEBUG 0
-#define LOG_TAG "LocSvc_eng"
+namespace loc_core {
 
-#include "loc_log.h"
-#include "loc_eng_log.h"
+class LocApiBase;
+class LocAdapterBase;
 
+class LBSProxyBase {
+    friend class ContextBase;
+    inline virtual LocApiBase*
+        getLocApi(const MsgTask* msgTask,
+                  LOC_API_ADAPTER_EVENT_MASK_T exMask) const {
+        return NULL;
+    }
+protected:
+    inline LBSProxyBase() {}
+public:
+    inline virtual ~LBSProxyBase() {}
+    inline virtual void requestUlp(LocAdapterBase* adapter,
+                                   unsigned long capabilities) const {}
+    inline virtual bool hasAgpsExt() const { return false; }
+    inline virtual bool hasCPIExt() const { return false; }
+};
+
+typedef LBSProxyBase* (getLBSProxy_t)();
+
+} // namespace loc_core
+
+#endif // IZAT_PROXY_BASE_H
