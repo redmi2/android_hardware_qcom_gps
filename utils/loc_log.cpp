@@ -134,18 +134,18 @@ RETURN VALUE
 const char *loc_get_target_name(unsigned int target)
 {
     int index = 0;
-    char ret[BUFFER_SIZE];
+    static char ret[BUFFER_SIZE];
 
     index =  getTargetGnssType(target);
     if( index >= target_name_num || index < 0)
         index = target_name_num - 1;
 
     if( (target & HAS_SSC) == HAS_SSC ) {
-        sprintf(ret, " %s with SSC",
+        snprintf(ret, sizeof(ret), " %s with SSC",
            loc_get_name_from_val(target_name, target_name_num, (long)index) );
     }
     else {
-       sprintf(ret, " %s  without SSC",
+       snprintf(ret, sizeof(ret), " %s  without SSC",
            loc_get_name_from_val(target_name, target_name_num, (long)index) );
     }
     return ret;
