@@ -76,8 +76,8 @@ class LocEngAdapter : public LocAdapterBase {
     bool mNavigating;
 
 public:
-    bool mSupportsAgpsExtendedCapabilities;
-    bool mSupportsCPIExtendedCapabilities;
+    bool mSupportsAgpsRequests;
+    bool mSupportsPositionInjection;
 
     LocEngAdapter(LOC_API_ADAPTER_EVENT_MASK_T mask,
                   void* owner,ContextBase* context,
