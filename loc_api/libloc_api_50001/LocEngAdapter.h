@@ -64,6 +64,7 @@ public:
     virtual void stopFixInt();
     virtual void getZppInt();
     virtual void setUlpProxy(UlpProxyBase* ulp);
+    virtual void shutdown();
 };
 
 typedef void (*loc_msg_sender)(void* loc_eng_data_p, void* msgp);
@@ -82,8 +83,8 @@ class LocEngAdapter : public LocAdapterBase {
     static const unsigned int POWER_VOTE_VALUE = 0x10;
 
 public:
-    bool mSupportsAgpsExtendedCapabilities;
-    bool mSupportsCPIExtendedCapabilities;
+    bool mSupportsAgpsRequests;
+    bool mSupportsPositionInjection;
 
     LocEngAdapter(LOC_API_ADAPTER_EVENT_MASK_T mask,
                   void* owner, ContextBase* context,
