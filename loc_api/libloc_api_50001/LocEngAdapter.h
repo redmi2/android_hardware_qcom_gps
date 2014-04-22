@@ -83,8 +83,8 @@ class LocEngAdapter : public LocAdapterBase {
     static const unsigned int POWER_VOTE_VALUE = 0x10;
 
 public:
-    bool mAgpsEnabled;
-    bool mCPIEnabled;
+    bool mSupportsAgpsRequests;
+    bool mSupportsPositionInjection;
 
     LocEngAdapter(LOC_API_ADAPTER_EVENT_MASK_T mask,
                   void* owner, ContextBase* context,
@@ -98,8 +98,8 @@ public:
     inline LocInternalAdapter* getInternalAdapter() { return mInternalAdapter; }
     inline UlpProxyBase* getUlpProxy() { return mUlp; }
     inline void* getOwner() { return mOwner; }
-    inline bool hasAgpsExt() { return mContext->hasAgpsExt(); }
-    inline bool hasCPIExt() { return mContext->hasCPIExt(); }
+    inline bool hasAgpsExtendedCapabilities() { return mContext->hasAgpsExtendedCapabilities(); }
+    inline bool hasCPIExtendedCapabilities() { return mContext->hasCPIExtendedCapabilities(); }
     inline const MsgTask* getMsgTask() { return mMsgTask; }
 
     inline enum loc_api_adapter_err
