@@ -1,4 +1,4 @@
-/* Copyright (c) 2011 - 2012, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011 - 2014, The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -1044,7 +1044,9 @@ const ulpInterface * loc_eng_get_ulp_inf(void)
      }
 
     // Initialize the ULP interface
-    loc_eng_ulpInf = get_ulp_inf();
+    if(get_ulp_inf != NULL) {
+        loc_eng_ulpInf = get_ulp_inf();
+    }
 
 exit:
     EXIT_LOG(%d, loc_eng_ulpInf == NULL);
