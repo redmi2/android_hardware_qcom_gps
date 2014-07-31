@@ -40,6 +40,7 @@ extern "C" {
 #include <loc_ulp.h>
 
 #define MIN_POSSIBLE_FIX_INTERVAL 1000 /* msec */
+#define XTRA_DATA_MAX_SIZE 100000 /*bytes*/
 
 typedef enum loc_server_type {
     LOC_AGPS_CDMA_PDE_SERVER,
