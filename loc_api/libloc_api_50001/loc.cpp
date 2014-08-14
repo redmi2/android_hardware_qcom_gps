@@ -474,11 +474,6 @@ static int loc_inject_location(double latitude, double longitude, float accuracy
 {
     ENTRY_LOG();
 
-    if (accuracy < 1000)
-    {
-      accuracy = 1000;
-    }
-
     int ret_val = 0;
     ret_val = loc_eng_inject_location(loc_afw_data, latitude, longitude, accuracy);
 
@@ -794,8 +789,12 @@ SIDE EFFECTS
 static int loc_xtra_inject_data(char* data, int length)
 {
     ENTRY_LOG();
-    int ret_val = loc_eng_xtra_inject_data(loc_afw_data, data, length);
-
+    int ret_val = -1;
+    if( (data != NULL) && ((unsigned int)length <= XTRA_DATA_MAX_SIZE))
+        ret_val = loc_eng_xtra_inject_data(loc_afw_data, data, length);
+    else
+        LOC_LOGE("%s, Could not inject XTRA data. Buffer address: %p, length: %d",
+                 __func__, data, length);
     EXIT_LOG(%d, ret_val);
     return ret_val;
 }
