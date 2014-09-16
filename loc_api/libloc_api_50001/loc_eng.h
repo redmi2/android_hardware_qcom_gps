@@ -146,6 +146,7 @@ typedef struct loc_gps_cfg_s
     unsigned long  LPP_PROFILE;
     uint8_t        NMEA_PROVIDER;
     unsigned long  A_GLONASS_POS_PROTOCOL_SELECT;
+    unsigned long  USE_EMERGENCY_PDN_FOR_EMERGENCY_SUPL;
 } loc_gps_cfg_s_type;
 
 typedef struct
