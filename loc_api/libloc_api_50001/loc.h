@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011,2014 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -55,6 +55,8 @@ typedef enum loc_position_mode_type {
     LOC_POSITION_MODE_RESERVED_3,
     LOC_POSITION_MODE_RESERVED_4
 } LocPositionMode;
+
+#define XTRA_DATA_MAX_SIZE 100000 /*bytes*/
 
 typedef void (*loc_location_cb_ext) (GpsLocation* location, void* locExt);
 typedef void (*loc_sv_status_cb_ext) (GpsSvStatus* sv_status, void* svExt);
