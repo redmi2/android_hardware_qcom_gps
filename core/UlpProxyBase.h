@@ -75,6 +75,11 @@ public:
     }
     inline virtual void setAdapter(LocAdapterBase* adapter) {}
     inline virtual void setCapabilities(unsigned long capabilities) {}
+
+    inline virtual bool reportDeleteAidingData(GpsAidingData aidingData)
+    {
+       return false;
+    }
 };
 
 } // namespace loc_core
