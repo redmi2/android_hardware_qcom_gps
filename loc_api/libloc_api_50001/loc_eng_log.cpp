@@ -27,6 +27,12 @@
  *
  */
 
+/*
+Copyright (c) 2014 Qualcomm Atheros, Inc.
+All Rights Reserved.
+Qualcomm Atheros Confidential and Proprietary.
+*/
+
 #define LOG_NDDEBUG 0
 #define LOG_TAG "LocSvc_eng"
 
@@ -178,6 +184,12 @@ static loc_name_val_s_type loc_eng_aiding_data_bits[] =
     NAME_VAL( BDS_DELETE_ALMANAC_CORR ),
     NAME_VAL( BDS_DELETE_EPHEMERIS ),
     NAME_VAL( BDS_DELETE_ALMANAC ),
+    NAME_VAL( GAL_DELETE_SVDIR ),
+    NAME_VAL( GAL_DELETE_SVSTEER ),
+    NAME_VAL( GAL_DELETE_TIME ),
+    NAME_VAL( GAL_DELETE_ALMANAC_CORR ),
+    NAME_VAL( GAL_DELETE_EPHEMERIS ),
+    NAME_VAL( GAL_DELETE_ALMANAC ),
     NAME_VAL( GPS_DELETE_ALL)
 };
 static int loc_eng_aiding_data_bit_num = sizeof(loc_eng_aiding_data_bits) / sizeof(loc_name_val_s_type);
