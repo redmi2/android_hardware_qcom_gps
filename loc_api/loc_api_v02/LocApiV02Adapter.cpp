@@ -1,4 +1,4 @@
-/* Copyright (c) 2011, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2011, 2015 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -75,8 +75,13 @@
 
 #define BDS_SV_ID_OFFSET        (201)
 
+#define GAL_SV_ID_OFFSET        (301)
+
 /* BeiDou SV ID RANGE*/
 #define BDS_SV_ID_RANGE         QMI_LOC_DELETE_MAX_BDS_SV_INFO_LENGTH_V02
+
+/* Galileo SV ID RANGE*/
+#define GAL_SV_ID_RANGE         QMI_LOC_DELETE_MAX_GAL_SV_INFO_LENGTH_V02
 
 /* static event callbacks that call the LocApiV02Adapter callbacks*/
 
@@ -819,6 +824,64 @@ if ( (f & GLO_DELETE_EPHEMERIS ) || (f & GLO_DELETE_ALMANAC ))
     {
       delete_req.deleteGnssDataMask_valid = 1;
       delete_req.deleteGnssDataMask |= QMI_LOC_MASK_DELETE_BDS_TIME_V02;
+    }
+
+    if( (f & GAL_DELETE_EPHEMERIS ) || (f & GAL_DELETE_ALMANAC ))
+    {
+      /*Delete Galileo SV info*/
+      sv_id = GAL_SV_ID_OFFSET;
+
+      delete_req.deleteGalSvInfoList_valid = 1;
+
+      delete_req.deleteGalSvInfoList_len = GAL_SV_ID_RANGE;
+
+      LOC_LOGV("%s:%d]: Delete GAL SV info for index 0 to %d"
+               "and sv id %d to %d \n",
+               __func__, __LINE__,
+               GAL_SV_ID_RANGE - 1,
+               sv_id, sv_id+GAL_SV_ID_RANGE - 1);
+
+      for( uint32_t i = 0; i < GAL_SV_ID_RANGE; i++, sv_id++ )
+      {
+          delete_req.deleteGalSvInfoList[i].gnssSvId = sv_id;
+
+          // set ephemeris mask for all GAL SV's
+          if(f & GAL_DELETE_EPHEMERIS)
+          {
+              delete_req.deleteGalSvInfoList[i].deleteSvInfoMask |=
+                  QMI_LOC_MASK_DELETE_EPHEMERIS_V02;
+          }
+          // set almanac mask for all GAL SV's
+          if(f & GAL_DELETE_ALMANAC)
+          {
+              delete_req.deleteGalSvInfoList[i].deleteSvInfoMask |=
+                  QMI_LOC_MASK_DELETE_ALMANAC_V02;
+          }
+      }
+    }
+
+    if(f & GAL_DELETE_SVDIR )
+    {
+      delete_req.deleteGnssDataMask_valid = 1;
+      delete_req.deleteGnssDataMask |= QMI_LOC_MASK_DELETE_GAL_SVDIR_V02;
+    }
+
+    if(f & GAL_DELETE_SVSTEER )
+    {
+      delete_req.deleteGnssDataMask_valid = 1;
+      delete_req.deleteGnssDataMask |= QMI_LOC_MASK_DELETE_GAL_SVSTEER_V02;
+    }
+
+    if(f & GAL_DELETE_ALMANAC_CORR )
+    {
+      delete_req.deleteGnssDataMask_valid = 1;
+      delete_req.deleteGnssDataMask |= QMI_LOC_MASK_DELETE_GAL_ALM_CORR_V02;
+    }
+
+    if(f & GAL_DELETE_TIME )
+    {
+      delete_req.deleteGnssDataMask_valid = 1;
+      delete_req.deleteGnssDataMask |= QMI_LOC_MASK_DELETE_GAL_TIME_V02;
     }
   }
 
@@ -1838,6 +1901,14 @@ void  LocApiV02Adapter :: reportSv (
         {
           SvStatus.sv_list[SvStatus.num_svs].prn =
             sv_info_ptr->gnssSvId;
+        }
+        //Galileo: Slot id: 1-36
+        //In extended measurement report, we follow nmea standard,
+        //which is 301-336
+        else if(sv_info_ptr->system == eQMI_LOC_SV_SYSTEM_GALILEO_V02)
+        {
+          SvStatus.sv_list[SvStatus.num_svs].prn =
+            sv_info_ptr->gnssSvId + (GAL_SV_ID_OFFSET - 1);
         }
         // Unsupported SV system
         else
