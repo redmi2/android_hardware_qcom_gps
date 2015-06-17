@@ -859,7 +859,7 @@ void LocEngReportPosition::send() const {
 
 //        case LOC_ENG_MSG_REPORT_SV:
 LocEngReportSv::LocEngReportSv(LocAdapterBase* adapter,
-                               GpsSvStatus &sv,
+                               GnssSvStatus &sv,
                                GpsLocationExtended &locExtended,
                                void* svExt) :
     LocMsg(), mAdapter(adapter), mSvStatus(sv),
@@ -892,7 +892,7 @@ void LocEngReportSv::locallog() const {
              "used in fix mask: %x\n      sv: prn         snr       "
              "elevation      azimuth",
              mSvStatus.num_svs, mSvStatus.ephemeris_mask,
-             mSvStatus.almanac_mask, mSvStatus.used_in_fix_mask);
+             mSvStatus.almanac_mask, mSvStatus.gps_used_in_fix_mask);
     for (int i = 0; i < mSvStatus.num_svs && i < GPS_MAX_SVS; i++) {
         LOC_LOGV("   %d:   %d    %f    %f    %f\n  ",
                  i,
