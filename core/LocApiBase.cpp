@@ -242,7 +242,7 @@ void LocApiBase::reportPosition(UlpLocation &location,
     );
 }
 
-void LocApiBase::reportSv(GpsSvStatus &svStatus,
+void LocApiBase::reportSv(GnssSvStatus &svStatus,
                   GpsLocationExtended &locationExtended,
                   void* svExt)
 {
