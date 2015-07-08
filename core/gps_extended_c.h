@@ -290,6 +290,47 @@ typedef struct GpsExtLocation_s {
     uint32_t        sources_used;
 } GpsExtLocation;
 
+/** Represents SV status. */
+typedef struct {
+    /** set to sizeof(GnssSvStatus) */
+    size_t          size;
+
+    /** Number of SVs currently visible. */
+    int         num_svs;
+
+    /** Contains an array of SV information. */
+    GpsSvInfo   sv_list[GPS_MAX_SVS];
+
+    /** Represents a bit mask indicating which SVs
+     * have ephemeris data.
+     */
+    uint32_t    ephemeris_mask;
+
+    /** Represents a bit mask indicating which SVs
+     * have almanac data.
+     */
+    uint32_t    almanac_mask;
+
+    /**
+     * Represents a bit mask indicating which GPS SVs
+     * were used for computing the most recent position fix.
+     */
+    uint32_t    gps_used_in_fix_mask;
+
+    /**
+     * Represents a bit mask indicating which GLONASS SVs
+     * were used for computing the most recent position fix.
+     */
+    uint32_t    glo_used_in_fix_mask;
+
+    /**
+     * Represents a bit mask indicating which BDS SVs
+     * were used for computing the most recent position fix.
+     */
+    uint64_t    bds_used_in_fix_mask;
+
+} GnssSvStatus;
+
 enum loc_sess_status {
     LOC_SESS_SUCCESS,
     LOC_SESS_INTERMEDIATE,
@@ -372,7 +413,7 @@ enum loc_api_adapter_event_index {
     LOC_API_ADAPTER_GDT_UPLOAD_BEGIN_REQ,              // GDT upload start request
     LOC_API_ADAPTER_GDT_UPLOAD_END_REQ,                // GDT upload end request
     LOC_API_ADAPTER_GNSS_MEASUREMENT,                  // GNSS Measurement report
-
+    LOC_API_ADAPTER_REQUEST_TIMEZONE,                  // Timezone injection request
     LOC_API_ADAPTER_EVENT_MAX
 };
 
@@ -401,6 +442,7 @@ enum loc_api_adapter_event_index {
 #define LOC_API_ADAPTER_BIT_GDT_UPLOAD_BEGIN_REQ             (1<<LOC_API_ADAPTER_GDT_UPLOAD_BEGIN_REQ)
 #define LOC_API_ADAPTER_BIT_GDT_UPLOAD_END_REQ               (1<<LOC_API_ADAPTER_GDT_UPLOAD_END_REQ)
 #define LOC_API_ADAPTER_BIT_GNSS_MEASUREMENT                 (1<<LOC_API_ADAPTER_GNSS_MEASUREMENT)
+#define LOC_API_ADAPTER_BIT_REQUEST_TIMEZONE                 (1<<LOC_API_ADAPTER_REQUEST_TIMEZONE)
 
 typedef unsigned int LOC_API_ADAPTER_EVENT_MASK_T;
 
@@ -422,4 +464,3 @@ typedef uint32_t LOC_GPS_LOCK_MASK;
 #endif /* __cplusplus */
 
 #endif /* GPS_EXTENDED_C_H */
-
