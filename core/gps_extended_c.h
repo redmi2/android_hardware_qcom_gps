@@ -258,6 +258,13 @@ typedef uint16_t GpsLocationExtendedFlags;
 /** GpsLocationExtended has valid speed uncertainty */
 #define GPS_LOCATION_EXTENDED_HAS_SPEED_UNC 0x0020
 
+typedef struct {
+    struct timespec apTimeStamp;
+    /*boottime received from pps-ktimer*/
+    float apTimeStampUncertaintyMs;
+    /* timestamp uncertainty in milli seconds */
+}Gnss_ApTimeStampStructType;
+
 /** Represents gps location extended. */
 typedef struct {
     /** set to sizeof(GpsLocationExtended) */
@@ -278,6 +285,7 @@ typedef struct {
     float           vert_unc;
     /** speed uncertainty in m/s */
     float           speed_unc;
+    Gnss_ApTimeStampStructType               timeStamp;
 } GpsLocationExtended;
 
 typedef struct GpsExtLocation_s {
@@ -906,13 +914,6 @@ typedef struct
     */
 } Gnss_ClockMeasurementStructType;
 
-typedef struct
-{
-    struct timespec apTimeStamp;
-    /*boottime received from pps-ktimer*/
-    float apTimeStampUncertaintyMs;
-    /* timestamp uncertainty in milli seconds */
-}Gnss_ApTimeStampStructType;
 
 typedef struct
 {
