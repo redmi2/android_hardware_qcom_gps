@@ -202,6 +202,13 @@ void LocEngAdapter::reportPosition(UlpLocation &location,
                                          loc_technology_mask);
     }
 }
+void LocInternalAdapter::reportDrNMEA(long long int timestamp,
+                  const char* nmea, int length)
+{
+   LOC_LOGV("LocInternalAdapter:reportDrNMEA TimeSt:%lld ", timestamp);
+   mLocEngAdapter->reportNmea(nmea,length);
+
+}
 
 void LocInternalAdapter::reportSv(GpsSvStatus &svStatus,
                                   GpsLocationExtended &locationExtended,
@@ -260,12 +267,13 @@ void LocEngAdapter::reportStatus(GpsStatusValue status)
         mInternalAdapter->reportStatus(status);
     }
 }
-
 inline
 void LocEngAdapter::reportNmea(const char* nmea, int length)
 {
+    LOC_LOGV("LocEngAdapter::reportNmea");
     sendMsg(new LocEngReportNmea(mOwner, nmea, length));
 }
+
 
 inline
 bool LocEngAdapter::reportXtraServer(const char* url1,
@@ -440,4 +448,12 @@ bool LocEngAdapter::gnssConstellationConfig()
     bool result = false;
     result = mLocApi->gnssConstellationConfig();
     return result;
+}
+
+/*
+  get DREnabled status
+ */
+bool LocEngAdapter::isDrEnabled()
+{
+   return mUlp->isDrEnabled();
 }

@@ -90,6 +90,11 @@ public:
     {
        return false;
     }
+    inline virtual bool isDrEnabled()
+    {
+      return false;
+    }
+
 };
 
 } // namespace loc_core

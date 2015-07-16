@@ -55,6 +55,9 @@ public:
                                 void* locationExt,
                                 enum loc_sess_status status,
                                 LocPosTechMask loc_technology_mask);
+    virtual void reportDrNMEA(long long int timestamp,
+                    const char* nmea, int length);
+
     virtual void reportSv(GpsSvStatus &svStatus,
                           GpsLocationExtended &locationExtended,
                           void* svExt);
@@ -347,6 +350,10 @@ public:
       Set Gnss Constellation Config
      */
     bool gnssConstellationConfig();
+    /*
+      get DREnabled Status
+     */
+    bool isDrEnabled();
 };
 
 #endif //LOC_API_ENG_ADAPTER_H

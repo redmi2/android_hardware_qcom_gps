@@ -815,11 +815,11 @@ void LocEngReportPosition::proc() const {
             locEng->adapter->setInSession(false);
         }
 
-        if (locEng->generateNmea &&
+        if ((locEng->generateNmea &&
             mLocation.position_source == ULP_LOCATION_IS_FROM_GNSS &&
             mTechMask & (LOC_POS_TECH_MASK_SATELLITE |
                          LOC_POS_TECH_MASK_SENSORS |
-                         LOC_POS_TECH_MASK_HYBRID))
+                         LOC_POS_TECH_MASK_HYBRID))&& (!locEng->adapter->isDrEnabled()) )
         {
             unsigned char generate_nmea = reported &&
                                           (mStatus != LOC_SESS_FAILURE);
@@ -872,7 +872,7 @@ void LocEngReportSv::proc() const {
                                  (void*)mSvExt);
         }
 
-        if (locEng->generateNmea)
+        if ((locEng->generateNmea) && (!locEng->adapter->isDrEnabled()))
         {
             loc_eng_nmea_generate_sv(locEng, mSvStatus, mLocationExtended);
         }

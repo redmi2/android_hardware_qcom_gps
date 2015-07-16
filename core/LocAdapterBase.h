@@ -115,6 +115,7 @@ public:
     virtual void shutdown();
     ContextBase* getContext() const { return mContext; }
     virtual void reportGpsMeasurementData(GpsData &gpsMeasurementData);
+    virtual void reportDrNMEA(long long int, const char*, int);
 };
 
 } // namespace loc_core

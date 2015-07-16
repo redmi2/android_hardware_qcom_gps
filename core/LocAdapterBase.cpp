@@ -100,6 +100,9 @@ DEFAULT_IMPL()
 void LocAdapterBase::
     reportNmea(const char* nmea, int length)
 DEFAULT_IMPL()
+void LocAdapterBase::
+    reportDrNMEA(long long int, const char* nmea, int length)
+DEFAULT_IMPL()
 
 bool LocAdapterBase::
     reportXtraServer(const char* url1, const char* url2,
