@@ -37,7 +37,7 @@ extern "C" {
 #include <ctype.h>
 #include <hardware/gps.h>
 
-#define MIN_POSSIBLE_FIX_INTERVAL 1000 /* msec */
+#define MIN_POSSIBLE_FIX_INTERVAL 100 /* msec */
 
 typedef enum loc_server_type {
     LOC_AGPS_CDMA_PDE_SERVER,
