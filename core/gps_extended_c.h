@@ -293,6 +293,12 @@ typedef struct {
      */
     uint64_t    bds_used_in_fix_mask;
 
+    /**
+     * Represents a bit mask indicating which GALILEO SVs
+     * were used for computing the most recent position fix.
+     */
+    uint64_t    gal_used_in_fix_mask;
+
 } GnssSvStatus;
 
 enum loc_sess_status {
