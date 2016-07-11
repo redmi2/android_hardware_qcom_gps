@@ -1,0 +1,10 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+
+Name: gnss-test-ship
+Description: QTI GPS Location API GNSS Test App
+Version: @VERSION@
+Libs:
+Cflags:

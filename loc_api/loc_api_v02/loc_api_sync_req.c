@@ -44,7 +44,8 @@
 // log debug logs
 #define LOG_NDDEBUG 1
 #define LOG_TAG "LocSvc_api_v02"
-#include "loc_util_log.h"
+#include "platform_lib_includes.h"
+#include "log_util.h"
 
 #define LOC_SYNC_REQ_BUFFER_SIZE 8
 
@@ -101,11 +102,11 @@ SIDE EFFECTS
 ===========================================================================*/
 void loc_sync_req_init()
 {
-   LOC_LOGV(" %s:%d]:\n", __func__, __LINE__);
+   LOC_LOGV(" %s:%d]:", __func__, __LINE__);
    pthread_mutex_lock(&loc_sync_call_mutex);
    if(true == loc_sync_call_initialized)
    {
-      LOC_LOGD("%s:%d]:already initialized\n", __func__, __LINE__);
+      LOC_LOGD("%s:%d]:already initialized", __func__, __LINE__);
       pthread_mutex_unlock(&loc_sync_call_mutex);
       return;
    }
@@ -161,14 +162,14 @@ void loc_sync_process_ind(
 )
 {
 
-   LOC_LOGV("%s:%d]: received indication, handle = %p ind_id = %u \n",
+   LOC_LOGV("%s:%d]: received indication, handle = %p ind_id = %u ",
                  __func__,__LINE__, client_handle, ind_id);
 
    pthread_mutex_lock(&loc_sync_call_mutex);
 
    if (!loc_sync_array.in_use)
    {
-      LOC_LOGD("%s:%d]: loc_sync_array not in use \n",
+      LOC_LOGD("%s:%d]: loc_sync_array not in use ",
                     __func__, __LINE__);
       pthread_mutex_unlock(&loc_sync_call_mutex);
       return;
@@ -211,7 +212,7 @@ void loc_sync_process_ind(
          else
          {
             /* If callback arrives before wait, remember it */
-            LOC_LOGV("%s:%d]: ind %u arrived before wait was called \n",
+            LOC_LOGV("%s:%d]: ind %u arrived before wait was called ",
                           __func__, __LINE__, ind_id);
 
             slot->ind_has_arrived = true;
@@ -263,7 +264,7 @@ static int loc_alloc_slot()
    }
 
    pthread_mutex_unlock(&loc_sync_call_mutex);
-   LOC_LOGV("%s:%d]: returning slot %d\n",
+   LOC_LOGV("%s:%d]: returning slot %d",
                  __func__, __LINE__, select_id);
    return select_id;
 }
@@ -292,7 +293,7 @@ static void loc_free_slot(int select_id)
 
    pthread_mutex_lock(&loc_sync_call_mutex);
 
-   LOC_LOGD("%s:%d]: freeing slot %d\n", __func__, __LINE__, select_id);
+   LOC_LOGD("%s:%d]: freeing slot %d", __func__, __LINE__, select_id);
 
    loc_sync_array.slot_in_use[select_id] = 0;
 
@@ -348,12 +349,12 @@ static int loc_sync_select_ind(
 {
    int select_id = loc_alloc_slot();
 
-   LOC_LOGV("%s:%d]: client handle %p, ind_id %u, req_id %u \n",
+   LOC_LOGV("%s:%d]: client handle %p, ind_id %u, req_id %u ",
                  __func__, __LINE__, client_handle, ind_id, req_id);
 
    if (select_id < 0)
    {
-      LOC_LOGE("%s:%d]: buffer full for this synchronous req %s \n",
+      LOC_LOGE("%s:%d]: buffer full for this synchronous req %s ",
                  __func__, __LINE__, loc_get_v02_event_name(req_id));
       return -ENOMEM;
    }
@@ -404,7 +405,7 @@ static int loc_sync_wait_for_ind(
 {
    if (select_id < 0 || select_id >= LOC_SYNC_REQ_BUFFER_SIZE || !loc_sync_array.slot_in_use[select_id])
    {
-      LOC_LOGE("%s:%d]: invalid select_id: %d \n",
+      LOC_LOGE("%s:%d]: invalid select_id: %d ",
                     __func__, __LINE__, select_id);
 
       return (-EINVAL);
@@ -430,7 +431,7 @@ static int loc_sync_wait_for_ind(
 
       if (slot->ind_is_waiting)
       {
-         LOC_LOGW("%s:%d]: already waiting in this slot %d\n", __func__,
+         LOC_LOGW("%s:%d]: already waiting in this slot %d", __func__,
                        __LINE__, select_id);
          ret_val = -EBUSY; // busy
          break;
@@ -453,7 +454,7 @@ static int loc_sync_wait_for_ind(
 
       if(rc == ETIMEDOUT)
       {
-         LOC_LOGE("%s:%d]: slot %d, timed out for ind_id %s\n",
+         LOC_LOGE("%s:%d]: slot %d, timed out for ind_id %s",
                     __func__, __LINE__, select_id, loc_get_v02_event_name(ind_id));
          ret_val = -ETIMEDOUT; //time out
       }
@@ -504,7 +505,7 @@ locClientStatusEnumType loc_sync_send_req
    if (select_id >= 0)
    {
       status =  locClientSendReq (client_handle, req_id, req_payload);
-      LOC_LOGV("%s:%d]: select_id = %d,locClientSendReq returned %d\n",
+      LOC_LOGV("%s:%d]: select_id = %d,locClientSendReq returned %d",
                     __func__, __LINE__, select_id, status);
 
       if (status != eLOC_CLIENT_SUCCESS )
@@ -531,7 +532,7 @@ locClientStatusEnumType loc_sync_send_req
          else
          {
             status =  eLOC_CLIENT_SUCCESS;
-            LOC_LOGV("%s:%d]: success (select id %d)\n",
+            LOC_LOGV("%s:%d]: success (select id %d)",
                           __func__, __LINE__, select_id);
          }
       }

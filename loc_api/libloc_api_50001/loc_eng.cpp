@@ -1,4 +1,4 @@
-/* Copyright (c) 2009-2012 The Linux Foundation. All rights reserved.
+/* Copyright (c) 2009-2012,2016 The Linux Foundation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -168,7 +168,7 @@ LocEngContext::LocEngContext(gps_create_thread threadCreator) :
     deferred_action_thread(threadCreator("loc_eng",loc_eng_deferred_action_thread, this)),
     counter(0)
 {
-    LOC_LOGV("LocEngContext %d : %d pthread_id %ld\n",
+    LOC_LOGV("LocEngContext %d : %d pthread_id %ld",
              getpid(), GETTID_PLATFORM_LIB_ABSTRACTION,
              deferred_action_thread);
 }
@@ -331,7 +331,7 @@ int loc_eng_init(loc_eng_data_s_type &loc_eng_data, LocCallbacks* callbacks,
         ((LocEngContext*)(loc_eng_data.context))->drop();
         loc_eng_data.context = NULL;
     } else {
-        LOC_LOGD("loc_eng_init created client, id = %p\n", loc_eng_data.client_handle);
+        LOC_LOGD("loc_eng_init created client, id = %p", loc_eng_data.client_handle);
 
         // call reinit to send initialization messages
        int tries = 30;
@@ -887,7 +887,7 @@ void loc_eng_agps_init(loc_eng_data_s_type &loc_eng_data, AGpsCallbacks* callbac
             loc_eng_dmn_conn_loc_api_server_launch(callbacks->create_thread_cb,
                                                    NULL, NULL, &loc_eng_data);
         } else {
-            LOC_LOGD("%s:%d] loc_eng_dmn_conn_loc_api_server was not initialized.baseband = %s\n",
+            LOC_LOGD("%s:%d] loc_eng_dmn_conn_loc_api_server was not initialized.baseband = %s",
             __func__, __LINE__, baseband);
         }
     }
@@ -923,7 +923,7 @@ int loc_eng_agps_open(loc_eng_data_s_type &loc_eng_data, AGpsType agpsType,
 
     if (apn == NULL)
     {
-        LOC_LOGE("APN Name NULL\n");
+        LOC_LOGE("APN Name NULL");
         return 0;
     }
 
@@ -1036,7 +1036,7 @@ static boolean resolve_in_addr(const char *host_addr, struct in_addr *in_addr_pt
         if (inet_aton(host_addr, in_addr_ptr) == 0)
         {
             /* IP not valid */
-            LOC_LOGE("DNS query on '%s' failed\n", host_addr);
+            LOC_LOGE("DNS query on '%s' failed", host_addr);
             ret_val = FALSE;
         }
     }
@@ -1084,7 +1084,7 @@ static int loc_eng_set_server(loc_eng_data_s_type &loc_eng_data,
         struct in_addr addr;
         if (!resolve_in_addr(hostname, &addr))
         {
-            LOC_LOGE("loc_eng_set_server, hostname %s cannot be resolved.\n", hostname);
+            LOC_LOGE("loc_eng_set_server, hostname %s cannot be resolved.", hostname);
             ret = -2;
         } else {
             unsigned int ip = htonl(addr.s_addr);
@@ -1096,7 +1096,7 @@ static int loc_eng_set_server(loc_eng_data_s_type &loc_eng_data,
                       msg, loc_eng_free_msg);
         }
     } else {
-        LOC_LOGE("loc_eng_set_server, type %d cannot be resolved.\n", type);
+        LOC_LOGE("loc_eng_set_server, type %d cannot be resolved.", type);
     }
 
     EXIT_LOG(%d, ret);
@@ -1181,7 +1181,7 @@ void loc_eng_agps_ril_update_network_availability(loc_eng_data_s_type &loc_eng_d
     INIT_CHECK(loc_eng_data.context, return);
     if (apn != NULL)
     {
-        LOC_LOGD("loc_eng_agps_ril_update_network_availability: APN Name = [%s]\n", apn);
+        LOC_LOGD("loc_eng_agps_ril_update_network_availability: APN Name = [%s]", apn);
         int apn_len = smaller_of(strlen (apn), MAX_APN_LEN);
         loc_eng_msg_set_data_enable *msg(new loc_eng_msg_set_data_enable(&loc_eng_data, apn,
                                                                          apn_len, available));
@@ -1337,19 +1337,19 @@ static void loc_eng_deferred_action_thread(void* arg)
 
     while (1)
     {
-        LOC_LOGD("%s:%d] %d listening ...\n", __func__, __LINE__, cnt++);
+        LOC_LOGD("%s:%d] %d listening ...", __func__, __LINE__, cnt++);
 
         // we are only sending / receiving msg pointers
         msq_q_err_type result = msg_q_rcv((void*)context->deferred_q, (void **) &msg);
         if (eMSG_Q_SUCCESS != result) {
-            LOC_LOGE("%s:%d] fail receiving msg: %s\n", __func__, __LINE__,
+            LOC_LOGE("%s:%d] fail receiving msg: %s", __func__, __LINE__,
                      loc_get_msg_q_status(result));
             return;
         }
 
         loc_eng_data_s_type* loc_eng_data_p = (loc_eng_data_s_type*)msg->owner;
 
-        LOC_LOGD("%s:%d] received msg_id = %s context = %p\n",
+        LOC_LOGD("%s:%d] received msg_id = %s context = %p",
                  __func__, __LINE__, loc_get_msg_name(msg->msgid), loc_eng_data_p->context);
 
         // need to ensure the instance data is valid
@@ -1391,7 +1391,7 @@ static void loc_eng_deferred_action_thread(void* arg)
             if (loc_eng_data_p->agps_request_pending)
             {
                 loc_eng_data_p->stop_request_pending = true;
-                LOC_LOGD("loc_eng_stop - deferring stop until AGPS data call is finished\n");
+                LOC_LOGD("loc_eng_stop - deferring stop until AGPS data call is finished");
             } else {
                 loc_eng_stop_handler(*loc_eng_data_p);
             }
@@ -1519,7 +1519,7 @@ static void loc_eng_deferred_action_thread(void* arg)
                                 ULP_LOCATION_IS_FROM_HYBRID == rpMsg->location.position_source) ||
                                ((LOC_POS_TECH_MASK_SATELLITE & rpMsg->technology_mask) ||
                                 (LOC_POS_TECH_MASK_SENSORS & rpMsg->technology_mask)))) ||
-                             (LOC_SESS_INTERMEDIATE == loc_eng_data_p->intermediateFix &&
+                             (LOC_SESS_INTERMEDIATE == rpMsg->status &&
                               !((rpMsg->location.flags & GPS_LOCATION_HAS_ACCURACY) &&
                                 (gps_conf.ACCURACY_THRES != 0) &&
                                 (rpMsg->location.accuracy > gps_conf.ACCURACY_THRES)))) {
@@ -1590,7 +1590,7 @@ static void loc_eng_deferred_action_thread(void* arg)
             } else if (brqMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_ANY) {
                 stateMachine = loc_eng_data_p->internet_nif;
             } else {
-                LOC_LOGD("%s]%d: unknown I/F request type = 0x%x\n", __func__, __LINE__, brqMsg->ifType);
+                LOC_LOGD("%s]%d: unknown I/F request type = 0x%x", __func__, __LINE__, brqMsg->ifType);
                 break;
             }
             BITSubscriber subscriber(stateMachine, brqMsg->ipv4Addr, brqMsg->ipv6Addr);
@@ -1608,7 +1608,7 @@ static void loc_eng_deferred_action_thread(void* arg)
             } else if (brlMsg->ifType == LOC_ENG_IF_REQUEST_TYPE_ANY) {
                 stateMachine = loc_eng_data_p->internet_nif;
             } else {
-                LOC_LOGD("%s]%d: unknown I/F request type = 0x%x\n", __func__, __LINE__, brlMsg->ifType);
+                LOC_LOGD("%s]%d: unknown I/F request type = 0x%x", __func__, __LINE__, brlMsg->ifType);
                 break;
             }
             BITSubscriber subscriber(stateMachine, brlMsg->ipv4Addr, brlMsg->ipv6Addr);
@@ -1797,7 +1797,7 @@ static void loc_eng_deferred_action_thread(void* arg)
         {
             loc_eng_msg_request_network_position *nlprequestmsg = (loc_eng_msg_request_network_position*)msg;
             //loc_eng_handle_request_network_position(nlprequestmsg );
-            LOC_LOGD("Received n/w position request from ULP.Request type %d Periodicity: %d\n",
+            LOC_LOGD("Received n/w position request from ULP.Request type %d Periodicity: %d",
                      nlprequestmsg->networkPosRequest.request_type,
                       nlprequestmsg->networkPosRequest.interval_ms);
             if(loc_eng_data_p->ulp_network_callback != NULL)
@@ -1824,7 +1824,7 @@ static void loc_eng_deferred_action_thread(void* arg)
         break;
 
         default:
-            LOC_LOGE("unsupported msgid = %d\n", msg->msgid);
+            LOC_LOGE("unsupported msgid = %d", msg->msgid);
             break;
         }
 
@@ -1910,7 +1910,7 @@ bool loc_eng_inject_raw_command(loc_eng_data_s_type &loc_eng_data,
     ENTRY_LOG_CALLFLOW();
     INIT_CHECK(loc_eng_data.context, return -1);
     boolean ret_val;
-    LOC_LOGD("loc_eng_send_extra_command: %s\n", command);
+    LOC_LOGD("loc_eng_send_extra_command: %s", command);
     ret_val = TRUE;
 
     if((loc_eng_data.ulp_initialized == true) && (gps_conf.CAPABILITIES & ULP_CAPABILITY))
@@ -1954,7 +1954,7 @@ int loc_eng_update_criteria(loc_eng_data_s_type &loc_eng_data,
 
     if((loc_eng_data.ulp_initialized == true) && (gps_conf.CAPABILITIES & ULP_CAPABILITY))
     {
-       LOC_LOGD("SJ:loc_eng_update_criteria: valid 0x%x action:%d, minTime:%ld, minDistance:%f, singleShot:%d, horizontalAccuracy:%d, powerRequirement:%d \n",
+       LOC_LOGD("SJ:loc_eng_update_criteria: valid 0x%x action:%d, minTime:%ld, minDistance:%f, singleShot:%d, horizontalAccuracy:%d, powerRequirement:%d ",
          criteria.valid_mask, criteria.action, criteria.min_interval, criteria.min_distance,  criteria.recurrence_type,  criteria.preferred_horizontal_accuracy,
               criteria.preferred_power_consumption );
      ulp_msg_update_criteria *msg(
@@ -1995,7 +1995,7 @@ int loc_eng_ulp_phone_context_settings_update(loc_eng_data_s_type &loc_eng_data,
 
     LOC_LOGD("loc_eng_ulp_phone_context_settings: context_type - 0x%x is_agps_enabled - %d "
              "is_battery_charging %d ,is_gps_enabled %d, is_network_position_available %d,"
-             "is_wifi_setting_enabled %d, is_agps_setting_enabled %d, is_enh_location_services_enabled %d\n",
+             "is_wifi_setting_enabled %d, is_agps_setting_enabled %d, is_enh_location_services_enabled %d",
              settings->context_type ,settings->is_agps_enabled,settings->is_battery_charging,
              settings->is_gps_enabled, settings->is_network_position_available,
              settings->is_wifi_setting_enabled, settings->is_agps_enabled,
@@ -2134,7 +2134,7 @@ int loc_eng_read_config(void)
       UTIL_READ_CONF(GPS_CONF_FILE, loc_parameter_table);
       gpsConfigAlreadyRead = true;
     } else {
-      LOC_LOGV("GPS Config file has already been read\n");
+      LOC_LOGV("GPS Config file has already been read");
     }
 
     EXIT_LOG(%d, 0);

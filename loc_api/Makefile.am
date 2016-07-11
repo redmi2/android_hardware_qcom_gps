@@ -34,7 +34,6 @@ libloc_api_la_SOURCES = \
             loc_api_v02/loc_api_sync_req.c \
             loc_api_v02/location_service_v02.c \
             loc_api_v02/LocApiV02Adapter.h \
-            loc_api_v02/loc_util_log.h \
             loc_api_v02/location_service_v02.h \
             loc_api_v02/loc_api_sync_req.h \
             loc_api_v02/loc_api_v02_client.h \
@@ -58,6 +57,7 @@ libloc_eng_so_la_SOURCES = \
     libloc_api_50001/loc_eng_xtra.cpp \
     libloc_api_50001/loc_eng_ni.cpp \
     libloc_api_50001/loc_eng_log.cpp \
+    libloc_api_50001/loc_gnss.cpp \
     libloc_api_50001/loc_eng_dmn_conn.cpp \
     libloc_api_50001/loc_eng_dmn_conn_handler.cpp \
     libloc_api_50001/loc_eng_dmn_conn_thread_helper.c \
@@ -106,8 +106,8 @@ library_include_HEADERS = \
    libloc_api_50001/loc_eng_msg.h \
    libloc_api_50001/loc_eng_msg_id.h \
    libloc_api_50001/loc_eng_log.h \
+   libloc_api_50001/loc_gnss.h \
    loc_api_v02/LocApiV02Adapter.h \
-   loc_api_v02/loc_util_log.h \
    loc_api_v02/location_service_v02.h \
    loc_api_v02/loc_api_sync_req.h \
    loc_api_v02/loc_api_v02_client.h \
