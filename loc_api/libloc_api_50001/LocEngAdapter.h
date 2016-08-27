@@ -85,6 +85,7 @@ public:
     bool mSupportsAgpsRequests;
     bool mSupportsPositionInjection;
     bool mSupportsTimeInjection;
+    GnssSystemInfo mGnssInfo;
 
     LocEngAdapter(LOC_API_ADAPTER_EVENT_MASK_T mask,
                   void* owner, ContextBase* context,
@@ -289,7 +290,7 @@ public:
     virtual bool requestSuplES(int connHandle);
     virtual bool reportDataCallOpened();
     virtual bool reportDataCallClosed();
-    virtual void reportGpsMeasurementData(GpsData &gpsMeasurementData);
+    virtual void reportGnssMeasurementData(GnssData &gnssMeasurementData);
 
     inline const LocPosMode& getPositionMode() const
     {return mFixCriteria;}
