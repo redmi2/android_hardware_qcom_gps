@@ -290,6 +290,7 @@ LocEngStopFix::LocEngStopFix(LocEngAdapter* adapter) :
 inline void LocEngStopFix::proc() const
 {
     loc_eng_data_s_type* locEng = (loc_eng_data_s_type*)mAdapter->getOwner();
+    mAdapter->clearGnssSvUsedListData();
     loc_eng_stop_handler(*locEng);
 }
 inline void LocEngStopFix::locallog() const
@@ -796,6 +797,10 @@ void LocEngReportPosition::proc() const {
                         (gps_conf.ACCURACY_THRES != 0) &&
                         (mLocation.gpsLocation.accuracy >
                          gps_conf.ACCURACY_THRES)))) {
+                if (mLocationExtended.flags & GPS_LOCATION_EXTENDED_HAS_GNSS_SV_USED_DATA)
+                {
+                    adapter->setGnssSvUsedListData(mLocationExtended.gnss_sv_used_ids);
+                }
                 locEng->location_cb((UlpLocation*)&(mLocation),
                                     (void*)mLocationExt);
                 reported = true;
@@ -870,14 +875,29 @@ void LocEngReportSv::proc() const {
 
     if (locEng->mute_session_state != LOC_MUTE_SESS_IN_SESSION)
     {
+        GnssSvStatus gnssSvStatus;
+        memcpy(&gnssSvStatus,&mSvStatus,sizeof(GnssSvStatus));
+        if (adapter->isGnssSvIdUsedInPosAvail())
+        {
+            GnssSvUsedInPosition gnssSvIdUsedInPosition =
+                                adapter->getGnssSvUsedListData();
+            gnssSvStatus.gps_used_in_fix_mask =
+                        gnssSvIdUsedInPosition.gps_sv_used_ids_mask;
+            gnssSvStatus.glo_used_in_fix_mask =
+                        gnssSvIdUsedInPosition.glo_sv_used_ids_mask;
+            gnssSvStatus.bds_used_in_fix_mask =
+                        gnssSvIdUsedInPosition.bds_sv_used_ids_mask;
+            gnssSvStatus.gal_used_in_fix_mask =
+                        gnssSvIdUsedInPosition.gal_sv_used_ids_mask;
+        }
         if (locEng->sv_status_cb != NULL) {
-            locEng->sv_status_cb((GpsSvStatus*)&(mSvStatus),
+            locEng->sv_status_cb((GpsSvStatus*)&(gnssSvStatus),
                                  (void*)mSvExt);
         }
 
         if (locEng->generateNmea)
         {
-            loc_eng_nmea_generate_sv(locEng, mSvStatus, mLocationExtended);
+            loc_eng_nmea_generate_sv(locEng, gnssSvStatus, mLocationExtended);
         }
     }
 }
