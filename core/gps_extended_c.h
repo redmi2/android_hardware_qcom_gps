@@ -299,17 +299,47 @@ typedef struct {
      */
     uint32_t    glo_used_in_fix_mask;
 
+    /** Represents a bit mask indicating which GLONASS SVs
+     * have ephemeris data.
+     */
+    uint64_t    glo_ephemeris_mask;
+
+    /** Represents a bit mask indicating which GLONASS SVs
+     * have almanac data.
+     */
+    uint64_t    glo_almanac_mask;
+
     /**
      * Represents a bit mask indicating which BDS SVs
      * were used for computing the most recent position fix.
      */
     uint64_t    bds_used_in_fix_mask;
 
+    /** Represents a bit mask indicating which BDS SVs
+     * have ephemeris data.
+     */
+    uint64_t    bds_ephemeris_mask;
+
+    /** Represents a bit mask indicating which BDS SVs
+     * have almanac data.
+     */
+    uint64_t    bds_almanac_mask;
+
     /**
      * Represents a bit mask indicating which GALILEO SVs
      * were used for computing the most recent position fix.
      */
     uint64_t    gal_used_in_fix_mask;
+
+    /** Represents a bit mask indicating which GALILEO SVs
+     * have ephemeris data.
+     */
+    uint64_t    gal_ephemeris_mask;
+
+    /** Represents a bit mask indicating which GALILEO SVs
+     * have almanac data.
+     */
+    uint64_t    gal_almanac_mask;
 
 } GnssSvStatus;
 
