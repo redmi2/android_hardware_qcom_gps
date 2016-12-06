@@ -258,12 +258,18 @@ void LocApiBase::reportSv(GnssSvStatus &svStatus,
                   void* svExt)
 {
     // print the SV info before delivering
-    LOC_LOGV("num sv: %d\n  ephemeris mask: %dxn  almanac mask: %x\n  gps/glo/bds/gal in use"
-             " mask: %x/%x/%x/%x\n      sv: prn         snr       elevation      azimuth",
-             svStatus.num_svs, svStatus.ephemeris_mask,
-             svStatus.almanac_mask, svStatus.gps_used_in_fix_mask,
-             svStatus.glo_used_in_fix_mask, svStatus.bds_used_in_fix_mask,
-             svStatus.gal_used_in_fix_mask);
+    LOC_LOGV("num sv: %d\n  ephemeris mask: %x  almanac mask: %x\n"
+             "glo ephemeris mask: %x glo almanac mask: %x\n"
+             "bds ephemeris mask: %x bds almanac mask: %x\n"
+             "gal ephemeris mask: %x gal almanac mask: %x\n"
+             "gps/glo/bds/gal in use mask: %x/%x/%x/%x\n"
+             "sv: prn         snr       elevation      azimuth",
+             svStatus.num_svs, svStatus.ephemeris_mask, svStatus.almanac_mask,
+             svStatus.glo_ephemeris_mask, svStatus.glo_almanac_mask,
+             svStatus.bds_ephemeris_mask, svStatus.bds_almanac_mask,
+             svStatus.gal_ephemeris_mask, svStatus.gal_almanac_mask,
+             svStatus.gps_used_in_fix_mask, svStatus.glo_used_in_fix_mask,
+             svStatus.bds_used_in_fix_mask, svStatus.gal_used_in_fix_mask);
     for (int i = 0; i < svStatus.num_svs && i < GPS_MAX_SVS; i++) {
         LOC_LOGV("   %d:   %d    %f    %f    %f",
                  i,
